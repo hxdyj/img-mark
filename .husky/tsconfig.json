@@ -1,0 +1,14 @@
+{
+  "target": "esnext",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "lib": ["esnext"]
+  },
+  "ts-node": {
+    "files": true,
+    "compilerOptions": {
+      "module": "nodenext"
+    }
+  }
+}

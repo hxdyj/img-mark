@@ -1,0 +1,3 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+ts-node -P "./.husky/tsconfig.json" "./.husky/hooks/verifyCommit.ts" $1
