@@ -20,7 +20,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'@': pathSrc,
-			'learnable-lib': pathVue3,
+			'img-mark': pathVue3,
 		},
 	},
 	css: {

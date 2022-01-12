@@ -2,9 +2,9 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
 	{
-		path: '/KeMathJax',
-		name: 'KeMathJax',
-		component: () => import('../views/KeMathJax.vue'),
+		path: '/',
+		name: 'pc',
+		component: () => import('../views/TestImgMark.vue'),
 	},
 ]
 
