@@ -11,22 +11,23 @@
 				@cropChange="cropChange"
 				@tagsStatusChange="tagsStatusChange"
 				:enableDrawCropOutOfImg="false"
-				:enableDrawTagOutOfCrop="true"
+				:enableDrawTagOutOfCrop="false"
 				:enableDrawTagOutOfImg="false"
 			></ImgMark>
 		</div>
 		<div class="info-panel">
+			{{ tagList }}
 			<el-input v-model="src"></el-input>
-			<el-alert :title="cropInfo" type="info" style="margin-top: 20px"> </el-alert>
+			<el-alert :title="JSON.stringify(cropInfo)" type="info" style="margin-top: 20px"> </el-alert>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="removeTag()">Remove All</el-button>
-			<el-alert v-for="(item, index) in tagList" @close="removeTag([item])" style="margin-top: 20px" :key="index" :title="item" type="warning"> </el-alert>
+			<el-alert v-for="item in tagList" @close="removeTag([item])" style="margin-top: 20px" :key="uid(6)" :title="JSON.stringify(item)" type="warning">
+			</el-alert>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { ImgMark, Mode, BoundingBox } from 'img-mark'
-
+import { uid } from 'uid'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('crop')
 let cropInfo = $ref<BoundingBox>()

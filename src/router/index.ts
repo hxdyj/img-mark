@@ -6,6 +6,11 @@ const routes: Array<RouteRecordRaw> = [
 		name: 'pc',
 		component: () => import('../views/TestImgMark.vue'),
 	},
+	{
+		path: '/multi',
+		name: 'multi',
+		component: () => import('../views/TestImgMarkMulti.vue'),
+	},
 ]
 
 export const constRoutes = routes.filter(i => i.meta?.isConstRoute)

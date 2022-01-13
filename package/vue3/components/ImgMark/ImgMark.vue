@@ -1,3 +1,11 @@
+<!--
+TODO
+1. multi crop (how to del crop)
+2. custom color and fontsize
+3. prop isShowTip
+4. prop enableCropResize
+
+ -->
 <template>
 	<div
 		class="comp-ocr-img"
@@ -29,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import {
@@ -238,7 +247,6 @@ async function initComponent() {
 		x: containerRectInfo.x,
 		y: containerRectInfo.y,
 	}
-	//TODO 多个组件的情况
 	addListenerKeyUpDown()
 	ctx = canvasRef.getContext('2d')
 	ctx2 = canvas2Ref.getContext('2d')
@@ -831,7 +839,9 @@ function removeTagItems(removeList: BoundingBox[]) {
 	console.log('newList', newTagArr)
 	tagArr = initTagArrScale(newTagArr, scale)
 	nextTick(() => {
-		if (!ctx2 || !cropInfo) return
+		if (!ctx2 || !cropInfo) {
+			throw new Error(`ctx2 or cropInfo can't find on removeItem.`)
+		}
 		drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
 		drawTagList(ctx2, tagArr, currentPosition)
 		triggerTagListChange()
