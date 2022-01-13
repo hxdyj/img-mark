@@ -1,8 +1,3 @@
-<!--
-TODO
-1. scale at image mouse origin
- -->
-
 <template>
 	<div
 		class="comp-ocr-img"
@@ -34,7 +29,7 @@ TODO
 </template>
 
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, reactive, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import {
 	BoundingBox,
@@ -79,17 +74,16 @@ type SetTimeout = ReturnType<typeof setTimeout>
 
 let spaceKeyDown = false
 let isWheeling: boolean
-let wheelSetTimeout: SetTimeout | undefined
 let mouseDownTime: number | undefined = undefined
 let mouseUpTime: number | undefined = undefined
 
-let zoomIntensity = 0.02
+let zoomIntensity = 0.1
 let mouseDownOnCropBorderOrVertex: ResizeItem | undefined
 let hasHoverRectInCanvas = false
 
 function initVar() {
 	hasHoverRectInCanvas = false
-	zoomIntensity = 0.02
+	zoomIntensity = 0.1
 	mouseDownOnCropBorderOrVertex = undefined
 }
 let props = withDefaults(
@@ -126,7 +120,6 @@ let emits = defineEmits<{
 type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>
 
 let inited = false
-let isWheeled = false
 let ctx: CanvasRenderingContext2D | null = null
 let ctx2: CanvasRenderingContext2D | null = null
 let img: HTMLImageElement | undefined
@@ -159,7 +152,6 @@ let tagArr: BoundingBox[] = []
 
 function initDataVar() {
 	inited = false
-	isWheeled = false
 	ctx = null
 	ctx2 = null
 	img = undefined
@@ -225,7 +217,7 @@ function removeListenerKeyUpDown() {
 	document.removeEventListener('keyup', onKeyUpListener)
 }
 
-async function initComponent(isFirst?: boolean) {
+async function initComponent() {
 	//处理文件变量
 	initVar()
 	//初始化Vue data变量
@@ -233,6 +225,7 @@ async function initComponent(isFirst?: boolean) {
 	await nextTick()
 	//初始化prop到data
 	cropInfo = props.cropBounding
+
 	tagArr = props.tagList
 	let containerRectInfo = containerRef.getBoundingClientRect()
 	containerInfo = {
@@ -246,9 +239,7 @@ async function initComponent(isFirst?: boolean) {
 		y: containerRectInfo.y,
 	}
 	//TODO 多个组件的情况
-	if (isFirst === true) {
-		addListenerKeyUpDown()
-	}
+	addListenerKeyUpDown()
 	ctx = canvasRef.getContext('2d')
 	ctx2 = canvas2Ref.getContext('2d')
 	if (!ctx || !ctx2) return Promise.reject(`Error: can't find canvas element.`)
@@ -268,69 +259,113 @@ async function initComponent(isFirst?: boolean) {
 		scale = cropScale = initScaleInfo.scale
 		if (debug) console.log('Scale', scale)
 		if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
-		if (isFirst === true) {
-			//处理没有cropInfo的情况
-			if (!cropInfo) {
-				if (initScaleInfo.fit === 'width') {
-					currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
-				} else {
-					currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
-				}
-				cropInfo = {
-					startX: 0,
-					startY: 0,
-					endX: 0 + imgWH.width,
-					endY: 0 + imgWH.height,
-				}
+		//处理没有cropInfo的情况
+		if (!cropInfo) {
+			if (initScaleInfo.fit === 'width') {
+				currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
+			} else {
+				currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
 			}
-			//处理有CropInfo的情况，放大裁剪区域之全屏
-			else {
-				if (debug) console.log(cropInfo)
-				let cropBoxInfo = transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition)
-				let commonOffset = 50
-				let widthRate = canvasWH.width / (cropBoxInfo[2] + commonOffset)
-				let heightRate = canvasWH.height / (cropBoxInfo[3] + commonOffset)
-				if (debug) console.log('RATE', widthRate, heightRate)
-				// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
-				let boxStretchScale = cropBoxInfo[2] >= cropBoxInfo[3] ? widthRate : heightRate // 长边尽量展示出来
-				let canvasZoom = Math.sqrt(boxStretchScale)
-				if (debug) console.log('currentPosition before', currentPosition)
-				currentPosition.x = currentPosition.x - cropInfo.startX * scale * canvasZoom + commonOffset / 2
-				currentPosition.y = currentPosition.y - cropInfo.startY * scale * canvasZoom + commonOffset / 2
-				if (debug) console.log('currentPosition after', currentPosition)
-				if (debug)
-					console.log('Fix Full', canvasWH, cropBoxInfo, cropBoxInfo[2] * boxStretchScale, cropBoxInfo[3] * boxStretchScale, boxStretchScale, canvasZoom)
-				onMouseWheel(
-					{
-						deltaY: 1,
-						clientX: 0,
-						clientY: 0,
-						preventDefault() {
-							if (debug) console.log('preventDefault')
-						},
-						__zoom: canvasZoom,
-					} as unknown as MouseEvent,
-					true
-				)
+			cropInfo = {
+				startX: 0,
+				startY: 0,
+				endX: 0 + imgWH.width,
+				endY: 0 + imgWH.height,
 			}
 		}
-		drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale * zoomScale, img.height * scale * zoomScale)
-		let initPosition = transfromBoundingBoxToLtwh(cropInfo!, cropScale, zoomScale, currentPosition)
+		//处理有CropInfo的情况，放大裁剪区域之全屏
+		else {
+			if (debug) console.log(cropInfo)
+			let cropBoxInfo = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
+			let commonOffset = 50
+			let widthRate = canvasWH.width / (cropBoxInfo[2] + commonOffset)
+			let heightRate = canvasWH.height / (cropBoxInfo[3] + commonOffset)
+			if (debug) console.log('RATE', widthRate, heightRate)
+			// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
+			let boxStretchScale = cropBoxInfo[2] >= cropBoxInfo[3] ? widthRate : heightRate // 长边尽量展示出来
+			let canvasZoom = Math.sqrt(boxStretchScale)
+			if (debug) console.log('currentPosition before', currentPosition)
+			currentPosition.x = currentPosition.x - cropInfo.startX * scale * canvasZoom + commonOffset / 2
+			currentPosition.y = currentPosition.y - cropInfo.startY * scale * canvasZoom + commonOffset / 2
+			if (debug) console.log('currentPosition after', currentPosition)
+			if (debug) console.log('Fix Full', canvasWH, cropBoxInfo, cropBoxInfo[2] * boxStretchScale, cropBoxInfo[3] * boxStretchScale, boxStretchScale, canvasZoom)
+			onMouseWheel(
+				{
+					deltaY: 1,
+					clientX: 0,
+					clientY: 0,
+					preventDefault() {
+						if (debug) console.log('preventDefault')
+					},
+					__zoom: canvasZoom,
+				} as unknown as MouseEvent,
+				true
+			)
+		}
+		drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
+		if (!cropInfo) throw new Error(`init Component can't fint cropInfo`)
+		let initPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 		if (debug) console.log('Crop Current', initPosition)
 		drawCropRect(ctx2, ...initPosition)
 		tagArr = initTagArrScale(tagArr, scale)
-		drawTagList(ctx2, tagArr, zoomScale, currentPosition)
+		drawTagList(ctx2, tagArr, currentPosition)
 		return true
 	})
 }
-function init(isFirst?: boolean) {
-	initComponent(isFirst).then(() => {
+function init() {
+	initComponent().then(() => {
 		inited = true
 	})
 }
+
+function initResizeVar() {
+	inited = false
+	canvasWH = cloneDeep(defaultWH)
+	startMousePoint = cloneDeep(defaultPoint)
+	endMousePoint = cloneDeep(defaultPoint)
+	containerInfo = undefined
+}
+
+async function resizeRender() {
+	initResizeVar()
+	await nextTick()
+	let containerRectInfo = containerRef.getBoundingClientRect()
+	containerInfo = {
+		top: containerRectInfo.top,
+		right: containerRectInfo.right,
+		bottom: containerRectInfo.bottom,
+		left: containerRectInfo.left,
+		width: containerRectInfo.width,
+		height: containerRectInfo.height,
+		x: containerRectInfo.x,
+		y: containerRectInfo.y,
+	}
+
+	if (!ctx || !ctx2 || !img) {
+		console.error(`ctx or ctx2 or img can't find on resize.`)
+		return
+	}
+	canvasWH = amendDpi(getElementWH(ctx.canvas))
+	if (!canvasWH) return Promise.reject(`Error: can't get canvas height and width.`)
+	initCanvasWH(ctx, canvasWH)
+	initCanvasWH(ctx2, canvasWH)
+	ctx.scale(zoomScale, zoomScale)
+	ctx2.scale(zoomScale, zoomScale)
+	ctx.translate(-origin.x, -origin.y)
+	ctx2.translate(-origin.x, -origin.y)
+	drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
+	if (!cropInfo) throw new Error(`init Component can't fint cropInfo`)
+	let initPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
+	if (debug) console.log('Crop Current', initPosition)
+	drawCropRect(ctx2, ...initPosition)
+	tagArr = initTagArrScale(tagArr, scale)
+	drawTagList(ctx2, tagArr, currentPosition)
+	inited = true
+}
+
 function onWindowResize() {
 	requestAnimationFrame(() => {
-		init()
+		resizeRender()
 	})
 }
 onBeforeUnmount(() => {
@@ -340,7 +375,7 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
-	init(true)
+	init()
 	window.addEventListener('resize', onWindowResize)
 })
 //修正鼠标cursor
@@ -356,13 +391,12 @@ watch(
 	() => props.src,
 	src => {
 		if (!src) return
-		init(true)
+		init()
 	}
 )
 watch(
 	() => props.cropBounding,
 	info => {
-		resetWheelStatus(true)
 		cropInfo = info || {
 			startX: 0,
 			startY: 0,
@@ -371,21 +405,20 @@ watch(
 		}
 		//cropBounding改变，相当于需要重新改变cropScale
 		cropScale = scale
-		let initPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition)
+		let initPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 		if (!ctx2) return
 		drawCropRect(ctx2, ...initPosition)
-		drawTagList(ctx2, tagArr, zoomScale, currentPosition)
+		drawTagList(ctx2, tagArr, currentPosition)
 	}
 )
 
 watch(
 	() => props.tagList,
 	list => {
-		resetWheelStatus(true)
 		tagArr = initTagArrScale(list, scale)
 		if (!ctx2 || !cropInfo) return
-		drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition))
-		drawTagList(ctx2, tagArr, zoomScale, currentPosition, undefined, undefined, undefined)
+		drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
+		drawTagList(ctx2, tagArr, currentPosition)
 	}
 )
 function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
@@ -403,10 +436,7 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	event.preventDefault()
 	if (spaceKeyDown) return
 	if ((startMousePoint.x !== undefined || endMousePoint.x !== undefined) && !event.onTouchMove) return
-	if (!isWheeled) {
-		ctx.translate(origin.x, origin.y)
-		ctx2.translate(origin.x, origin.y)
-	}
+
 	let mousex = privateCall ? 0 : event.clientX - containerInfo.left
 	let mousey = privateCall ? 0 : event.clientY - containerInfo.top
 	// if (debug) console.log('Mouse Position', mousex, mousey)
@@ -414,6 +444,7 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	let zoom = privateCall ? event.__zoom : Math.exp(wheel * zoomIntensity)
 	if (zoomScale * zoom < 0.2) return
 	isWheeling = true
+	// console.log('Origin 1', origin)
 	ctx.translate(origin.x, origin.y)
 	ctx2.translate(origin.x, origin.y)
 	origin = {
@@ -425,46 +456,22 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	ctx2.scale(zoom, zoom)
 	ctx.translate(-origin.x, -origin.y)
 	ctx2.translate(-origin.x, -origin.y)
+	// console.log('Origin 2', {
+	// 	x: -origin.x,
+	// 	y: -origin.y,
+	// })
+
 	zoomScale *= zoom
 	//动态设置字体大小
 	ctx2.font = `${8 * zoomScale}px serif`
 	clearCanvas(ctx)
 	clearCanvas(ctx2)
-	drawImage(ctx, img, -origin.x + currentPosition.x, -origin.y + currentPosition.y, imgWH.width * scale * zoomScale, imgWH.height * scale * zoomScale)
-	let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition)
-	positions[0] += -origin.x
-	positions[1] += -origin.y
+	drawImage(ctx, img, currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
+	let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 	drawCropRect(ctx2, ...positions)
-	drawTagList(ctx2, tagArr, zoomScale, currentPosition, undefined, origin)
-	isWheeled = true
+	drawTagList(ctx2, tagArr, currentPosition, undefined)
 	hasHoverRectInCanvas = false
-	resetWheelStatus()
-}
-
-function resetWheelStatus(immediately = false) {
-	let commonDeal = () => {
-		wheelSetTimeout = undefined
-		isWheeling = false
-		if (isWheeled) {
-			if (ctx) ctx.translate(-origin.x, -origin.y)
-			if (ctx2) ctx2.translate(-origin.x, -origin.y)
-			isWheeled = false
-		}
-	}
-	if (immediately) {
-		if (wheelSetTimeout) {
-			clearTimeout(wheelSetTimeout)
-			commonDeal()
-		}
-	} else {
-		if (wheelSetTimeout) {
-			clearTimeout(wheelSetTimeout)
-			wheelSetTimeout = undefined
-		}
-		wheelSetTimeout = setTimeout(() => {
-			commonDeal()
-		}, 700)
-	}
+	isWheeling = false
 }
 
 function cleartMousePoints() {
@@ -473,11 +480,11 @@ function cleartMousePoints() {
 		if (tmpCurrentPosition) currentPosition = cloneDeep(tmpCurrentPosition)
 		tmpCurrentPosition = undefined
 		if (debug) console.log('CurrentPosition', currentPosition)
-		if (debug) console.log('cropInfo', cropInfo, transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition))
+		if (debug) console.log('cropInfo', cropInfo, transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
 		if (tmpCropPositionInfo) {
 			console.log('Before CROP INFO', cropInfo)
-			cropInfo = getRectInfoByPosition(tmpCropPositionInfo, zoomScale, currentPosition, cropScale)
-			console.log('SET CROP INFO', cropInfo, zoomScale, currentPosition)
+			cropInfo = getRectInfoByPosition(tmpCropPositionInfo, currentPosition, cropScale)
+			console.log('SET CROP INFO 1', cropInfo, zoomScale, currentPosition)
 			triggerCropInfoChange()
 			tmpCropPositionInfo = undefined
 		}
@@ -486,14 +493,14 @@ function cleartMousePoints() {
 			if (props.mode === 'crop') {
 				cropScale = 1
 				if (tmpCropPositionInfo) {
-					cropInfo = getRectInfoByPosition(tmpCropPositionInfo, zoomScale, currentPosition)
-					if (debug) console.log('SET CROP INFO', cropInfo)
+					cropInfo = getRectInfoByPosition(tmpCropPositionInfo, currentPosition)
+					if (debug) console.log('SET CROP INFO 2', cropInfo)
 					triggerCropInfoChange()
 					tmpCropPositionInfo = undefined
 				}
 			} else {
 				if (tmpTagPositionInfo) {
-					let tagInfo = Object.assign(getRectInfoByPosition(tmpTagPositionInfo, zoomScale, currentPosition), {
+					let tagInfo = Object.assign(getRectInfoByPosition(tmpTagPositionInfo, currentPosition), {
 						scale: 1,
 						isShow: true,
 					})
@@ -618,11 +625,7 @@ function onMouseDown(e: MouseEvent) {
 	mouseDownTime = new Date().getTime()
 
 	let event = e as LayerTouchEvent
-	if (isWheeled) {
-		ctx.translate(-origin.x, -origin.y)
-		ctx2.translate(-origin.x, -origin.y)
-		isWheeled = false
-	}
+
 	startMousePoint = {
 		x: event.layerX,
 		y: event.layerY,
@@ -699,9 +702,9 @@ function onMouseMove(e: MouseEvent) {
 	} else {
 		if (props.mode === 'crop') {
 			tmpCropPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin)
-			drawTagList(ctx2, tagArr, zoomScale, currentPosition)
+			drawTagList(ctx2, tagArr, currentPosition)
 		} else {
-			drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition))
+			drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
 			tmpTagPositionInfo = moveDrawTagRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, tagArr, currentPosition)
 		}
 	}
@@ -714,7 +717,6 @@ function onMouseUp() {
 
 function onMouseOut() {
 	if (!inited) return
-	resetWheelStatus(true)
 	containerRef.style.cursor = 'auto'
 	cleartMousePoints()
 }
@@ -730,15 +732,15 @@ function onClick(event) {
 	if (clickInterval > 100) {
 		return
 	}
-	let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition)
+	let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 	drawCropRect(ctx2, ...positions)
 	if (debug) console.log('touchPoint', touchPoint, tagArr)
-	let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, zoomScale, currentPosition, undefined, undefined, touchPoint)
+	let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, undefined, touchPoint)
 	if (isReDraw) {
 		console.log('CHANGE ITEM IS SHOW.')
 		if (debug) console.log('tagArr', tagArr)
 		drawCropRect(ctx2, ...positions)
-		drawTagList(ctx2, tagArr, zoomScale, currentPosition)
+		drawTagList(ctx2, tagArr, currentPosition)
 		triggerTagListChange()
 		emits('tagsStatusChange', getTagList(redrawList))
 	}
@@ -810,14 +812,12 @@ function onTouchEnd(event) {
 /* API */
 function refreshDrawTags() {
 	if (!ctx2 || !cropInfo) return
-	resetWheelStatus(true)
 	tagArr = initTagArrScale(props.tagList, scale)
-	drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition))
-	drawTagList(ctx2, tagArr, zoomScale, currentPosition)
+	drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
+	drawTagList(ctx2, tagArr, currentPosition)
 }
 /* API */
 function removeTagItems(removeList: BoundingBox[]) {
-	resetWheelStatus(true)
 	console.log('removeList', removeList)
 	let newTagArr: BoundingBox[] = []
 	if (removeList.length !== 0) {
@@ -832,8 +832,8 @@ function removeTagItems(removeList: BoundingBox[]) {
 	tagArr = initTagArrScale(newTagArr, scale)
 	nextTick(() => {
 		if (!ctx2 || !cropInfo) return
-		drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition))
-		drawTagList(ctx2, tagArr, zoomScale, currentPosition)
+		drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
+		drawTagList(ctx2, tagArr, currentPosition)
 		triggerTagListChange()
 	})
 }

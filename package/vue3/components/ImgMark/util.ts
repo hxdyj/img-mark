@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash'
 const CancasSafeArea = 100000
 const DPI = window.devicePixelRatio || 1
-export const debug = true
+export const debug = false
 
 export type WH = {
 	width: number
@@ -237,7 +237,6 @@ export function getTwoRectIntersectPart(rect1: BoundingBox, rect2: BoundingBox):
 export function transfromBoundingBoxToLtwh(
 	position: BoundingBox,
 	scale = 1,
-	zoomScale = 1,
 	currentPosition: Point = {
 		x: 0,
 		y: 0,
@@ -247,11 +246,11 @@ export function transfromBoundingBoxToLtwh(
 	let { startX, startY } = fixResult.info
 	let width = fixResult.position[2]
 	let height = fixResult.position[3]
-	return [startX * scale * zoomScale + currentPosition.x, startY * scale * zoomScale + currentPosition.y, width * scale * zoomScale, height * scale * zoomScale]
+	return [startX * scale + currentPosition.x, startY * scale + currentPosition.y, width * scale, height * scale]
 }
 
 export function isRectValidity(rect: BoundingBox) {
-	let position = transfromBoundingBoxToLtwh(rect, 1, 1)
+	let position = transfromBoundingBoxToLtwh(rect, 1)
 	if (position[2] >= 5 && position[3] >= 5) {
 		return true
 	}
@@ -330,24 +329,19 @@ type Offset = {
 export function drawTagList(
 	ctx: CanvasRenderingContext2D,
 	list: BoundingBox[],
-	zoomScale: number,
 	currentPosition: Point,
 	offsetInfo: Offset = {
 		offsetX: 0,
 		offsetY: 0,
-	},
-	origin: Point = {
-		x: 0,
-		y: 0,
 	},
 	touchPoint?: TypePoint
 ) {
 	let isReDraw = false
 	let redrawList: BoundingBox[] = []
 	list.forEach((tagInfo, index) => {
-		let positions = transfromBoundingBoxToLtwh(tagInfo, tagInfo.scale, zoomScale, currentPosition)
-		positions[0] += offsetInfo!.offsetX - origin!.x
-		positions[1] += offsetInfo!.offsetY - origin!.y
+		let positions = transfromBoundingBoxToLtwh(tagInfo, tagInfo.scale, currentPosition)
+		positions[0] += offsetInfo!.offsetX
+		positions[1] += offsetInfo!.offsetY
 		// if (debug) console.log(`DRAW ITEM${index}`, tagInfo, positions)
 		let drawTagInfo = drawTagRect(ctx, ...positions, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine)
 		if (drawTagInfo !== undefined) {
@@ -365,14 +359,22 @@ export function drawTagList(
 }
 
 export function fixMoveRectPosition(position: Rect, zoomScale: number, origin: Point) {
-	position[0] = position[0] / zoomScale + origin.x * 2
-	position[1] = position[1] / zoomScale + origin.y * 2
+	let point = fixPoint(
+		{
+			x: position[0],
+			y: position[1],
+		},
+		zoomScale,
+		origin
+	)
+	position[0] = point.x
+	position[1] = point.y
 	position[2] /= zoomScale
 	position[3] /= zoomScale
 	return position
 }
 
-export function moveDrawCropRect(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, zoomScale = 1, origin: Point) {
+export function moveDrawCropRect(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, zoomScale, origin: Point) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
 		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
@@ -389,7 +391,7 @@ export function moveDrawTagRect(ctx, startPoint, endPoint, zoomScale = 1, origin
 		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
 			// if (debug) console.log('DRAW Tag', position)
-			drawTagList(ctx, tagArr, zoomScale, currentPosition)
+			drawTagList(ctx, tagArr, currentPosition)
 			drawTagRect(ctx, ...position, tagArr.length + 1, undefined, true)
 			return position
 		}
@@ -445,12 +447,13 @@ export function moveCanvas(
 				x: currentPosition.x + offsetX,
 				y: currentPosition.y + offsetY,
 			}
-			drawImage(ctx, img, newPosition.x, newPosition.y, imgWH.width * scale * zoomScale, imgWH.height * scale * zoomScale)
-			let boundingBoxPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition)
+
+			drawImage(ctx, img, newPosition.x, newPosition.y, imgWH.width * scale, imgWH.height * scale)
+			let boundingBoxPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 			boundingBoxPosition[0] += offsetX
 			boundingBoxPosition[1] += offsetY
 			drawCropRect(ctx2, ...boundingBoxPosition)
-			drawTagList(ctx2, tagArr, zoomScale, currentPosition, {
+			drawTagList(ctx2, tagArr, currentPosition, {
 				offsetX,
 				offsetY,
 			})
@@ -468,23 +471,25 @@ export type LayerTouchEvent = (MouseEvent | TouchEvent) & {
 	layerY: number
 }
 
-export function getTouchPoint(event: LayerTouchEvent, zoomScale, origin, type: TouchType): TypePoint {
-	let startPoint = {
-		x: event.layerX,
-		y: event.layerY,
-	}
-	let endPoint = {
-		x: event.layerX + 1,
-		y: event.layerY + 1,
-	}
-	let calcTouchPoint = transfromTwoPointsToLtwh(startPoint, endPoint)
-	calcTouchPoint[0] = calcTouchPoint[0] / zoomScale + origin.x * 2
-	calcTouchPoint[1] = calcTouchPoint[1] / zoomScale + origin.y * 2
-	calcTouchPoint[2] /= zoomScale
-	calcTouchPoint[3] /= zoomScale
+export function fixPoint(point: Point, zoomScale, origin: Point): Point {
 	return {
-		x: calcTouchPoint[0],
-		y: calcTouchPoint[1],
+		x: point.x / zoomScale + origin.x,
+		y: point.y / zoomScale + origin.y,
+	}
+}
+
+export function getTouchPoint(event: LayerTouchEvent, zoomScale, origin: Point, type: TouchType): TypePoint {
+	let startPoint = fixPoint(
+		{
+			x: event.layerX,
+			y: event.layerY,
+		},
+		zoomScale,
+		origin
+	)
+	return {
+		x: startPoint.x,
+		y: startPoint.y,
 		type,
 	}
 }
@@ -512,7 +517,7 @@ export function moveDrawUnshowTagDashRect(
 		let touchPoint = getTouchPoint(e, zoomScale, origin, 'move')
 		let dashArr: BoundingBox[] = []
 		unShowArr.forEach(tag => {
-			let positions = transfromBoundingBoxToLtwh(tag, tag.scale, zoomScale, currentPosition)
+			let positions = transfromBoundingBoxToLtwh(tag, tag.scale, currentPosition)
 			if (pointIsInRect(touchPoint, positions)) {
 				// console.log('DETECT hasTouchPointInArr', positions, touchPoint, [positions[0] + origin.x, positions[1] + origin.y], this, origin, zoomScale)
 				dashArr.push(tag)
@@ -521,13 +526,13 @@ export function moveDrawUnshowTagDashRect(
 		})
 		if (isHasTouchPointInArr) {
 			hasHoverRectInCanvas = true
-			drawTagList(ctx, dashArr, zoomScale, currentPosition, undefined, undefined, touchPoint)
+			drawTagList(ctx, dashArr, currentPosition, undefined, touchPoint)
 		} else {
 			if (hasHoverRectInCanvas) {
 				console.log('CLEAN HOVER Rect')
-				let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition)
+				let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 				drawCropRect(ctx, ...positions)
-				drawTagList(ctx, tagArr, zoomScale, currentPosition, undefined, undefined)
+				drawTagList(ctx, tagArr, currentPosition)
 				hasHoverRectInCanvas = false
 			}
 		}
@@ -546,8 +551,8 @@ export type ResizeItem = {
 	positions: Rect
 }
 
-export function getCropFourBorderRect(cropInfo: BoundingBox, cropScale: number, zoomScale: number, currentPosition: Point) {
-	let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, zoomScale, currentPosition)
+export function getCropFourBorderRect(cropInfo: BoundingBox, cropScale: number, currentPosition: Point) {
+	let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 	const BorderWidth = 6
 	let HalfBorder = BorderWidth / 2
 	let list: ResizeItem[] = [
@@ -623,7 +628,9 @@ export function detectEventIsTriggerOnCropBorderOrVertex(
 	origin: Point
 ) {
 	let touchPoint = getTouchPoint(event, zoomScale, origin, 'move')
-	let borderList = getCropFourBorderRect(cropInfo, cropScale, zoomScale, currentPosition)
+	// console.log('Detect touchPoint', touchPoint)
+	let borderList = getCropFourBorderRect(cropInfo, cropScale, currentPosition)
+	// console.log('BorderRect', borderList)
 	let detectResult = pointIsInRectList(
 		touchPoint,
 		borderList.map(i => i.positions)
@@ -714,17 +721,16 @@ export function moveResizeCrop(
 			let newCropInfo = getResizeCropInfo(
 				cropInfo,
 				{
-					offsetX: offsetX / zoomScale / cropScale,
-					offsetY: offsetY / zoomScale / cropScale,
+					offsetX: offsetX / cropScale,
+					offsetY: offsetY / cropScale,
 				},
 				borderOrVertex
 			)
-			let position = transfromBoundingBoxToLtwh(newCropInfo, cropScale, zoomScale, currentPosition)
+
+			let position = transfromBoundingBoxToLtwh(newCropInfo, cropScale, currentPosition)
 			drawCropRect(ctx, ...position)
-			drawTagList(ctx, tagArr, zoomScale, currentPosition, undefined, undefined, undefined)
-			// let realPosition = cloneDeep(position)
-			// realPosition[2] /= zoomScale
-			// realPosition[3] /= zoomScale
+			drawTagList(ctx, tagArr, currentPosition, undefined, undefined)
+			console.log(offsetX, offsetY)
 			return position
 		}
 	}
@@ -754,8 +760,8 @@ export function getTwoFingerTouchListDistence(
 	}
 }
 
-export function getRectInfoByPosition(position: Rect, zoomScale: number, currentPosition: Point, scale = 1) {
-	let zoom = zoomScale * scale
+export function getRectInfoByPosition(position: Rect, currentPosition: Point, scale = 1) {
+	let zoom = scale
 	let rectInfo = {
 		startX: (position[0] - currentPosition.x) / zoom,
 		startY: (position[1] - currentPosition.y) / zoom,

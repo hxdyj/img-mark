@@ -42,6 +42,14 @@ let tagList = $ref<MyBoundingBox[]>([
 		isShow: true,
 		type: 1,
 	},
+	{
+		startX: 0,
+		startY: 0,
+		endX: 1774,
+		endY: 100,
+		isShow: true,
+		type: 1,
+	},
 ])
 
 let imgMarkRef = $ref<InstanceType<typeof ImgMark>>()
