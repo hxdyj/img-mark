@@ -7,8 +7,7 @@ TODO
 2. custom color and fontsize
 3. prop isShowTip
 4. prop enableCropResize
-5. chunk hooks
-6. README.md API
+5. README.md API
  -->
 <template>
 	<div
@@ -83,6 +82,7 @@ import {
 	initBoundingArrScale,
 	TypePoint,
 	DPI,
+	fixRectInfo,
 } from './util'
 
 let spaceKeyDown = false
@@ -106,7 +106,6 @@ let props = withDefaults(
 		enableDrawTagOutOfCrop?: boolean
 		//是否允许Tag画到img外
 		enableDrawTagOutOfImg?: boolean
-		cropBounding?: BoundingBox
 		cropList?: BoundingBox[]
 		tagList?: BoundingBox[]
 		mode: Mode
@@ -127,7 +126,6 @@ let emits = defineEmits<{
 	(e: 'update:tagList', list: BoundingBox[]): void
 	(e: 'tagListChange', list: BoundingBox[]): void
 	(e: 'update:mode', mode: Mode): void
-	(e: 'update:cropBounding', cropInfo: BoundingBox): void
 	(e: 'tagsStatusChange', list: BoundingBox[]): void
 	(e: 'cropChange'): void
 }>()
@@ -253,8 +251,8 @@ let actions = {
 		}
 	},
 	scale(zoom: number, mouse: Point) {
-		if (!img || !cropInfo || !ctx || !ctx2) {
-			throw new Error(`can't find canvas ctx or img or cropInfo`)
+		if (!img || !ctx || !ctx2) {
+			throw new Error(`can't find canvas ctx or img`)
 		}
 		status.isScaleing = true
 		ctx.translate(origin.x, origin.y)
@@ -280,7 +278,7 @@ let actions = {
 		status.isScaleing = false
 	},
 	move() {
-		if (!ctx || !ctx2 || !img || !cropInfo) return
+		if (!ctx || !ctx2 || !img) return
 		status.isMoving = true
 		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr)
 		if (offsetInfo) {
@@ -424,6 +422,38 @@ function removeListenerKeyUpDown() {
 	document.removeEventListener('keyup', onKeyUpListener)
 }
 
+function initCropInfo() {
+	if (props.cropList.length > 1) {
+		let cropRect = {
+			startX: Infinity,
+			startY: Infinity,
+			endX: -Infinity,
+			endY: -Infinity,
+		}
+		props.cropList.forEach(cropInfo => {
+			let rectInfo = fixRectInfo(cropInfo)
+			if (rectInfo.info.startX < cropRect.startX) {
+				cropRect.startX = rectInfo.info.startX
+			}
+			if (rectInfo.info.startY < cropRect.startY) {
+				cropRect.startY = rectInfo.info.startY
+			}
+			if (rectInfo.info.endX > cropRect.endX) {
+				cropRect.endX = rectInfo.info.endX
+			}
+			if (rectInfo.info.endY > cropRect.endY) {
+				cropRect.endY = rectInfo.info.endY
+			}
+		})
+		cropInfo = cropRect
+		debugger
+	}
+	if (props.cropList.length == 1) {
+		cropInfo = props.cropList[0]
+		debugger
+	}
+}
+
 async function initComponent() {
 	//处理文件变量
 	initVar()
@@ -431,8 +461,7 @@ async function initComponent() {
 	initDataVar()
 	await nextTick()
 	//初始化prop到data
-	cropInfo = props.cropBounding
-
+	initCropInfo()
 	tagArr = props.tagList
 	cropArr = props.cropList
 	let containerRectInfo = containerRef.getBoundingClientRect()
@@ -481,6 +510,7 @@ async function initComponent() {
 			}
 		}
 		//处理有CropInfo的情况，放大裁剪区域之全屏
+		//TODO BUG
 		else {
 			// if (debug) console.log(cropInfo)
 			let cropBoxInfo = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
@@ -510,7 +540,6 @@ async function initComponent() {
 			)
 		}
 		drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
-		if (!cropInfo) throw new Error(`init Component can't fint cropInfo`)
 		// let initPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
 		// if (debug) console.log('Crop Current', initPosition)
 		// drawCropRect(ctx2, ...initPosition)
@@ -558,11 +587,6 @@ async function resizeRender() {
 	ctx.translate(-origin.x, -origin.y)
 	ctx2.translate(-origin.x, -origin.y)
 	drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
-	if (!cropInfo) throw new Error(`init Component can't fint cropInfo`)
-	let initPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
-	if (debug) console.log('Crop Current', initPosition)
-
-	// drawCropRect(ctx2, ...initPosition)
 	cropArr = initBoundingArrScale(cropArr, scale)
 	drawCropList(ctx2, cropArr, currentPosition)
 	tagArr = initBoundingArrScale(tagArr, scale)
@@ -603,7 +627,7 @@ watch(
 watch(
 	() => props.tagList,
 	list => {
-		if (!ctx2 || !cropInfo) return
+		if (!ctx2) return
 		drawCropList(ctx2, cropArr, currentPosition)
 		tagArr = initBoundingArrScale(list, scale)
 		drawTagList(ctx2, tagArr, currentPosition)
@@ -703,9 +727,8 @@ function triggerTagListChange() {
 	})
 }
 
-function getTagList(tagList?: BoundingBox[], _cropInfo?: BoundingBox, initScale?: number, imageWH?: WH) {
+function getTagList(tagList?: BoundingBox[], cropList?: BoundingBox[], initScale?: number, imageWH?: WH) {
 	let list = tagList || tagArr
-	let info = cropInfo || getCropBounding()
 	let resultList = list.map(tag => {
 		let newTagInfo: BoundingBox & {
 			scale?: number
@@ -721,18 +744,19 @@ function getTagList(tagList?: BoundingBox[], _cropInfo?: BoundingBox, initScale?
 		if (newTagInfo.scale === 1) {
 			delete newTagInfo.scale
 		}
-		if (!props.enableDrawTagOutOfCrop) {
-			let intersectPart = getTwoRectIntersectPart(newTagInfo, info)
-			if (!intersectPart) {
-				newTagInfo.__isValidity = false
-			} else {
-				if (!isRectValidity(intersectPart)) {
-					newTagInfo.__isValidity = false
-				} else {
-					Object.assign(newTagInfo, intersectPart)
-				}
-			}
-		}
+		// if (!props.enableDrawTagOutOfCrop) {
+		// 	//TODO
+		// 	let intersectPart = getTwoRectIntersectPart(newTagInfo, info)
+		// 	if (!intersectPart) {
+		// 		newTagInfo.__isValidity = false
+		// 	} else {
+		// 		if (!isRectValidity(intersectPart)) {
+		// 			newTagInfo.__isValidity = false
+		// 		} else {
+		// 			Object.assign(newTagInfo, intersectPart)
+		// 		}
+		// 	}
+		// }
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
 			let whObj = imageWH || imgWH
 			const imgRect = {
@@ -755,40 +779,6 @@ function getTagList(tagList?: BoundingBox[], _cropInfo?: BoundingBox, initScale?
 		return newTagInfo
 	})
 	return resultList.filter(i => i.__isValidity !== false)
-}
-
-function getCropBounding(_cropInfo?: BoundingBox, _cropScale?: number, initScale?: number, imageWH?: WH): BoundingBox {
-	let info = _cropInfo || cropInfo
-	if (!info) {
-		throw new Error(`none cropInfo`)
-	}
-	let _scale = (_cropScale || cropScale) === 1 ? initScale || scale : 1
-	let result = {
-		startX: info.startX / _scale,
-		startY: info.startY / _scale,
-		endX: info.endX / _scale,
-		endY: info.endY / _scale,
-	}
-	if (!props.enableDrawCropOutOfImg) {
-		let whObj = imageWH || imgWH
-		const imgRect = {
-			startX: 0,
-			startY: 0,
-			endX: whObj.width,
-			endY: whObj.height,
-		}
-		let intersectPart = getTwoRectIntersectPart(result, imgRect)
-		if (!intersectPart) {
-			result = imgRect
-		} else {
-			if (isRectValidity(intersectPart)) {
-				result = intersectPart
-			} else {
-				result = imgRect
-			}
-		}
-	}
-	return result
 }
 
 function getCropListBounding(): BoundingBox[] {
@@ -826,7 +816,7 @@ function getCropListBounding(): BoundingBox[] {
 }
 
 function onMouseDown(e: MouseEvent) {
-	if (!inited || !ctx || !ctx2 || !cropInfo) return
+	if (!inited || !ctx || !ctx2) return
 	mouseDownTime = new Date().getTime()
 
 	let event = e as LayerTouchEvent
@@ -939,8 +929,7 @@ function onTouchEnd(event) {
 
 /* API */
 function refreshDrawTags() {
-	if (!ctx2 || !cropInfo) return
-	// drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
+	if (!ctx2) return
 	cropArr = initBoundingArrScale(props.cropList, scale)
 	drawCropList(ctx2, cropArr, currentPosition)
 	tagArr = initBoundingArrScale(props.tagList, scale)
@@ -961,10 +950,9 @@ function removeTagItems(removeList: BoundingBox[]) {
 	console.log('newList', newTagArr)
 	tagArr = initBoundingArrScale(newTagArr, scale)
 	nextTick(() => {
-		if (!ctx2 || !cropInfo) {
-			throw new Error(`ctx2 or cropInfo can't find on removeItem.`)
+		if (!ctx2) {
+			throw new Error(`ctx2  can't find on removeItem.`)
 		}
-		// drawCropRect(ctx2, ...transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition))
 		drawCropList(ctx2, cropArr, currentPosition)
 		drawTagList(ctx2, tagArr, currentPosition)
 		triggerTagListChange()

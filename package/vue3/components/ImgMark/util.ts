@@ -674,7 +674,6 @@ export function detectEventIsTriggerOnCropBorderOrVertex(
 			return getCropFourBorderRect(cropInfo, currentPosition, index)
 		})
 		.flat()
-	console.log(111, touchPoint, event.layerX, event.layerY, borderList)
 
 	let detectResult = pointIsInRectList(
 		touchPoint,

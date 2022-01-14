@@ -37,7 +37,7 @@ let cropList = $ref<BoundingBox[]>([
 	{
 		startX: 0,
 		startY: 0,
-		endX: 1774,
+		endX: 500,
 		endY: 100,
 	},
 	{
