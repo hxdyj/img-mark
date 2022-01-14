@@ -82,6 +82,7 @@ import {
 	drawCropList,
 	initBoundingArrScale,
 	TypePoint,
+	DPI,
 } from './util'
 
 let spaceKeyDown = false
@@ -636,8 +637,8 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	//有startMousePoint的时候也不能缩放
 	// if ((startMousePoint.x !== undefined || endMousePoint.x !== undefined) && !event.onTouchMove) return
 
-	let mousex = privateCall ? 0 : event.clientX - containerInfo.left
-	let mousey = privateCall ? 0 : event.clientY - containerInfo.top
+	let mousex = privateCall ? 0 : (event.clientX - containerInfo.left) * DPI
+	let mousey = privateCall ? 0 : (event.clientY - containerInfo.top) * DPI
 	let wheel = event.deltaY < 0 ? 1 : -1
 	let zoom = privateCall ? event.__zoom : Math.exp(wheel * zoomIntensity)
 	//缩放系数过小，不能缩放

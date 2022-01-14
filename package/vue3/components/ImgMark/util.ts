@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash'
 const CancasSafeArea = 100000
-const DPI = window.devicePixelRatio || 1
+export const DPI = window.devicePixelRatio || 1
 export const debug = false
 
 export type WH = {
