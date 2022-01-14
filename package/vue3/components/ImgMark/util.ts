@@ -387,8 +387,8 @@ export function fixMoveRectPosition(position: Rect, zoomScale: number, origin: P
 	)
 	position[0] = point.x
 	position[1] = point.y
-	position[2] /= zoomScale
-	position[3] /= zoomScale
+	position[2] /= zoomScale / DPI
+	position[3] /= zoomScale / DPI
 	return position
 }
 
@@ -442,8 +442,8 @@ export function twoPointsGetOffsetInfo(
 	offsetInfo: Offset
 } {
 	let position = transfromTwoPointsToLtwh(startPoint, endPoint)
-	let offsetX = (endPoint.x - startPoint.x) / zoomScale
-	let offsetY = (endPoint.y - startPoint.y) / zoomScale
+	let offsetX = ((endPoint.x - startPoint.x) / zoomScale) * DPI
+	let offsetY = ((endPoint.y - startPoint.y) / zoomScale) * DPI
 	let isStartMove = false
 	const MIN_MOVE = 5
 	if (position[2] > MIN_MOVE || position[3] > MIN_MOVE) {
@@ -507,8 +507,8 @@ export type LayerTouchEvent = (MouseEvent | TouchEvent) & {
 
 export function fixPoint(point: Point, zoomScale, origin: Point): Point {
 	return {
-		x: point.x / zoomScale + origin.x,
-		y: point.y / zoomScale + origin.y,
+		x: (point.x / zoomScale) * DPI + origin.x,
+		y: (point.y / zoomScale) * DPI + origin.y,
 	}
 }
 
@@ -521,6 +521,7 @@ export function getTouchPoint(event: LayerTouchEvent, zoomScale, origin: Point, 
 		zoomScale,
 		origin
 	)
+
 	return {
 		x: startPoint.x,
 		y: startPoint.y,
@@ -673,6 +674,8 @@ export function detectEventIsTriggerOnCropBorderOrVertex(
 			return getCropFourBorderRect(cropInfo, currentPosition, index)
 		})
 		.flat()
+	console.log(111, touchPoint, event.layerX, event.layerY, borderList)
+
 	let detectResult = pointIsInRectList(
 		touchPoint,
 		borderList.map(i => i.positions)

@@ -3,7 +3,7 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
-1. multi crop (how to del crop and before cropInfo to init fit img and resize crop items)  tag raw auto clip by crop position
+1. multi crop (how to del crop and before cropInfo to init fit img )  tag raw auto clip by crop position
 2. custom color and fontsize
 3. prop isShowTip
 4. prop enableCropResize
@@ -227,8 +227,9 @@ let actions = {
 		}
 
 		if (type == 'resizeCrop') {
-			let clickedCrop = cropArr[status.resizeCropHovering?.index || -1]
+			let clickedCrop = cropArr[status.resizeCropHovering?.index || 0]
 			if (!status.resizeCropHovering || !clickedCrop) return
+
 			tmpCropPositionInfo = moveResizeCrop(
 				ctx2,
 				startMousePoint,
@@ -862,7 +863,7 @@ function onMouseOut() {
 
 function onClick(event) {
 	if (!inited) return
-	let touchPoint = amendDpi(getTouchPoint(event, zoomScale, origin, 'click'), ['x', 'y'])
+	let touchPoint = getTouchPoint(event, zoomScale, origin, 'click')
 	let clickInterval = mouseUpTime && mouseDownTime ? mouseUpTime - mouseDownTime : 0
 	mouseDownTime = undefined
 	mouseUpTime = undefined
