@@ -1,6 +1,9 @@
 <!--
+Known issues
+1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
+
 TODO
-1. multi crop (how to del crop and before cropInfo to init fit img and resize crop items)
+1. multi crop (how to del crop and before cropInfo to init fit img and resize crop items)  tag raw auto clip by crop position
 2. custom color and fontsize
 3. prop isShowTip
 4. prop enableCropResize
@@ -209,12 +212,10 @@ let actions = {
 	//画方块一半被打断
 	dragCreatRectInterrupt() {
 		cleartMousePoints()
-		status.isDrawRecting = false
 	},
 	dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resizeCrop') {
 		if (!ctx2) return
 		status.isDrawRecting = true
-
 		if (type == 'drawCrop') {
 			tmpCropPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, cropArr, currentPosition)
 			drawTagList(ctx2, tagArr, currentPosition)
@@ -237,11 +238,10 @@ let actions = {
 				zoomScale,
 				currentPosition,
 				tagArr,
-				status.resizeCropHovering
+				status.resizeCropHovering,
+				cropArr.filter((item, i) => i !== status.resizeCropHovering?.index)
 			)
 		}
-
-		status.isDrawRecting = false
 	},
 	changeMode() {
 		if (props.mode === 'tag') {
@@ -389,6 +389,7 @@ let hooks = {
 	/* window resize */
 	resize() {
 		requestAnimationFrame(() => {
+			console.log('resized')
 			resizeRender()
 		})
 	},
@@ -679,6 +680,7 @@ function cleartMousePoints() {
 	}
 
 	status.resizeCropHovering = undefined
+	status.isDrawRecting = false
 	startMousePoint = cloneDeep(defaultPoint)
 	endMousePoint = cloneDeep(defaultPoint)
 }
@@ -975,6 +977,10 @@ defineExpose({
 
 <style lang="scss" scoped>
 .comp-ocr-img {
+	flex-shrink: 0;
+	flex-grow: 0;
+	width: 100%;
+	height: 100%;
 	position: relative;
 	canvas {
 		width: 100%;

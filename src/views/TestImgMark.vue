@@ -1,9 +1,8 @@
 <template>
 	<div class="page-test-img-mark">
-		<div style="width: 50vw; height: 100vh; background: #ccc; box-sizing: border-box">
+		<div style="width: 50vw; height: 100vh; background: #ccc; box-sizing: border-box; flex-shrink: 0">
 			<ImgMark
 				ref="imgMarkRef"
-				style="width: 100%; height: 100%"
 				:src="src"
 				v-model:mode="mode"
 				v-model:cropBounding="cropInfo"

@@ -100,7 +100,7 @@ export function initScale(canvasWH: WH, imgWH: HTMLImageElement): ScaleReturn {
 	}
 }
 type ObjectToString = 'Number' | 'String' | 'Symbol' | 'Object' | 'Function' | 'Null'
-export function getVariableType(value) {
+export function getVariableType(value: unknown) {
 	let valueObjectString = Object.prototype.toString.call(value)
 	return valueObjectString.slice(8, valueObjectString.length - 1) as ObjectToString
 }
@@ -412,7 +412,15 @@ export function moveDrawCropRect(
 	return undefined
 }
 
-export function moveDrawTagRect(ctx, startPoint, endPoint, zoomScale = 1, origin, tagArr, currentPosition) {
+export function moveDrawTagRect(
+	ctx: CanvasRenderingContext2D,
+	startPoint: Point,
+	endPoint: Point,
+	zoomScale: number,
+	origin: Point,
+	tagArr: BoundingBox[],
+	currentPosition: Point
+) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
 		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
@@ -744,7 +752,8 @@ export function moveResizeCrop(
 	zoomScale: number,
 	currentPosition: Point,
 	tagArr: BoundingBox[],
-	resizeCropHovering: ResizeItem
+	resizeCropHovering: ResizeItem,
+	cropList: BoundingBox[]
 ) {
 	if (startPoint && startPoint.x !== undefined && endPoint && endPoint.x !== undefined) {
 		let offsetResult = twoPointsGetOffsetInfo(startPoint, endPoint, zoomScale)
@@ -761,7 +770,9 @@ export function moveResizeCrop(
 			)
 
 			let position = transfromBoundingBoxToLtwh(newCropInfo, cropScale, currentPosition)
-			drawCropRect(ctx, ...position)
+
+			drawCropList(ctx, cropList, currentPosition)
+			drawCropRect(ctx, ...position, true)
 			drawTagList(ctx, tagArr, currentPosition, undefined, undefined)
 			return position
 		}
