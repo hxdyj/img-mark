@@ -128,11 +128,29 @@ export function amendMobileTouchEventDpi(touchEvent: TouchEvent) {
 	})
 }
 
-export function drawCropRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number) {
-	clearCanvas(ctx)
-	drawLayerBg(ctx)
+export function drawCropRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, unClearCanvas?: boolean) {
+	if (!unClearCanvas) {
+		clearCanvas(ctx)
+		drawLayerBg(ctx)
+	}
 	drawLayerImageData(ctx, left, top, width, height)
 	drawLayerBorder(ctx, left, top, width, height)
+}
+
+export function drawCropList(ctx: CanvasRenderingContext2D, cropList: BoundingBox[], currentPosition: Point, offset?: Offset, unClearCanvas?: boolean) {
+	if (!unClearCanvas) {
+		clearCanvas(ctx)
+		drawLayerBg(ctx)
+	}
+	cropList.forEach(crop => {
+		let position = transfromBoundingBoxToLtwh(crop, crop.scale, currentPosition)
+		if (offset) {
+			position[0] += offset.offsetX
+			position[1] += offset.offsetY
+		}
+		drawLayerImageData(ctx, ...position)
+		drawLayerBorder(ctx, ...position)
+	})
 }
 
 export type Rect = [left: number, top: number, width: number, height: number]
@@ -250,7 +268,7 @@ export function transfromBoundingBoxToLtwh(
 }
 
 export function isRectValidity(rect: BoundingBox) {
-	let position = transfromBoundingBoxToLtwh(rect, 1)
+	let position = transfromBoundingBoxToLtwh(rect)
 	if (position[2] >= 5 && position[3] >= 5) {
 		return true
 	}
@@ -258,7 +276,7 @@ export function isRectValidity(rect: BoundingBox) {
 }
 
 type TouchType = 'move' | 'click'
-type TypePoint = Point & {
+export type TypePoint = Point & {
 	type: TouchType
 }
 export function drawTagRect(
@@ -303,7 +321,7 @@ export function drawTagRect(
 	if (touchPoint) {
 		if (pointIsInRect(touchPoint, [left, top, width, height])) {
 			if (touchPoint.type === 'click') {
-				console.log('Point In Rect', touchPoint, [left, top, width, height], index)
+				// console.log('Point In Rect', touchPoint, [left, top, width, height], index)
 				isShow = !isShow
 				isCrash = true
 				return {
@@ -374,12 +392,20 @@ export function fixMoveRectPosition(position: Rect, zoomScale: number, origin: P
 	return position
 }
 
-export function moveDrawCropRect(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, zoomScale, origin: Point) {
+export function moveDrawCropRect(
+	ctx: CanvasRenderingContext2D,
+	startPoint: Point,
+	endPoint: Point,
+	zoomScale,
+	origin: Point,
+	cropList: BoundingBox[],
+	currentPosition: Point
+) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
 		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
-			// if (debug) console.log('DRAW', position)
-			drawCropRect(ctx, ...position)
+			drawCropList(ctx, cropList, currentPosition)
+			drawCropRect(ctx, ...position, true)
 			return position
 		}
 	}
@@ -433,8 +459,7 @@ export function moveCanvas(
 	currentPosition: Point,
 	startPoint: Point,
 	endPoint: Point,
-	cropInfo: BoundingBox,
-	cropScale: number,
+	cropList: BoundingBox[],
 	zoomScale: number,
 	tagArr: BoundingBox[]
 ): Offset | undefined {
@@ -449,10 +474,11 @@ export function moveCanvas(
 			}
 
 			drawImage(ctx, img, newPosition.x, newPosition.y, imgWH.width * scale, imgWH.height * scale)
-			let boundingBoxPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
-			boundingBoxPosition[0] += offsetX
-			boundingBoxPosition[1] += offsetY
-			drawCropRect(ctx2, ...boundingBoxPosition)
+			// let boundingBoxPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
+			// boundingBoxPosition[0] += offsetX
+			// boundingBoxPosition[1] += offsetY
+			// drawCropRect(ctx2, ...boundingBoxPosition)
+			drawCropList(ctx2, cropList, currentPosition, offsetResult.offsetInfo)
 			drawTagList(ctx2, tagArr, currentPosition, {
 				offsetX,
 				offsetY,
@@ -503,15 +529,14 @@ export function moveDrawUnshowTagDashRect(
 	currentPosition: Point,
 	origin: Point,
 	e: LayerTouchEvent,
-	cropInfo: BoundingBox,
-	cropScale: number,
-	isWheeling: boolean,
-	hasHoverRectInCanvas: boolean
+	cropList: BoundingBox[],
+	isScaleing: boolean,
+	hasHoverRectInTagItem: boolean
 ) {
 	/*
   判断tagArr里边unShow的tag在坐标点，就绘制，不在页绘制为空
   */
-	if (mode === 'tag' && !isWheeling) {
+	if (mode === 'tag' && !isScaleing) {
 		let unShowArr = tagArr.filter(i => !i.isShow)
 		let isHasTouchPointInArr = false
 		let touchPoint = getTouchPoint(e, zoomScale, origin, 'move')
@@ -525,20 +550,19 @@ export function moveDrawUnshowTagDashRect(
 			}
 		})
 		if (isHasTouchPointInArr) {
-			hasHoverRectInCanvas = true
+			hasHoverRectInTagItem = true
 			drawTagList(ctx, dashArr, currentPosition, undefined, touchPoint)
 		} else {
-			if (hasHoverRectInCanvas) {
-				console.log('CLEAN HOVER Rect')
-				let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
-				drawCropRect(ctx, ...positions)
+			if (hasHoverRectInTagItem) {
+				// console.log('CLEAN HOVER Rect')
+				drawCropList(ctx, cropList, currentPosition)
 				drawTagList(ctx, tagArr, currentPosition)
-				hasHoverRectInCanvas = false
+				hasHoverRectInTagItem = false
 			}
 		}
 	}
 
-	return hasHoverRectInCanvas
+	return hasHoverRectInTagItem
 }
 
 type ResizeType = {
@@ -546,52 +570,61 @@ type ResizeType = {
 	border: 'left' | 'top' | 'right' | 'bottom'
 }
 export type ResizeItem = {
+	index: number
 	type: keyof ResizeType
 	name: ResizeType[keyof ResizeType]
 	positions: Rect
 }
 
-export function getCropFourBorderRect(cropInfo: BoundingBox, cropScale: number, currentPosition: Point) {
-	let positions = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
+export function getCropFourBorderRect(cropInfo: BoundingBox, currentPosition: Point, index: number) {
+	let positions = transfromBoundingBoxToLtwh(cropInfo, cropInfo.scale, currentPosition)
 	const BorderWidth = 6
 	let HalfBorder = BorderWidth / 2
 	let list: ResizeItem[] = [
 		{
+			index,
 			name: 'left-top',
 			type: 'vertex',
 			positions: [positions[0] - HalfBorder, positions[1] - HalfBorder, BorderWidth, BorderWidth],
 		},
 		{
+			index,
 			name: 'right-top',
 			type: 'vertex',
 			positions: [positions[0] + positions[2] - HalfBorder, positions[1] - HalfBorder, BorderWidth, BorderWidth],
 		},
 		{
+			index,
 			name: 'left-bottom',
 			type: 'vertex',
 			positions: [positions[0] - HalfBorder, positions[1] + positions[3] - HalfBorder, BorderWidth, BorderWidth],
 		},
 		{
+			index,
 			name: 'right-bottom',
 			type: 'vertex',
 			positions: [positions[0] + positions[2] - HalfBorder, positions[1] + positions[3] - HalfBorder, BorderWidth, BorderWidth],
 		},
 		{
+			index,
 			name: 'left',
 			type: 'border',
 			positions: [positions[0] - HalfBorder, positions[1] + HalfBorder, BorderWidth, positions[3] - HalfBorder],
 		},
 		{
+			index,
 			name: 'top',
 			type: 'border',
 			positions: [positions[0] + HalfBorder, positions[1] - HalfBorder, positions[2] - HalfBorder, BorderWidth],
 		},
 		{
+			index,
 			name: 'right',
 			type: 'border',
 			positions: [positions[0] + positions[2] - HalfBorder, positions[1] + HalfBorder, BorderWidth, positions[3] - HalfBorder],
 		},
 		{
+			index,
 			name: 'bottom',
 			type: 'border',
 			positions: [positions[0] + HalfBorder, positions[1] + positions[3] - HalfBorder, positions[2] - HalfBorder, BorderWidth],
@@ -621,16 +654,17 @@ export function pointIsInRectList(point: Point, list: Rect[]) {
 
 export function detectEventIsTriggerOnCropBorderOrVertex(
 	event: LayerTouchEvent,
-	cropInfo: BoundingBox,
-	cropScale: number,
+	cropList: BoundingBox[],
 	zoomScale: number,
 	currentPosition: Point,
 	origin: Point
 ) {
 	let touchPoint = getTouchPoint(event, zoomScale, origin, 'move')
-	// console.log('Detect touchPoint', touchPoint)
-	let borderList = getCropFourBorderRect(cropInfo, cropScale, currentPosition)
-	// console.log('BorderRect', borderList)
+	let borderList = cropList
+		.map((cropInfo, index) => {
+			return getCropFourBorderRect(cropInfo, currentPosition, index)
+		})
+		.flat()
 	let detectResult = pointIsInRectList(
 		touchPoint,
 		borderList.map(i => i.positions)
@@ -651,16 +685,15 @@ export function moveDetectCropBorderSetCursor(
 	ele: HTMLElement,
 	event: LayerTouchEvent,
 	mode: Mode,
-	cropInfo: BoundingBox,
-	cropScale: number,
+	cropList: BoundingBox[],
 	zoomScale: number,
 	currentPosition: Point,
 	origin: Point,
-	isWheeling: boolean
+	isScaleing: boolean
 ) {
 	//判断鼠标是否在裁剪框的4个边加四个顶点，在的话更改container鼠标手势  nwse-resize nesw-resize
-	if (mode === 'crop' && !isWheeling) {
-		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropInfo, cropScale, zoomScale, currentPosition, origin)
+	if (mode === 'crop' && !isScaleing) {
+		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropList, zoomScale, currentPosition, origin)
 		if (!detectResult.hasIn) {
 			ele.style.cursor = 'auto'
 		} else {
@@ -711,12 +744,12 @@ export function moveResizeCrop(
 	zoomScale: number,
 	currentPosition: Point,
 	tagArr: BoundingBox[],
-	mouseDownOnCropBorderOrVertex: ResizeItem
+	resizeCropHovering: ResizeItem
 ) {
 	if (startPoint && startPoint.x !== undefined && endPoint && endPoint.x !== undefined) {
 		let offsetResult = twoPointsGetOffsetInfo(startPoint, endPoint, zoomScale)
 		if (offsetResult.isStartMove) {
-			let borderOrVertex = mouseDownOnCropBorderOrVertex
+			let borderOrVertex = resizeCropHovering
 			let { offsetX, offsetY } = offsetResult.offsetInfo
 			let newCropInfo = getResizeCropInfo(
 				cropInfo,
@@ -730,7 +763,6 @@ export function moveResizeCrop(
 			let position = transfromBoundingBoxToLtwh(newCropInfo, cropScale, currentPosition)
 			drawCropRect(ctx, ...position)
 			drawTagList(ctx, tagArr, currentPosition, undefined, undefined)
-			console.log(offsetX, offsetY)
 			return position
 		}
 	}
@@ -771,7 +803,7 @@ export function getRectInfoByPosition(position: Rect, currentPosition: Point, sc
 	return fixRectInfo(rectInfo).info
 }
 
-export function initTagArrScale(tagArr: BoundingBox[], scale: number) {
+export function initBoundingArrScale(tagArr: BoundingBox[], scale: number) {
 	return tagArr.map(tag => {
 		if (tag.scale !== 1) {
 			tag.scale = scale

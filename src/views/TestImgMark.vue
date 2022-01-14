@@ -8,6 +8,7 @@
 				v-model:mode="mode"
 				v-model:cropBounding="cropInfo"
 				v-model:tagList="tagList"
+				v-model:cropList="cropList"
 				@cropChange="cropChange"
 				@tagsStatusChange="tagsStatusChange"
 				:enableDrawCropOutOfImg="false"
@@ -22,6 +23,8 @@
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="removeTag()">Remove All</el-button>
 			<el-alert v-for="item in tagList" @close="removeTag([item])" style="margin-top: 20px" :key="uid(6)" :title="JSON.stringify(item)" type="warning">
 			</el-alert>
+			<hr />
+			<el-alert v-for="item in cropList" style="margin-top: 20px" :key="uid(6)" :title="JSON.stringify(item)" type="warning"> </el-alert>
 		</div>
 	</div>
 </template>
@@ -31,6 +34,20 @@ import { uid } from 'uid'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('crop')
 let cropInfo = $ref<BoundingBox>()
+let cropList = $ref<BoundingBox[]>([
+	{
+		startX: 0,
+		startY: 0,
+		endX: 1774,
+		endY: 100,
+	},
+	{
+		startX: 200,
+		startY: 200,
+		endX: 1000,
+		endY: 500,
+	},
+])
 type MyBoundingBox = BoundingBox & {
 	type: number
 }
