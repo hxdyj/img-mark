@@ -155,6 +155,17 @@ export function drawCropList(ctx: CanvasRenderingContext2D, cropList: BoundingBo
 
 export type Rect = [left: number, top: number, width: number, height: number]
 
+export function pointIsInBoxList(point: Point, boxList: BoundingBox[]) {
+	let boxListPointIn: BoundingBox[] = []
+	let rectList = boxList.map(box => transfromBoundingBoxToLtwh(box))
+	rectList.forEach((rect, index) => {
+		if (pointIsInRect(point, rect)) {
+			boxListPointIn.push(boxList[index])
+		}
+	})
+	return boxListPointIn
+}
+
 export function pointIsInRect(point: Point, rect: Rect) {
 	let rectPositionInfo = {
 		startX: rect[0],

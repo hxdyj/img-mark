@@ -3,11 +3,15 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
-1. multi crop (how to del crop and before cropInfo to init fit img )  tag raw auto clip by crop position
 2. custom color and fontsize
 3. prop isShowTip
 4. prop enableCropResize
 5. README.md API
+
+User Options
+1. Down Sapce Key and Drag Mouse Move to Draw
+2. Double Click Crop del crop
+3. Click Tag to Hide Or Show Tag
  -->
 <template>
 	<div
@@ -83,12 +87,35 @@ import {
 	TypePoint,
 	DPI,
 	fixRectInfo,
+	pointIsInRect,
+	pointIsInBoxList,
+	fixPoint,
 } from './util'
 
 let spaceKeyDown = false
 
 let mouseDownTime: number | undefined = undefined
 let mouseUpTime: number | undefined = undefined
+
+let mouseQuickDoubleTapTime: {
+	last: {
+		down: number | undefined
+		up: number | undefined
+	}
+	prev: {
+		down: number | undefined
+		up: number | undefined
+	}
+} = {
+	last: {
+		down: undefined,
+		up: undefined,
+	},
+	prev: {
+		down: undefined,
+		up: undefined,
+	},
+}
 
 let zoomIntensity = 0.1
 let hasHoverRectInTagItem = false
@@ -364,6 +391,16 @@ let hooks = {
 			this.onSpaceMove()
 		}
 	},
+	onDoubleClick(touchPoint: TypePoint) {
+		if (props.mode === 'crop') {
+			let point = {
+				x: (touchPoint.x - currentPosition.x) * DPI,
+				y: (touchPoint.y - currentPosition.y) * DPI,
+			}
+			let removeCropList = pointIsInBoxList(point, cropArr)
+			removeCropItems(removeCropList)
+		}
+	},
 	onCick(touchPoint: TypePoint) {
 		if (props.mode !== 'tag') return
 		if (!ctx2) return
@@ -446,11 +483,9 @@ function initCropInfo() {
 			}
 		})
 		cropInfo = cropRect
-		debugger
 	}
 	if (props.cropList.length == 1) {
 		cropInfo = props.cropList[0]
-		debugger
 	}
 }
 
@@ -509,23 +544,26 @@ async function initComponent() {
 				endY: 0 + imgWH.height,
 			}
 		}
-		//处理有CropInfo的情况，放大裁剪区域之全屏
-		//TODO BUG
+		//处理有CropInfo的情况，放大裁剪区域至全屏中间
 		else {
 			// if (debug) console.log(cropInfo)
 			let cropBoxInfo = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
-			let commonOffset = 50
-			let widthRate = canvasWH.width / (cropBoxInfo[2] + commonOffset)
-			let heightRate = canvasWH.height / (cropBoxInfo[3] + commonOffset)
+			let whiteRate = 0.05
+			let widthRate = (canvasWH.width - canvasWH.width * whiteRate) / cropBoxInfo[2]
+			let heightRate = (canvasWH.height - canvasWH.height * whiteRate) / cropBoxInfo[3]
+
 			// if (debug) console.log('RATE', widthRate, heightRate)
 			// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
 			let boxStretchScale = cropBoxInfo[2] >= cropBoxInfo[3] ? widthRate : heightRate // 长边尽量展示出来
-			let canvasZoom = Math.sqrt(boxStretchScale)
-			// if (debug) console.log('currentPosition before', currentPosition)
-			currentPosition.x = currentPosition.x - cropInfo.startX * scale * canvasZoom + commonOffset / 2
-			currentPosition.y = currentPosition.y - cropInfo.startY * scale * canvasZoom + commonOffset / 2
-			// if (debug) console.log('currentPosition after', currentPosition)
-			// if (debug) console.log('Fix Full', canvasWH, cropBoxInfo, cropBoxInfo[2] * boxStretchScale, cropBoxInfo[3] * boxStretchScale, boxStretchScale, canvasZoom)
+			let canvasZoom = boxStretchScale
+
+			if (boxStretchScale === widthRate) {
+				currentPosition.x = (canvasWH.width * whiteRate) / 2 / canvasZoom
+				currentPosition.y = (canvasWH.height - cropBoxInfo[3] * canvasZoom * DPI) / 2
+			} else {
+				currentPosition.x = (canvasWH.width - cropBoxInfo[2] * canvasZoom * DPI) / 2
+				currentPosition.y = (canvasWH.height * whiteRate) / 2 / canvasZoom
+			}
 			onMouseWheel(
 				{
 					deltaY: 1,
@@ -654,7 +692,7 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 		throw new Error(`can't find  containerInfo.`)
 	}
 
-	if (!inited) return
+	if (!inited && !event.__zoom) return
 	event.preventDefault()
 	//空格键按下的时候不能缩放
 	if (status.isDrawRecting) return
@@ -665,6 +703,7 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	let mousey = privateCall ? 0 : (event.clientY - containerInfo.top) * DPI
 	let wheel = event.deltaY < 0 ? 1 : -1
 	let zoom = privateCall ? event.__zoom : Math.exp(wheel * zoomIntensity)
+
 	//缩放系数过小，不能缩放
 	if (zoomScale * zoom < 0.2) return
 	hooks.onWheel(zoom, {
@@ -697,6 +736,7 @@ function cleartMousePoints() {
 				let tagInfo = Object.assign(getRectInfoByPosition(tmpTagPositionInfo, currentPosition), {
 					scale: 1,
 					isShow: true,
+					__newAdd: true,
 				})
 				tagArr.push(tagInfo)
 				triggerTagListChange()
@@ -727,13 +767,18 @@ function triggerTagListChange() {
 	})
 }
 
-function getTagList(tagList?: BoundingBox[], cropList?: BoundingBox[], initScale?: number, imageWH?: WH) {
+type TagItemTmp = BoundingBox & {
+	scale?: number
+	__isValidity?: boolean
+	__newAdd?: boolean
+}
+
+function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScale?: number, imageWH?: WH) {
 	let list = tagList || tagArr
-	let resultList = list.map(tag => {
-		let newTagInfo: BoundingBox & {
-			scale?: number
-			__isValidity?: boolean
-		} = cloneDeep(tag)
+	let cropList = _cropList || cropArr
+	let resultList: TagItemTmp[] = []
+	list.forEach(tag => {
+		let newTagInfo: TagItemTmp = cloneDeep(tag)
 		let _scale = tag.scale === 1 ? initScale || scale : 1
 		Object.assign(newTagInfo, {
 			startX: tag.startX / _scale,
@@ -744,19 +789,28 @@ function getTagList(tagList?: BoundingBox[], cropList?: BoundingBox[], initScale
 		if (newTagInfo.scale === 1) {
 			delete newTagInfo.scale
 		}
-		// if (!props.enableDrawTagOutOfCrop) {
-		// 	//TODO
-		// 	let intersectPart = getTwoRectIntersectPart(newTagInfo, info)
-		// 	if (!intersectPart) {
-		// 		newTagInfo.__isValidity = false
-		// 	} else {
-		// 		if (!isRectValidity(intersectPart)) {
-		// 			newTagInfo.__isValidity = false
-		// 		} else {
-		// 			Object.assign(newTagInfo, intersectPart)
-		// 		}
-		// 	}
-		// }
+		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd) {
+			let tagStartXYinCropList = pointIsInBoxList(
+				{
+					x: newTagInfo.startX,
+					y: newTagInfo.startY,
+				},
+				cropList
+			)
+			let mousePointCropInfo = tagStartXYinCropList[0]
+			if (!mousePointCropInfo) return
+			let intersectPart = getTwoRectIntersectPart(newTagInfo, mousePointCropInfo)
+			if (!intersectPart) {
+				newTagInfo.__isValidity = false
+			} else {
+				if (!isRectValidity(intersectPart)) {
+					newTagInfo.__isValidity = false
+				} else {
+					Object.assign(newTagInfo, intersectPart)
+				}
+			}
+		}
+		delete newTagInfo.__newAdd
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
 			let whObj = imageWH || imgWH
 			const imgRect = {
@@ -776,7 +830,7 @@ function getTagList(tagList?: BoundingBox[], cropList?: BoundingBox[], initScale
 				}
 			}
 		}
-		return newTagInfo
+		resultList.push(newTagInfo)
 	})
 	return resultList.filter(i => i.__isValidity !== false)
 }
@@ -817,7 +871,13 @@ function getCropListBounding(): BoundingBox[] {
 
 function onMouseDown(e: MouseEvent) {
 	if (!inited || !ctx || !ctx2) return
-	mouseDownTime = new Date().getTime()
+	let time = new Date().getTime()
+	mouseDownTime = time
+	if (mouseQuickDoubleTapTime.prev.down) {
+		mouseQuickDoubleTapTime.last.down = time
+	} else {
+		mouseQuickDoubleTapTime.prev.down = time
+	}
 
 	let event = e as LayerTouchEvent
 
@@ -843,6 +903,13 @@ function onMouseMove(e: MouseEvent) {
 
 function onMouseUp() {
 	if (!inited) return
+	let time = new Date().getTime()
+	if (mouseQuickDoubleTapTime.prev.up) {
+		mouseQuickDoubleTapTime.last.up = time
+	} else {
+		mouseQuickDoubleTapTime.prev.up = time
+	}
+
 	cleartMousePoints()
 }
 
@@ -862,6 +929,18 @@ function onClick(event) {
 		return
 	}
 	hooks.onCick(touchPoint)
+
+	const minInterval = 360
+	if (mouseQuickDoubleTapTime.prev.up && mouseQuickDoubleTapTime.prev.down && mouseQuickDoubleTapTime.last.up && mouseQuickDoubleTapTime.last.down) {
+		if (mouseQuickDoubleTapTime.last.up - mouseQuickDoubleTapTime.prev.down < minInterval) {
+			hooks.onDoubleClick(touchPoint)
+		}
+		//将last值设置为prev，last设置为空
+		mouseQuickDoubleTapTime.prev.down = mouseQuickDoubleTapTime.last.down
+		mouseQuickDoubleTapTime.prev.up = mouseQuickDoubleTapTime.last.up
+		mouseQuickDoubleTapTime.last.down = undefined
+		mouseQuickDoubleTapTime.last.up = undefined
+	}
 }
 
 function onTouchStart(event: TouchEvent) {
@@ -937,7 +1016,6 @@ function refreshDrawTags() {
 }
 /* API */
 function removeTagItems(removeList: BoundingBox[]) {
-	console.log('removeList', removeList)
 	let newTagArr: BoundingBox[] = []
 	if (removeList.length !== 0) {
 		let currentList = getTagList()
@@ -947,7 +1025,6 @@ function removeTagItems(removeList: BoundingBox[]) {
 			}
 		})
 	}
-	console.log('newList', newTagArr)
 	tagArr = initBoundingArrScale(newTagArr, scale)
 	nextTick(() => {
 		if (!ctx2) {
@@ -956,6 +1033,29 @@ function removeTagItems(removeList: BoundingBox[]) {
 		drawCropList(ctx2, cropArr, currentPosition)
 		drawTagList(ctx2, tagArr, currentPosition)
 		triggerTagListChange()
+	})
+}
+
+function removeCropItems(removeList: BoundingBox[]) {
+	if (removeList.length === 0) return
+	console.log('remove', cloneDeep(removeList))
+	let newCropArr: BoundingBox[] = []
+	if (removeList.length !== 0) {
+		let currentList = getCropListBounding()
+		currentList.forEach(tag => {
+			if (!removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
+				newCropArr.push(tag)
+			}
+		})
+	}
+	cropArr = initBoundingArrScale(newCropArr, scale)
+	nextTick(() => {
+		if (!ctx2) {
+			throw new Error(`ctx2  can't find on removeItem.`)
+		}
+		drawCropList(ctx2, cropArr, currentPosition)
+		drawTagList(ctx2, tagArr, currentPosition)
+		triggerCropListChange()
 	})
 }
 
