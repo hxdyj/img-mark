@@ -8,6 +8,121 @@
 
 ![](./img/preview.png)
 
+## 使用
+
+```vue
+<template>
+	<div class="page-test-img-mark">
+		<div style="width: 50vw; height: 100vh; background: #ccc; box-sizing: border-box; flex-shrink: 0">
+			<ImgMark
+				ref="imgMarkRef"
+				:src="src"
+				v-model:mode="mode"
+				v-model:tagList="tagList"
+				v-model:cropList="cropList"
+				@tagsStatusChange="tagsStatusChange"
+				:enableDrawCropOutOfImg="false"
+				:enableDrawTagOutOfCrop="false"
+				:enableDrawTagOutOfImg="false"
+			></ImgMark>
+		</div>
+		<div class="info-panel">
+			<el-input v-model="src"></el-input>
+			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
+			<el-alert
+				v-for="item in tagList"
+				@close="removeTag([item])"
+				@mouseenter="setHoverItem(item)"
+				@mouseleave="removeHoverItem(item)"
+				style="margin-top: 20px"
+				:key="uid(6)"
+				:title="JSON.stringify(item)"
+				type="warning"
+			>
+			</el-alert>
+		</div>
+	</div>
+</template>
+<script setup lang="ts">
+import { ImgMark, Mode, BoundingBox } from 'img-mark'
+import { uid } from 'uid'
+let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
+let mode = $ref<Mode>('crop')
+let cropList = $ref<BoundingBox[]>([
+	{
+		startX: 0,
+		startY: 0,
+		endX: 1774,
+		endY: 100,
+	},
+	{
+		startX: 200,
+		startY: 200,
+		endX: 1000,
+		endY: 500,
+	},
+])
+
+let tagList = $ref<BoundingBox[]>([
+	{
+		startX: 50,
+		startY: 0,
+		endX: 100,
+		endY: 50,
+		isShow: true,
+	},
+	{
+		startX: 0,
+		startY: 0,
+		endX: 1774,
+		endY: 100,
+		isShow: true,
+	},
+])
+
+let imgMarkRef = $ref<InstanceType<typeof ImgMark>>()
+
+function removeTag(data?: BoundingBox[]) {
+	if (data) {
+		imgMarkRef.removeTagItems(data)
+	}
+}
+function cropChange() {
+	removeTag()
+}
+
+function setHoverItem(item: BoundingBox) {
+	item.showOutLine = true
+}
+function removeHoverItem(item: BoundingBox) {
+	item.showOutLine = false
+}
+
+function tagsStatusChange(list: BoundingBox[]) {
+	let removeList = list.filter(i => !i.type)
+	if (removeList.length !== 0) {
+		removeTag(removeList)
+	}
+}
+
+function getGroupInfo() {
+	let groupInfo = imgMarkRef.getTagListGroupByCropIndex()
+	console.log(groupInfo)
+}
+</script>
+<style scoped lang="scss">
+.page-test-img-mark {
+	display: flex;
+	justify-content: space-between;
+	.info-panel {
+		width: 50vw;
+		box-sizing: border-box;
+		padding: 20px;
+	}
+}
+</style>
+```
+
 ## 类型
 
 ```ts
@@ -44,20 +159,35 @@ type TagConfig = {
 
 ## 属性
 
-| 属性                   | 说明                          | 类型          | 可选值     | 默认值 |
-| ---------------------- | ----------------------------- | ------------- | ---------- | ------ |
-| src                    | 图片地址                      | string        | ——         | ——     |
-| mode                   | 模式                          | string        | crop/tag   | crop   |
-| cropList               | 裁切区域集合                  | BoundingBox[] | ——         | []     |
-| tagList                | tag 区域集合                  | BoundingBox[] | ——         | []     |
-| enableDrawCropOutOfImg | 是否允许 `Crop` 画到图片外    | boolean       | true/false | true   |
-| enableDrawTagOutOfCrop | 是否允许 `Tag` 画到 `Crop` 外 | boolean       | true/false | true   |
-| enableDrawTagOutOfImg  | 是否允许 `Tag` 画到图片外     | boolean       | true/false | true   |
-| enableCropResize       | 是否允许 `Crop` 改变大小      | boolean       | true/false | true   |
-| isShowTip              | 是否显示底部提示区域          | boolean       | true/false | false  |
-| layerConfig            | 浮层样式                      | LayerConfig   | ——         | ——     |
-| cropConfig             | `crop` 样式                   | CropConfig    | ——         | ——     |
-| tagConfig              | `tag` 样式                    | TagConfig     | ——         | ——     |
+| 属性                      | 说明                          | 类型          | 可选值     | 默认值 |
+| ------------------------- | ----------------------------- | ------------- | ---------- | ------ |
+| src                       | 图片地址                      | string        | ——         | ——     |
+| mode/v-model:mode         | 模式                          | string        | crop/tag   | crop   |
+| cropList/v-model:cropList | 裁切区域集合                  | BoundingBox[] | ——         | []     |
+| tagList/v-model:tagList   | tag 区域集合                  | BoundingBox[] | ——         | []     |
+| enableDrawCropOutOfImg    | 是否允许 `Crop` 画到图片外    | boolean       | true/false | true   |
+| enableDrawTagOutOfCrop    | 是否允许 `Tag` 画到 `Crop` 外 | boolean       | true/false | true   |
+| enableDrawTagOutOfImg     | 是否允许 `Tag` 画到图片外     | boolean       | true/false | true   |
+| enableCropResize          | 是否允许 `Crop` 改变大小      | boolean       | true/false | true   |
+| isShowTip                 | 是否显示底部提示区域          | boolean       | true/false | false  |
+| layerConfig               | 浮层样式                      | LayerConfig   | ——         | ——     |
+| cropConfig                | `crop` 样式                   | CropConfig    | ——         | ——     |
+| tagConfig                 | `tag` 样式                    | TagConfig     | ——         | ——     |
+
+## 事件
+
+| 事件名           | 说明                            | 参数               |
+| ---------------- | ------------------------------- | ------------------ |
+| tagsStatusChange | 当点击 `tag` 项展示或隐藏时触发 | list:BoundingBox[] |
+| tagListChange    | 当添加或者删除了 `tag` 项触发   | list:BoundingBox[] |
+| cropListChange   | 当添加或者删除了 `crop` 项触发  | list:BoundingBox[] |
+
+## 方法
+
+| 方法                       | 说明                                   | 参数               |
+| -------------------------- | -------------------------------------- | ------------------ |
+| removeTagItems             | 移除 `tag` 项                          | list:BoundingBox[] |
+| getTagListGroupByCropIndex | 获取 `tagList` 并按照 `CropIndex` 分组 | ——                 |
 
 ## 操作
 

@@ -5,10 +5,9 @@
 				ref="imgMarkRef"
 				:src="src"
 				v-model:mode="mode"
-				v-model:cropBounding="cropInfo"
 				v-model:tagList="tagList"
 				v-model:cropList="cropList"
-				@cropChange="cropChange"
+				@cropListChange="cropListChange"
 				@tagsStatusChange="tagsStatusChange"
 				:enableDrawCropOutOfImg="false"
 				:enableDrawTagOutOfCrop="false"
@@ -16,11 +15,8 @@
 			></ImgMark>
 		</div>
 		<div class="info-panel">
-			{{ tagList }}
 			<el-input v-model="src"></el-input>
-			<el-alert :title="JSON.stringify(cropInfo)" type="info" style="margin-top: 20px"> </el-alert>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
-			<el-button type="primary" size="small" style="margin-top: 40px" @click="removeTag()">Remove All</el-button>
 			<el-alert
 				v-for="item in tagList"
 				@close="removeTag([item])"
@@ -42,7 +38,6 @@ import { ImgMark, Mode, BoundingBox } from 'img-mark'
 import { uid } from 'uid'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('crop')
-let cropInfo = $ref<BoundingBox>()
 let cropList = $ref<BoundingBox[]>([
 	{
 		startX: 0,
@@ -86,8 +81,8 @@ function removeTag(data?: BoundingBox[]) {
 		imgMarkRef.removeTagItems(data)
 	}
 }
-function cropChange() {
-	removeTag()
+function cropListChange() {
+	console.log(111)
 }
 
 function setHoverItem(item: MyBoundingBox) {

@@ -200,7 +200,6 @@ export function pointIsInBoxList(
 	let indexList: number[] = []
 	let arr = boxList.map(box => transfromBoxSize2Visual(box, scale, currentPosition))
 	arr.forEach((rect, index) => {
-		console.log(point, rect)
 		if (pointIsInBox(point, rect)) {
 			boxListPointIn.push(boxList[index])
 			indexList.push(index)

@@ -128,7 +128,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'tagListChange', list: BoundingBox[]): void;
         (e: 'update:mode', mode: Mode): void;
         (e: 'tagsStatusChange', list: BoundingBox[]): void;
-        (e: 'cropChange'): void;
     };
     inited: boolean;
     ctx: null;
@@ -215,7 +214,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagListGroupByCropIndex: () => {
         [index: number]: BoundingBox[];
     };
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "cropChange")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "cropChange", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
     cropConfig?: unknown;
     layerConfig?: unknown;
     tagConfig?: unknown;
@@ -248,7 +247,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onTagListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:mode"?: ((...args: any[]) => any) | undefined;
     onTagsStatusChange?: ((...args: any[]) => any) | undefined;
-    onCropChange?: ((...args: any[]) => any) | undefined;
 }, {
     cropConfig: Record<string, any>;
     layerConfig: Record<string, any>;

@@ -188,7 +188,6 @@ let emits = defineEmits<{
 	(e: 'tagListChange', list: BoundingBox[]): void
 	(e: 'update:mode', mode: Mode): void
 	(e: 'tagsStatusChange', list: BoundingBox[]): void
-	(e: 'cropChange'): void
 }>()
 
 type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>
@@ -1014,7 +1013,7 @@ function onTouchStart(event: TouchEvent) {
 	if (event.touches.length == 2) {
 		let { width, height } = getTwoFingerTouchListDistence(touchList)
 		let hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
-		console.log('TouchStart', event.touches, width, height, hypotenuse)
+		// console.log('TouchStart', event.touches, width, height, hypotenuse)
 		hypotenuse = hypotenuse
 		twoFingerCenterPoint = {
 			x: (touchList[0].clientX + touchList[1].clientX) / 2,
