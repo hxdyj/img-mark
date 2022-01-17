@@ -2,6 +2,8 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
+import { uglify } from 'rollup-plugin-uglify'
+
 export default defineConfig({
 	build: {
 		lib: {
@@ -32,5 +34,6 @@ export default defineConfig({
 			outputDir: 'types',
 			exclude: ['vue.d.ts'],
 		}),
+		uglify(),
 	],
 })

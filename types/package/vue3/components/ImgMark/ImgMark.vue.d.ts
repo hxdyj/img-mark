@@ -1,6 +1,61 @@
-import { BoundingBox, ResizeItem, Mode, WH, Point, Rect } from './util';
+import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
+declare type CropConfig = {
+    lineDash?: number[];
+    strokeStyle?: string;
+    lineWidth?: number;
+};
+declare type LayerConfig = {
+    fillStyle?: string;
+};
+declare type TagConfig = {
+    fillStyle?: string;
+    textFillStyle?: string;
+    hoverStrokeStyle?: string;
+    hoverLineWidth?: number;
+    hoverLineDash?: number[];
+    highlightStrokeStyle?: string;
+    highlightLineWidth?: number;
+    highlightLineDash?: number[];
+};
+export declare type Config = {
+    cropConfig: Required<CropConfig>;
+    layerConfig: Required<LayerConfig>;
+    tagConfig: Required<TagConfig>;
+};
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
+declare type TagItemTmp = BoundingBox & {
+    scale?: number;
+    __isValidity?: boolean;
+    __newAdd?: boolean;
+    __vertexPosition?: VertexPosition;
+    __groupIndex?: number;
+};
 declare const _sfc_main: import("vue").DefineComponent<{
+    cropConfig: {
+        type: ObjectConstructor;
+        required: false;
+        default: () => Required<CropConfig>;
+    };
+    layerConfig: {
+        type: ObjectConstructor;
+        required: false;
+        default: () => Required<LayerConfig>;
+    };
+    tagConfig: {
+        type: ObjectConstructor;
+        required: false;
+        default: () => Required<TagConfig>;
+    };
+    isShowTip: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableCropResize: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     enableDrawCropOutOfImg: {
         type: BooleanConstructor;
         required: false;
@@ -16,9 +71,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
-    cropBounding: {
-        type: null;
+    cropList: {
+        type: ArrayConstructor;
         required: false;
+        default: () => any[];
     };
     tagList: {
         type: ArrayConstructor;
@@ -36,33 +92,45 @@ declare const _sfc_main: import("vue").DefineComponent<{
     };
 }, {
     spaceKeyDown: boolean;
-    isWheeling: boolean;
-    wheelSetTimeout: NodeJS.Timeout | undefined;
     mouseDownTime: undefined;
     mouseUpTime: undefined;
+    mouseQuickDoubleTapTime: {
+        last: {
+            down: number | undefined;
+            up: number | undefined;
+        };
+        prev: {
+            down: number | undefined;
+            up: number | undefined;
+        };
+    };
     zoomIntensity: number;
-    mouseDownOnCropBorderOrVertex: ResizeItem | undefined;
-    hasHoverRectInCanvas: boolean;
+    hasHoverRectInTagItem: boolean;
     initVar: () => void;
     props: {
+        cropConfig: CropConfig;
+        layerConfig: LayerConfig;
+        tagConfig: TagConfig;
+        isShowTip: boolean;
+        enableCropResize: boolean;
         enableDrawCropOutOfImg: boolean;
         enableDrawTagOutOfCrop: boolean;
         enableDrawTagOutOfImg: boolean;
-        cropBounding?: BoundingBox | undefined;
+        cropList: BoundingBox[];
         tagList: BoundingBox[];
         mode: Mode;
         src: string;
     };
     emits: {
+        (e: 'update:cropList', list: BoundingBox[]): void;
+        (e: 'cropListChange', list: BoundingBox[]): void;
         (e: 'update:tagList', list: BoundingBox[]): void;
         (e: 'tagListChange', list: BoundingBox[]): void;
         (e: 'update:mode', mode: Mode): void;
-        (e: 'update:cropBounding', cropInfo: BoundingBox): void;
         (e: 'tagsStatusChange', list: BoundingBox[]): void;
         (e: 'cropChange'): void;
     };
     inited: boolean;
-    isWheeled: boolean;
     ctx: null;
     ctx2: null;
     img: HTMLImageElement | undefined;
@@ -83,27 +151,56 @@ declare const _sfc_main: import("vue").DefineComponent<{
     tmpCropPositionInfo: Rect | undefined;
     tmpTagPositionInfo: Rect | undefined;
     tagArr: BoundingBox[];
+    cropArr: BoundingBox[];
+    config: any;
     initDataVar: () => void;
     containerRef: any;
     canvasRef: any;
     canvas2Ref: any;
+    status: {
+        isScaleing: boolean;
+        isDrawRecting: boolean;
+        isMoving: boolean;
+        resizeCropHovering: ResizeItem | undefined;
+        isMouseDown: () => boolean;
+        isMouseUpDownPoints: () => boolean;
+    };
+    actions: {
+        dragCreatRectInterrupt(): void;
+        dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resizeCrop'): void;
+        changeMode(): void;
+        scale(zoom: number, mouse: Point): void;
+        move(): void;
+        hoverRect(event: LayerTouchEvent): void;
+    };
+    hooks: {
+        onKeyUpCtrlB(): void;
+        onKeyUpSpace(): void;
+        onKeyDownSpace(): void;
+        onMouseOverMove(event: LayerTouchEvent): void;
+        onSpaceMove(): void;
+        onHoldMouseLeftBtnMove(event: LayerTouchEvent): void;
+        onDoubleClick(touchPoint: TypePoint): void;
+        onCick(touchPoint: TypePoint): void;
+        onWheel(zoom: number, mouse: Point): void;
+        init(): void;
+        resize(): void;
+    };
     onKeyDownListener: (e: any) => void;
     onKeyUpListener: (e: any) => void;
     addListenerKeyUpDown: () => void;
     removeListenerKeyUpDown: () => void;
-    initComponent: (isFirst?: boolean | undefined) => Promise<boolean>;
-    init: (isFirst?: boolean | undefined) => void;
+    initCropInfo: () => void;
+    initComponent: () => Promise<boolean>;
+    initResizeVar: () => void;
+    resizeRender: () => Promise<undefined>;
     onWindowResize: () => void;
-    onMouseWheel: (e: MouseEvent, privateCall?: boolean | undefined) => Error | undefined;
-    resetWheelStatus: (immediately?: boolean) => void;
+    onMouseWheel: (e: MouseEvent, privateCall?: boolean | undefined) => void;
     cleartMousePoints: () => void;
-    triggerCropInfoChange: () => void;
+    triggerCropListChange: () => void;
     triggerTagListChange: () => void;
-    getTagList: (tagList?: BoundingBox[] | undefined, _cropInfo?: BoundingBox | undefined, initScale?: number | undefined, imageWH?: WH | undefined) => (BoundingBox & {
-        scale?: number | undefined;
-        __isValidity?: boolean | undefined;
-    })[];
-    getCropBounding: (_cropInfo?: BoundingBox | undefined, _cropScale?: number | undefined, initScale?: number | undefined, imageWH?: WH | undefined) => BoundingBox;
+    getTagList: (tagList?: BoundingBox[] | undefined, _cropList?: BoundingBox[] | undefined, initScale?: number | undefined, imageWH?: WH | undefined) => TagItemTmp[];
+    getCropList: () => BoundingBox[];
     onMouseDown: (e: MouseEvent) => void;
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: () => void;
@@ -114,34 +211,54 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onTouchEnd: (event: any) => void;
     refreshDrawTags: () => void;
     removeTagItems: (removeList: BoundingBox[]) => void;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:tagList" | "tagListChange" | "update:mode" | "update:cropBounding" | "tagsStatusChange" | "cropChange")[], "update:tagList" | "tagListChange" | "update:mode" | "update:cropBounding" | "tagsStatusChange" | "cropChange", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
+    removeCropItems: (removeList: BoundingBox[]) => void;
+    getTagListGroupByCropIndex: () => {
+        [index: number]: BoundingBox[];
+    };
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "cropChange")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "cropChange", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
+    cropConfig?: unknown;
+    layerConfig?: unknown;
+    tagConfig?: unknown;
+    isShowTip?: unknown;
+    enableCropResize?: unknown;
     enableDrawCropOutOfImg?: unknown;
     enableDrawTagOutOfCrop?: unknown;
     enableDrawTagOutOfImg?: unknown;
-    cropBounding?: unknown;
+    cropList?: unknown;
     tagList?: unknown;
     mode?: unknown;
     src?: unknown;
 } & {
+    cropConfig: Record<string, any>;
+    layerConfig: Record<string, any>;
+    tagConfig: Record<string, any>;
+    isShowTip: boolean;
+    enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
     enableDrawTagOutOfImg: boolean;
+    cropList: unknown[];
     tagList: unknown[];
     mode: any;
     src: string;
-} & {
-    cropBounding?: any;
-}> & {
+} & {}> & {
+    "onUpdate:cropList"?: ((...args: any[]) => any) | undefined;
+    onCropListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:tagList"?: ((...args: any[]) => any) | undefined;
     onTagListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:mode"?: ((...args: any[]) => any) | undefined;
-    "onUpdate:cropBounding"?: ((...args: any[]) => any) | undefined;
     onTagsStatusChange?: ((...args: any[]) => any) | undefined;
     onCropChange?: ((...args: any[]) => any) | undefined;
 }, {
+    cropConfig: Record<string, any>;
+    layerConfig: Record<string, any>;
+    tagConfig: Record<string, any>;
+    isShowTip: boolean;
+    enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
     enableDrawTagOutOfImg: boolean;
+    cropList: unknown[];
     tagList: unknown[];
     mode: any;
 }>;

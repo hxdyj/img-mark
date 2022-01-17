@@ -192,15 +192,24 @@ export function pointIsInBoxList(
 		x: 0,
 		y: 0,
 	}
-) {
+): {
+	boxList: BoundingBox[]
+	indexList: number[]
+} {
 	let boxListPointIn: BoundingBox[] = []
+	let indexList: number[] = []
 	let arr = boxList.map(box => transfromBoxSize2Visual(box, scale, currentPosition))
 	arr.forEach((rect, index) => {
+		console.log(point, rect)
 		if (pointIsInBox(point, rect)) {
 			boxListPointIn.push(boxList[index])
+			indexList.push(index)
 		}
 	})
-	return boxListPointIn
+	return {
+		boxList: boxListPointIn,
+		indexList,
+	}
 }
 
 export function transfromBoxSize2Visual(box: BoundingBox, scale: number, currentPosition: Point): BoundingBox {
@@ -213,7 +222,7 @@ export function transfromBoxSize2Visual(box: BoundingBox, scale: number, current
 }
 
 export function pointIsInBox(point: Point, box: BoundingBox) {
-	if (point.x > box.startX && point.x < box.endX && point.y > box.startY && point.y < box.endY) {
+	if (point.x >= box.startX && point.x <= box.endX && point.y >= box.startY && point.y <= box.endY) {
 		return true
 	}
 	return false
@@ -225,7 +234,7 @@ export function pointIsInRect(point: Point, rect: Rect) {
 		startY: rect[1],
 		endY: rect[1] + rect[3],
 	}
-	if (point.x > rectPositionInfo.startX && point.x < rectPositionInfo.endX && point.y > rectPositionInfo.startY && point.y < rectPositionInfo.endY) {
+	if (point.x >= rectPositionInfo.startX && point.x <= rectPositionInfo.endX && point.y >= rectPositionInfo.startY && point.y <= rectPositionInfo.endY) {
 		return true
 	}
 	return false

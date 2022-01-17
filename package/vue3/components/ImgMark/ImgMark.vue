@@ -2,9 +2,6 @@
 Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
-TODO
-5. README.md API
-
 User Options
 1. Down Sapce Key and Drag Mouse Move to Draw
 2. Double Click Crop del crop
@@ -43,7 +40,7 @@ User Options
 <script setup lang="ts">
 // console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, groupBy } from 'lodash'
 import {
 	BoundingBox,
 	ResizeItem,
@@ -456,8 +453,8 @@ let hooks = {
 			// 	x: (touchPoint.x - currentPosition.x) * zoomScale * DPI,
 			// 	y: (touchPoint.y - currentPosition.y) * zoomScale * DPI,
 			// }
-			let removeCropList = pointIsInBoxList(touchPoint, cropArr, scale, currentPosition)
-			removeCropItems(removeCropList)
+			let removeCropInfo = pointIsInBoxList(touchPoint, cropArr, scale, currentPosition)
+			removeCropItems(removeCropInfo.boxList)
 		}
 	},
 	onCick(touchPoint: TypePoint) {
@@ -727,6 +724,9 @@ watch(
 		drawCropList(ctx2, cropArr, currentPosition, config)
 		tagArr = initBoundingArrScale(list, scale)
 		drawTagList(ctx2, tagArr, currentPosition, config)
+	},
+	{
+		deep: true,
 	}
 )
 
@@ -815,7 +815,7 @@ function cleartMousePoints() {
 
 function triggerCropListChange() {
 	nextTick().then(() => {
-		let list = getCropListBounding()
+		let list = getCropList()
 		emits('update:cropList', list)
 		emits('cropListChange', list)
 	})
@@ -834,6 +834,7 @@ type TagItemTmp = BoundingBox & {
 	__isValidity?: boolean
 	__newAdd?: boolean
 	__vertexPosition?: VertexPosition
+	__groupIndex?: number
 }
 
 function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScale?: number, imageWH?: WH) {
@@ -892,7 +893,7 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 	return resultList.filter(i => i.__isValidity !== false)
 }
 
-function getCropListBounding(): BoundingBox[] {
+function getCropList(): BoundingBox[] {
 	let list = cropArr.map(crop => {
 		let result: BoundingBox & { _del?: boolean } = {
 			startX: crop.startX,
@@ -1098,7 +1099,7 @@ function removeCropItems(removeList: BoundingBox[]) {
 	// console.log('remove', cloneDeep(removeList))
 	let newCropArr: BoundingBox[] = []
 	if (removeList.length !== 0) {
-		let currentList = getCropListBounding()
+		let currentList = getCropList()
 		currentList.forEach(tag => {
 			if (!removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
 				newCropArr.push(tag)
@@ -1116,9 +1117,28 @@ function removeCropItems(removeList: BoundingBox[]) {
 	})
 }
 
+function getTagListGroupByCropIndex(): {
+	[index: number]: BoundingBox[]
+} {
+	let tags = getTagList()
+	let crops = getCropList()
+	tags.forEach(tag => {
+		let result = pointIsInBoxList(
+			{
+				x: tag.startX,
+				y: tag.startY,
+			},
+			crops
+		)
+		tag.__groupIndex = result.indexList[0]
+	})
+	console.log(tags, crops)
+	return groupBy(tags, '__groupIndex')
+}
+
 defineExpose({
 	removeTagItems,
-	refreshDrawTags,
+	getTagListGroupByCropIndex,
 })
 </script>
 

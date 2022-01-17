@@ -19,8 +19,18 @@
 			{{ tagList }}
 			<el-input v-model="src"></el-input>
 			<el-alert :title="JSON.stringify(cropInfo)" type="info" style="margin-top: 20px"> </el-alert>
+			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="removeTag()">Remove All</el-button>
-			<el-alert v-for="item in tagList" @close="removeTag([item])" style="margin-top: 20px" :key="uid(6)" :title="JSON.stringify(item)" type="warning">
+			<el-alert
+				v-for="item in tagList"
+				@close="removeTag([item])"
+				@mouseenter="setHoverItem(item)"
+				@mouseleave="removeHoverItem(item)"
+				style="margin-top: 20px"
+				:key="uid(6)"
+				:title="JSON.stringify(item)"
+				type="warning"
+			>
 			</el-alert>
 			<hr />
 			<el-alert v-for="item in cropList" style="margin-top: 20px" :key="uid(6)" :title="JSON.stringify(item)" type="warning"> </el-alert>
@@ -37,7 +47,7 @@ let cropList = $ref<BoundingBox[]>([
 	{
 		startX: 0,
 		startY: 0,
-		endX: 500,
+		endX: 1774,
 		endY: 100,
 	},
 	{
@@ -80,11 +90,23 @@ function cropChange() {
 	removeTag()
 }
 
+function setHoverItem(item: MyBoundingBox) {
+	item.showOutLine = true
+}
+function removeHoverItem(item: MyBoundingBox) {
+	item.showOutLine = false
+}
+
 function tagsStatusChange(list: MyBoundingBox[]) {
 	let removeList = list.filter(i => !i.type)
 	if (removeList.length !== 0) {
 		removeTag(removeList)
 	}
+}
+
+function getGroupInfo() {
+	let groupInfo = imgMarkRef.getTagListGroupByCropIndex()
+	console.log(groupInfo)
 }
 </script>
 <style scoped lang="scss">
