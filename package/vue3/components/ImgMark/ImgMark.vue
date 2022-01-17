@@ -3,7 +3,6 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
-1. tag startPoint to Decide point is in cropInfo
 3. prop isShowTip
 4. prop enableCropResize
 5. README.md API
@@ -89,6 +88,9 @@ import {
 	fixBoxInfo,
 	pointIsInBoxList,
 	DEFAULT_CONFIG,
+	getVertexPositionByTwoPoints,
+	getPointByBoxAndVertexPosition,
+	VertexPosition,
 } from './util'
 
 let spaceKeyDown = false
@@ -781,10 +783,13 @@ function cleartMousePoints() {
 			}
 		} else {
 			if (tmpTagPositionInfo) {
-				let tagInfo = Object.assign(transfromRect2Box(tmpTagPositionInfo, currentPosition), {
+				let vertexPosition = getVertexPositionByTwoPoints(startMousePoint, endMousePoint)
+				let tagInfo = transfromRect2Box(tmpTagPositionInfo, currentPosition)
+				Object.assign(tagInfo, {
 					scale: 1,
 					isShow: true,
 					__newAdd: true,
+					__vertexPosition: vertexPosition,
 				})
 				tagArr.push(tagInfo)
 				triggerTagListChange()
@@ -820,6 +825,7 @@ type TagItemTmp = BoundingBox & {
 	scale?: number
 	__isValidity?: boolean
 	__newAdd?: boolean
+	__vertexPosition?: VertexPosition
 }
 
 function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScale?: number, imageWH?: WH) {
@@ -838,14 +844,8 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 		if (newTagInfo.scale === 1) {
 			delete newTagInfo.scale
 		}
-		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd) {
-			let tagStartXYinCropList = pointIsInBoxList(
-				{
-					x: newTagInfo.startX,
-					y: newTagInfo.startY,
-				},
-				cropList
-			)
+		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd && newTagInfo.__vertexPosition) {
+			let tagStartXYinCropList = pointIsInBoxList(getPointByBoxAndVertexPosition(newTagInfo, newTagInfo.__vertexPosition), cropList)
 			let mousePointCropInfo = tagStartXYinCropList[0]
 			if (!mousePointCropInfo) return
 			let intersectPart = getTwoBoxIntersectPart(newTagInfo, mousePointCropInfo)
@@ -1087,7 +1087,7 @@ function removeTagItems(removeList: BoundingBox[]) {
 
 function removeCropItems(removeList: BoundingBox[]) {
 	if (removeList.length === 0) return
-	console.log('remove', cloneDeep(removeList))
+	// console.log('remove', cloneDeep(removeList))
 	let newCropArr: BoundingBox[] = []
 	if (removeList.length !== 0) {
 		let currentList = getCropListBounding()

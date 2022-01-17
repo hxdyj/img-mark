@@ -470,7 +470,23 @@ export function moveDrawCropRect(
 	}
 	return undefined
 }
+export type VertexPosition = 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom'
+export function getVertexPositionByTwoPoints(startPoint: Point, endPoint: Point): VertexPosition {
+	let lr: 'left' | 'right' = startPoint.x <= endPoint.x ? 'left' : 'right'
+	let tb: 'bottom' | 'top' = startPoint.y <= endPoint.y ? 'top' : 'bottom'
 
+	return (lr + '-' + tb) as VertexPosition
+}
+
+export function getPointByBoxAndVertexPosition(box: BoundingBox, vertex: VertexPosition): Point {
+	let position = vertex.split('-') as ['left' | 'right', 'bottom' | 'top']
+	let x = position[0] === 'left' ? box.startX : box.endX
+	let y = position[1] === 'top' ? box.startY : box.endY
+	return {
+		x,
+		y,
+	}
+}
 export function moveDrawTagRect(
 	ctx: CanvasRenderingContext2D,
 	startPoint: Point,
