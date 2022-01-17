@@ -7,7 +7,6 @@ export const debug = false
 export const DEFAULT_CONFIG: Config = {
 	tagConfig: {
 		fillStyle: 'rgba(242, 88, 85, 0.5)',
-		textRectFillStyle: 'rgba(242, 88, 85, 0.5)',
 		textFillStyle: 'rgba(255, 255, 255, 0.6)',
 		hoverStrokeStyle: '#F25856',
 		hoverLineWidth: 1,
@@ -185,7 +184,15 @@ export function drawCropList(
 
 export type Rect = [left: number, top: number, width: number, height: number]
 
-export function pointIsInBoxList(point: Point, boxList: BoundingBox[], scale: number, currentPosition: Point) {
+export function pointIsInBoxList(
+	point: Point,
+	boxList: BoundingBox[],
+	scale: number = 1,
+	currentPosition: Point = {
+		x: 0,
+		y: 0,
+	}
+) {
 	let boxListPointIn: BoundingBox[] = []
 	let arr = boxList.map(box => transfromBoxSize2Visual(box, scale, currentPosition))
 	arr.forEach((rect, index) => {
@@ -357,13 +364,8 @@ export function drawTagRect(
 		ctx.fillRect(left, top, width, height)
 		if (index) {
 			let fontsize = parseFloat(ctx.font.split(' ')[0].replace('px', ''))
-			let measure = ctx.measureText('index')
-			let indexRectWitdh = measure.width
-			let indexRectHeight = height
-			ctx.fillStyle = config.tagConfig.textRectFillStyle
-			ctx.fillRect(left, top, indexRectWitdh, indexRectHeight)
 			ctx.fillStyle = config.tagConfig.textFillStyle
-			ctx.fillText(index + '', left + (indexRectWitdh - fontsize) / 2, top + indexRectHeight / 2 + fontsize / 2)
+			ctx.fillText(index + '', left + 4, top + height / 2 + fontsize / 2)
 		}
 	}
 	if (showOutLine) {

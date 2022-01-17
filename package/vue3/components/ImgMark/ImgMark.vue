@@ -3,6 +3,7 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
+1. tag startPoint to Decide point is in cropInfo
 3. prop isShowTip
 4. prop enableCropResize
 5. README.md API
@@ -136,7 +137,6 @@ type LayerConfig = {
 
 type TagConfig = {
 	fillStyle?: string
-	textRectFillStyle?: string
 	textFillStyle?: string
 	hoverStrokeStyle?: string
 	hoverLineWidth?: number
@@ -387,12 +387,18 @@ let hooks = {
 	},
 	/* Space 弹起 */
 	onKeyUpSpace() {
-		if (!status.isMoving) {
+		if (!status.isMoving && !status.resizeCropHovering) {
 			actions.dragCreatRectInterrupt()
 		}
 		nextTick().then(() => {
 			spaceKeyDown = false
 		})
+	},
+	onKeyDownSpace() {
+		containerRef.style.cursor = 'crosshair'
+		if (!status.isMouseDown()) {
+			spaceKeyDown = true
+		}
 	},
 	onMouseOverMove(event: LayerTouchEvent) {
 		//当没有鼠标按下的时候
@@ -478,9 +484,7 @@ let hooks = {
 function onKeyDownListener(e) {
 	if (e.code === 'Space') {
 		e.preventDefault()
-		if (!status.isMouseDown()) {
-			spaceKeyDown = true
-		}
+		hooks.onKeyDownSpace()
 	}
 }
 
@@ -793,6 +797,7 @@ function cleartMousePoints() {
 	status.isDrawRecting = false
 	startMousePoint = cloneDeep(defaultPoint)
 	endMousePoint = cloneDeep(defaultPoint)
+	containerRef.style.cursor = 'auto'
 }
 
 function triggerCropListChange() {
@@ -833,28 +838,27 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 		if (newTagInfo.scale === 1) {
 			delete newTagInfo.scale
 		}
-		//TODO
-		// if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd) {
-		// 	let tagStartXYinCropList = pointIsInBoxList(
-		// 		{
-		// 			x: newTagInfo.startX,
-		// 			y: newTagInfo.startY,
-		// 		},
-		// 		cropList
-		// 	)
-		// 	let mousePointCropInfo = tagStartXYinCropList[0]
-		// 	if (!mousePointCropInfo) return
-		// 	let intersectPart = getTwoBoxIntersectPart(newTagInfo, mousePointCropInfo)
-		// 	if (!intersectPart) {
-		// 		newTagInfo.__isValidity = false
-		// 	} else {
-		// 		if (!isBoxValidity(intersectPart)) {
-		// 			newTagInfo.__isValidity = false
-		// 		} else {
-		// 			Object.assign(newTagInfo, intersectPart)
-		// 		}
-		// 	}
-		// }
+		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd) {
+			let tagStartXYinCropList = pointIsInBoxList(
+				{
+					x: newTagInfo.startX,
+					y: newTagInfo.startY,
+				},
+				cropList
+			)
+			let mousePointCropInfo = tagStartXYinCropList[0]
+			if (!mousePointCropInfo) return
+			let intersectPart = getTwoBoxIntersectPart(newTagInfo, mousePointCropInfo)
+			if (!intersectPart) {
+				newTagInfo.__isValidity = false
+			} else {
+				if (!isBoxValidity(intersectPart)) {
+					newTagInfo.__isValidity = false
+				} else {
+					Object.assign(newTagInfo, intersectPart)
+				}
+			}
+		}
 		delete newTagInfo.__newAdd
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
 			let whObj = imageWH || imgWH
@@ -931,7 +935,7 @@ function onMouseDown(e: MouseEvent) {
 		y: event.layerY,
 	}
 	//检测是否点在了crop的border或者vertex上边
-	if (props.mode === 'crop') {
+	if (props.mode === 'crop' && !spaceKeyDown) {
 		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropArr, zoomScale, currentPosition, origin)
 		if (detectResult.hasIn) {
 			status.resizeCropHovering = findOneBorderOrVertex(detectResult.list)
