@@ -559,11 +559,12 @@ async function initComponent() {
 
 			if (boxStretchScale === widthRate) {
 				currentPosition.x = (canvasWH.width * whiteRate) / 2 / canvasZoom
-				currentPosition.y = (canvasWH.height - cropBoxInfo[3] * canvasZoom * DPI) / 2
+				currentPosition.y = (canvasWH.height / canvasZoom - cropBoxInfo[3]) / 2
 			} else {
-				currentPosition.x = (canvasWH.width - cropBoxInfo[2] * canvasZoom * DPI) / 2
+				currentPosition.x = (canvasWH.width / canvasZoom - cropBoxInfo[2]) / 2
 				currentPosition.y = (canvasWH.height * whiteRate) / 2 / canvasZoom
 			}
+
 			onMouseWheel(
 				{
 					deltaY: 1,
