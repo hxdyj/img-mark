@@ -10,6 +10,15 @@
 
 ## 使用
 
+### 引入样式
+
+```ts
+//main.ts
+import 'img-mark/dist/style.css'
+```
+
+### 示例
+
 ```vue
 <template>
 	<div class="page-test-img-mark">
