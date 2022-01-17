@@ -1,7 +1,30 @@
 import { cloneDeep } from 'lodash'
+import { Config } from './ImgMark.vue'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
 export const debug = false
+
+export const DEFAULT_CONFIG: Config = {
+	tagConfig: {
+		fillStyle: 'rgba(242, 88, 85, 0.5)',
+		textRectFillStyle: 'rgba(242, 88, 85, 0.5)',
+		textFillStyle: 'rgba(255, 255, 255, 0.6)',
+		hoverStrokeStyle: '#F25856',
+		hoverLineWidth: 1,
+		hoverLineDash: [5],
+		highlightStrokeStyle: 'yellow',
+		highlightLineWidth: 2,
+		highlightLineDash: [5],
+	},
+	layerConfig: {
+		fillStyle: 'rgba(0, 0, 0, 0.6)',
+	},
+	cropConfig: {
+		lineDash: [],
+		strokeStyle: 'rgba(255, 255, 255, 1)',
+		lineWidth: 2,
+	},
+}
 
 export type WH = {
 	width: number
@@ -49,8 +72,8 @@ export function drawImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 	ctx.drawImage(img, left, top, width, height)
 }
 
-export function drawLayerBg(ctx: CanvasRenderingContext2D) {
-	ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'
+export function drawLayerBg(ctx: CanvasRenderingContext2D, config: Config) {
+	ctx.fillStyle = config.layerConfig.fillStyle
 	ctx.fillRect(-CancasSafeArea / 2, -CancasSafeArea / 2, CancasSafeArea, CancasSafeArea)
 }
 
@@ -58,10 +81,10 @@ export function drawLayerImageData(ctx: CanvasRenderingContext2D, left: number, 
 	ctx.clearRect(left, top, width, height)
 }
 
-export function drawLayerBorder(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number) {
-	ctx.setLineDash([])
-	ctx.strokeStyle = 'rgba(255, 255, 255, 1)'
-	ctx.lineWidth = 2
+export function drawLayerBorder(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config) {
+	ctx.setLineDash(config.cropConfig.lineDash)
+	ctx.strokeStyle = config.cropConfig.strokeStyle
+	ctx.lineWidth = config.cropConfig.lineWidth
 	ctx.strokeRect(left, top, width, height)
 }
 
@@ -128,19 +151,26 @@ export function amendMobileTouchEventDpi(touchEvent: TouchEvent) {
 	})
 }
 
-export function drawCropRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, unClearCanvas?: boolean) {
+export function drawCropRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, unClearCanvas?: boolean) {
 	if (!unClearCanvas) {
 		clearCanvas(ctx)
-		drawLayerBg(ctx)
+		drawLayerBg(ctx, config)
 	}
 	drawLayerImageData(ctx, left, top, width, height)
-	drawLayerBorder(ctx, left, top, width, height)
+	drawLayerBorder(ctx, left, top, width, height, config)
 }
 
-export function drawCropList(ctx: CanvasRenderingContext2D, cropList: BoundingBox[], currentPosition: Point, offset?: Offset, unClearCanvas?: boolean) {
+export function drawCropList(
+	ctx: CanvasRenderingContext2D,
+	cropList: BoundingBox[],
+	currentPosition: Point,
+	config: Config,
+	offset?: Offset,
+	unClearCanvas?: boolean
+) {
 	if (!unClearCanvas) {
 		clearCanvas(ctx)
-		drawLayerBg(ctx)
+		drawLayerBg(ctx, config)
 	}
 	cropList.forEach(crop => {
 		let position = transfromBoundingBoxToLtwh(crop, crop.scale, currentPosition)
@@ -149,7 +179,7 @@ export function drawCropList(ctx: CanvasRenderingContext2D, cropList: BoundingBo
 			position[1] += offset.offsetY
 		}
 		drawLayerImageData(ctx, ...position)
-		drawLayerBorder(ctx, ...position)
+		drawLayerBorder(ctx, ...position, config)
 	})
 }
 
@@ -296,6 +326,7 @@ export function drawTagRect(
 	top: number,
 	width: number,
 	height: number,
+	config: Config,
 	index?: number,
 	touchPoint?: TypePoint,
 	isShow?: boolean,
@@ -309,23 +340,23 @@ export function drawTagRect(
 	// if (debug) console.log(`DRAW ITEM${index}`, touchPoint, [left, top, width, height], isShow)
 	if (!touchPoint && !isShow) return
 	if (isShow && (!touchPoint || touchPoint.type !== 'move')) {
-		ctx.fillStyle = 'rgba(242, 88, 85, 0.5)'
+		ctx.fillStyle = config.tagConfig.fillStyle
 		ctx.fillRect(left, top, width, height)
 		if (index) {
 			let fontsize = parseFloat(ctx.font.split(' ')[0].replace('px', ''))
 			let measure = ctx.measureText('index')
 			let indexRectWitdh = measure.width
 			let indexRectHeight = height
-			ctx.fillStyle = 'rgba(242, 88, 85, 0.5)'
+			ctx.fillStyle = config.tagConfig.textRectFillStyle
 			ctx.fillRect(left, top, indexRectWitdh, indexRectHeight)
-			ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+			ctx.fillStyle = config.tagConfig.textFillStyle
 			ctx.fillText(index + '', left + (indexRectWitdh - fontsize) / 2, top + indexRectHeight / 2 + fontsize / 2)
 		}
 	}
 	if (showOutLine) {
-		ctx.strokeStyle = 'yellow'
-		ctx.lineWidth = 2
-		ctx.setLineDash([5])
+		ctx.strokeStyle = config.tagConfig.highlightStrokeStyle
+		ctx.lineWidth = config.tagConfig.highlightLineWidth
+		ctx.setLineDash(config.tagConfig.highlightLineDash)
 		ctx.strokeRect(left, top, width, height)
 	}
 	let isCrash = false
@@ -341,9 +372,9 @@ export function drawTagRect(
 				}
 			}
 			if (touchPoint.type === 'move' && !isShow) {
-				ctx.strokeStyle = '#F25856'
-				ctx.lineWidth = 1
-				ctx.setLineDash([5])
+				ctx.strokeStyle = config.tagConfig.hoverStrokeStyle
+				ctx.lineWidth = config.tagConfig.hoverLineWidth
+				ctx.setLineDash(config.tagConfig.hoverLineDash)
 				ctx.strokeRect(left, top, width, height)
 			}
 		}
@@ -359,6 +390,7 @@ export function drawTagList(
 	ctx: CanvasRenderingContext2D,
 	list: BoundingBox[],
 	currentPosition: Point,
+	config: Config,
 	offsetInfo: Offset = {
 		offsetX: 0,
 		offsetY: 0,
@@ -372,7 +404,7 @@ export function drawTagList(
 		positions[0] += offsetInfo!.offsetX
 		positions[1] += offsetInfo!.offsetY
 		// if (debug) console.log(`DRAW ITEM${index}`, tagInfo, positions)
-		let drawTagInfo = drawTagRect(ctx, ...positions, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine)
+		let drawTagInfo = drawTagRect(ctx, ...positions, config, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine)
 		if (drawTagInfo !== undefined) {
 			tagInfo.isShow = drawTagInfo.isShow
 			if (drawTagInfo.isCrash) {
@@ -410,13 +442,14 @@ export function moveDrawCropRect(
 	zoomScale,
 	origin: Point,
 	cropList: BoundingBox[],
-	currentPosition: Point
+	currentPosition: Point,
+	config: Config
 ) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
 		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
-			drawCropList(ctx, cropList, currentPosition)
-			drawCropRect(ctx, ...position, true)
+			drawCropList(ctx, cropList, currentPosition, config)
+			drawCropRect(ctx, ...position, config, true)
 			return position
 		}
 	}
@@ -430,14 +463,15 @@ export function moveDrawTagRect(
 	zoomScale: number,
 	origin: Point,
 	tagArr: BoundingBox[],
-	currentPosition: Point
+	currentPosition: Point,
+	config: Config
 ) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
 		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
 			// if (debug) console.log('DRAW Tag', position)
-			drawTagList(ctx, tagArr, currentPosition)
-			drawTagRect(ctx, ...position, tagArr.length + 1, undefined, true)
+			drawTagList(ctx, tagArr, currentPosition, config)
+			drawTagRect(ctx, ...position, config, tagArr.length + 1, undefined, true)
 			return position
 		}
 	}
@@ -480,7 +514,8 @@ export function moveCanvas(
 	endPoint: Point,
 	cropList: BoundingBox[],
 	zoomScale: number,
-	tagArr: BoundingBox[]
+	tagArr: BoundingBox[],
+	config: Config
 ): Offset | undefined {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
 		let offsetResult = twoPointsGetOffsetInfo(startPoint, endPoint, zoomScale)
@@ -497,8 +532,8 @@ export function moveCanvas(
 			// boundingBoxPosition[0] += offsetX
 			// boundingBoxPosition[1] += offsetY
 			// drawCropRect(ctx2, ...boundingBoxPosition)
-			drawCropList(ctx2, cropList, currentPosition, offsetResult.offsetInfo)
-			drawTagList(ctx2, tagArr, currentPosition, {
+			drawCropList(ctx2, cropList, currentPosition, config, offsetResult.offsetInfo)
+			drawTagList(ctx2, tagArr, currentPosition, config, {
 				offsetX,
 				offsetY,
 			})
@@ -551,7 +586,8 @@ export function moveDrawUnshowTagDashRect(
 	e: LayerTouchEvent,
 	cropList: BoundingBox[],
 	isScaleing: boolean,
-	hasHoverRectInTagItem: boolean
+	hasHoverRectInTagItem: boolean,
+	config: Config
 ) {
 	/*
   判断tagArr里边unShow的tag在坐标点，就绘制，不在页绘制为空
@@ -571,12 +607,12 @@ export function moveDrawUnshowTagDashRect(
 		})
 		if (isHasTouchPointInArr) {
 			hasHoverRectInTagItem = true
-			drawTagList(ctx, dashArr, currentPosition, undefined, touchPoint)
+			drawTagList(ctx, dashArr, currentPosition, config, undefined, touchPoint)
 		} else {
 			if (hasHoverRectInTagItem) {
 				// console.log('CLEAN HOVER Rect')
-				drawCropList(ctx, cropList, currentPosition)
-				drawTagList(ctx, tagArr, currentPosition)
+				drawCropList(ctx, cropList, currentPosition, config)
+				drawTagList(ctx, tagArr, currentPosition, config)
 				hasHoverRectInTagItem = false
 			}
 		}
@@ -766,7 +802,8 @@ export function moveResizeCrop(
 	currentPosition: Point,
 	tagArr: BoundingBox[],
 	resizeCropHovering: ResizeItem,
-	cropList: BoundingBox[]
+	cropList: BoundingBox[],
+	config: Config
 ) {
 	if (startPoint && startPoint.x !== undefined && endPoint && endPoint.x !== undefined) {
 		let offsetResult = twoPointsGetOffsetInfo(startPoint, endPoint, zoomScale)
@@ -784,9 +821,9 @@ export function moveResizeCrop(
 
 			let position = transfromBoundingBoxToLtwh(newCropInfo, cropScale, currentPosition)
 
-			drawCropList(ctx, cropList, currentPosition)
-			drawCropRect(ctx, ...position, true)
-			drawTagList(ctx, tagArr, currentPosition, undefined, undefined)
+			drawCropList(ctx, cropList, currentPosition, config)
+			drawCropRect(ctx, ...position, config, true)
+			drawTagList(ctx, tagArr, currentPosition, config)
 			return position
 		}
 	}

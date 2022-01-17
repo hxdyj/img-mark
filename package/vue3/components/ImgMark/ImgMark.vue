@@ -3,7 +3,6 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
-2. custom color and fontsize
 3. prop isShowTip
 4. prop enableCropResize
 5. README.md API
@@ -45,7 +44,7 @@ User Options
 
 <script setup lang="ts">
 // console.log('Init Component.')
-import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import {
 	BoundingBox,
@@ -87,9 +86,8 @@ import {
 	TypePoint,
 	DPI,
 	fixRectInfo,
-	pointIsInRect,
 	pointIsInBoxList,
-	fixPoint,
+	DEFAULT_CONFIG,
 } from './util'
 
 let spaceKeyDown = false
@@ -125,8 +123,40 @@ function initVar() {
 	zoomIntensity = 0.1
 	status.resizeCropHovering = undefined
 }
+
+type CropConfig = {
+	lineDash?: number[]
+	strokeStyle?: string
+	lineWidth?: number
+}
+
+type LayerConfig = {
+	fillStyle?: string
+}
+
+type TagConfig = {
+	fillStyle?: string
+	textRectFillStyle?: string
+	textFillStyle?: string
+	hoverStrokeStyle?: string
+	hoverLineWidth?: number
+	hoverLineDash?: number[]
+	highlightStrokeStyle?: string
+	highlightLineWidth?: number
+	highlightLineDash?: number[]
+}
+
+export type Config = {
+	cropConfig: Required<CropConfig>
+	layerConfig: Required<LayerConfig>
+	tagConfig: Required<TagConfig>
+}
+
 let props = withDefaults(
 	defineProps<{
+		cropConfig?: CropConfig
+		layerConfig?: LayerConfig
+		tagConfig?: TagConfig
 		//是否允许crop画到图片外
 		enableDrawCropOutOfImg?: boolean
 		//是否允许Tag画到crop外
@@ -139,6 +169,9 @@ let props = withDefaults(
 		src: string
 	}>(),
 	{
+		tagConfig: () => DEFAULT_CONFIG.tagConfig,
+		layerConfig: () => DEFAULT_CONFIG.layerConfig,
+		cropConfig: () => DEFAULT_CONFIG.cropConfig,
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
@@ -190,6 +223,14 @@ let tmpCropPositionInfo: Rect | undefined
 let tmpTagPositionInfo: Rect | undefined
 let tagArr: BoundingBox[] = []
 let cropArr: BoundingBox[] = []
+
+let config = $computed<Config>(() => {
+	let obj = cloneDeep(DEFAULT_CONFIG)
+	Object.assign(obj.cropConfig, props.cropConfig)
+	Object.assign(obj.tagConfig, props.tagConfig)
+	Object.assign(obj.layerConfig, props.layerConfig)
+	return obj
+})
 
 function initDataVar() {
 	inited = false
@@ -243,13 +284,13 @@ let actions = {
 		if (!ctx2) return
 		status.isDrawRecting = true
 		if (type == 'drawCrop') {
-			tmpCropPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, cropArr, currentPosition)
-			drawTagList(ctx2, tagArr, currentPosition)
+			tmpCropPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, cropArr, currentPosition, config)
+			drawTagList(ctx2, tagArr, currentPosition, config)
 		}
 
 		if (type == 'drawTag') {
-			drawCropList(ctx2, cropArr, currentPosition)
-			tmpTagPositionInfo = moveDrawTagRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, tagArr, currentPosition)
+			drawCropList(ctx2, cropArr, currentPosition, config)
+			tmpTagPositionInfo = moveDrawTagRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, tagArr, currentPosition, config)
 		}
 
 		if (type == 'resizeCrop') {
@@ -266,7 +307,8 @@ let actions = {
 				currentPosition,
 				tagArr,
 				status.resizeCropHovering,
-				cropArr.filter((item, i) => i !== status.resizeCropHovering?.index)
+				cropArr.filter((item, i) => i !== status.resizeCropHovering?.index),
+				config
 			)
 		}
 	},
@@ -299,15 +341,15 @@ let actions = {
 		clearCanvas(ctx)
 		clearCanvas(ctx2)
 		drawImage(ctx, img, currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
-		drawCropList(ctx2, cropArr, currentPosition)
-		drawTagList(ctx2, tagArr, currentPosition, undefined)
+		drawCropList(ctx2, cropArr, currentPosition, config)
+		drawTagList(ctx2, tagArr, currentPosition, config)
 		hasHoverRectInTagItem = false
 		status.isScaleing = false
 	},
 	move() {
 		if (!ctx || !ctx2 || !img) return
 		status.isMoving = true
-		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr)
+		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr, config)
 		if (offsetInfo) {
 			tmpCurrentPosition = cloneDeep(currentPosition)
 			if (!tmpCurrentPosition) return
@@ -328,7 +370,8 @@ let actions = {
 			event,
 			cropArr,
 			status.isScaleing,
-			hasHoverRectInTagItem
+			hasHoverRectInTagItem,
+			config
 		)
 
 		//检测鼠标是否在裁剪框四边上
@@ -404,11 +447,11 @@ let hooks = {
 	onCick(touchPoint: TypePoint) {
 		if (props.mode !== 'tag') return
 		if (!ctx2) return
-		drawCropList(ctx2, cropArr, currentPosition)
-		let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, undefined, touchPoint)
+		drawCropList(ctx2, cropArr, currentPosition, config)
+		let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, config, undefined, touchPoint)
 		if (isReDraw) {
-			drawCropList(ctx2, cropArr, currentPosition)
-			drawTagList(ctx2, tagArr, currentPosition)
+			drawCropList(ctx2, cropArr, currentPosition, config)
+			drawTagList(ctx2, tagArr, currentPosition, config)
 			triggerTagListChange()
 			emits('tagsStatusChange', getTagList(redrawList))
 		}
@@ -583,9 +626,9 @@ async function initComponent() {
 		// if (debug) console.log('Crop Current', initPosition)
 		// drawCropRect(ctx2, ...initPosition)
 		cropArr = initBoundingArrScale(cropArr, scale)
-		drawCropList(ctx2, cropArr, currentPosition)
+		drawCropList(ctx2, cropArr, currentPosition, config)
 		tagArr = initBoundingArrScale(tagArr, scale)
-		drawTagList(ctx2, tagArr, currentPosition)
+		drawTagList(ctx2, tagArr, currentPosition, config)
 		return true
 	})
 }
@@ -627,9 +670,9 @@ async function resizeRender() {
 	ctx2.translate(-origin.x, -origin.y)
 	drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
 	cropArr = initBoundingArrScale(cropArr, scale)
-	drawCropList(ctx2, cropArr, currentPosition)
+	drawCropList(ctx2, cropArr, currentPosition, config)
 	tagArr = initBoundingArrScale(tagArr, scale)
-	drawTagList(ctx2, tagArr, currentPosition)
+	drawTagList(ctx2, tagArr, currentPosition, config)
 	inited = true
 }
 
@@ -667,9 +710,9 @@ watch(
 	() => props.tagList,
 	list => {
 		if (!ctx2) return
-		drawCropList(ctx2, cropArr, currentPosition)
+		drawCropList(ctx2, cropArr, currentPosition, config)
 		tagArr = initBoundingArrScale(list, scale)
-		drawTagList(ctx2, tagArr, currentPosition)
+		drawTagList(ctx2, tagArr, currentPosition, config)
 	}
 )
 
@@ -678,8 +721,8 @@ watch(
 	list => {
 		cropArr = initBoundingArrScale(list, scale)
 		if (!ctx2) return
-		drawCropList(ctx2, cropArr, currentPosition)
-		drawTagList(ctx2, tagArr, currentPosition)
+		drawCropList(ctx2, cropArr, currentPosition, config)
+		drawTagList(ctx2, tagArr, currentPosition, config)
 	}
 )
 function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
@@ -1011,9 +1054,9 @@ function onTouchEnd(event) {
 function refreshDrawTags() {
 	if (!ctx2) return
 	cropArr = initBoundingArrScale(props.cropList, scale)
-	drawCropList(ctx2, cropArr, currentPosition)
+	drawCropList(ctx2, cropArr, currentPosition, config)
 	tagArr = initBoundingArrScale(props.tagList, scale)
-	drawTagList(ctx2, tagArr, currentPosition)
+	drawTagList(ctx2, tagArr, currentPosition, config)
 }
 /* API */
 function removeTagItems(removeList: BoundingBox[]) {
@@ -1031,8 +1074,8 @@ function removeTagItems(removeList: BoundingBox[]) {
 		if (!ctx2) {
 			throw new Error(`ctx2  can't find on removeItem.`)
 		}
-		drawCropList(ctx2, cropArr, currentPosition)
-		drawTagList(ctx2, tagArr, currentPosition)
+		drawCropList(ctx2, cropArr, currentPosition, config)
+		drawTagList(ctx2, tagArr, currentPosition, config)
 		triggerTagListChange()
 	})
 }
@@ -1054,8 +1097,8 @@ function removeCropItems(removeList: BoundingBox[]) {
 		if (!ctx2) {
 			throw new Error(`ctx2  can't find on removeItem.`)
 		}
-		drawCropList(ctx2, cropArr, currentPosition)
-		drawTagList(ctx2, tagArr, currentPosition)
+		drawCropList(ctx2, cropArr, currentPosition, config)
+		drawTagList(ctx2, tagArr, currentPosition, config)
 		triggerCropListChange()
 	})
 }
