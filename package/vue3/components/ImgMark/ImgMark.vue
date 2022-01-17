@@ -4,7 +4,6 @@ Known issues
 
 TODO
 3. prop isShowTip
-4. prop enableCropResize
 5. README.md API
 
 User Options
@@ -159,6 +158,7 @@ let props = withDefaults(
 		cropConfig?: CropConfig
 		layerConfig?: LayerConfig
 		tagConfig?: TagConfig
+		enableCropResize?: boolean
 		//是否允许crop画到图片外
 		enableDrawCropOutOfImg?: boolean
 		//是否允许Tag画到crop外
@@ -174,6 +174,7 @@ let props = withDefaults(
 		tagConfig: () => DEFAULT_CONFIG.tagConfig,
 		layerConfig: () => DEFAULT_CONFIG.layerConfig,
 		cropConfig: () => DEFAULT_CONFIG.cropConfig,
+		enableCropResize: true,
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
@@ -296,22 +297,26 @@ let actions = {
 		}
 
 		if (type == 'resizeCrop') {
-			let clickedCrop = cropArr[status.resizeCropHovering?.index || 0]
-			if (!status.resizeCropHovering || !clickedCrop) return
+			if (props.enableCropResize) {
+				let clickedCrop = cropArr[status.resizeCropHovering?.index || 0]
+				if (!status.resizeCropHovering || !clickedCrop) return
 
-			tmpCropPositionInfo = moveResizeCrop(
-				ctx2,
-				startMousePoint,
-				endMousePoint,
-				clickedCrop,
-				clickedCrop.scale || 1,
-				zoomScale,
-				currentPosition,
-				tagArr,
-				status.resizeCropHovering,
-				cropArr.filter((item, i) => i !== status.resizeCropHovering?.index),
-				config
-			)
+				tmpCropPositionInfo = moveResizeCrop(
+					ctx2,
+					startMousePoint,
+					endMousePoint,
+					clickedCrop,
+					clickedCrop.scale || 1,
+					zoomScale,
+					currentPosition,
+					tagArr,
+					status.resizeCropHovering,
+					cropArr.filter((item, i) => i !== status.resizeCropHovering?.index),
+					config
+				)
+			} else {
+				actions.move()
+			}
 		}
 	},
 	changeMode() {
@@ -349,7 +354,7 @@ let actions = {
 		status.isScaleing = false
 	},
 	move() {
-		if (!ctx || !ctx2 || !img) return
+		if (!ctx || !ctx2 || !img || status.isScaleing) return
 		status.isMoving = true
 		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr, config)
 		if (offsetInfo) {
@@ -375,9 +380,10 @@ let actions = {
 			hasHoverRectInTagItem,
 			config
 		)
-
-		//检测鼠标是否在裁剪框四边上
-		moveDetectCropBorderSetCursor(containerRef, event, props.mode, cropArr, zoomScale, currentPosition, origin, status.isScaleing)
+		if (props.enableCropResize) {
+			//检测鼠标是否在裁剪框四边上
+			moveDetectCropBorderSetCursor(containerRef, event, props.mode, cropArr, zoomScale, currentPosition, origin, status.isScaleing)
+		}
 	},
 }
 
@@ -745,7 +751,7 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	if (!inited && !event.__zoom) return
 	event.preventDefault()
 	//空格键按下的时候不能缩放
-	if (status.isDrawRecting) return
+	if (status.isDrawRecting || status.isMoving) return
 	//有startMousePoint的时候也不能缩放
 	// if ((startMousePoint.x !== undefined || endMousePoint.x !== undefined) && !event.onTouchMove) return
 
