@@ -173,7 +173,7 @@ export function drawCropList(
 		drawLayerBg(ctx, config)
 	}
 	cropList.forEach(crop => {
-		let position = transfromBoundingBoxToLtwh(crop, crop.scale, currentPosition)
+		let position = transfromBoxToRect(crop, crop.scale, currentPosition)
 		if (offset) {
 			position[0] += offset.offsetX
 			position[1] += offset.offsetY
@@ -185,17 +185,32 @@ export function drawCropList(
 
 export type Rect = [left: number, top: number, width: number, height: number]
 
-export function pointIsInBoxList(point: Point, boxList: BoundingBox[]) {
+export function pointIsInBoxList(point: Point, boxList: BoundingBox[], scale: number, currentPosition: Point) {
 	let boxListPointIn: BoundingBox[] = []
-	let rectList = boxList.map(box => transfromBoundingBoxToLtwh(box))
-	rectList.forEach((rect, index) => {
-		if (pointIsInRect(point, rect)) {
+	let arr = boxList.map(box => transfromBoxSize2Visual(box, scale, currentPosition))
+	arr.forEach((rect, index) => {
+		if (pointIsInBox(point, rect)) {
 			boxListPointIn.push(boxList[index])
 		}
 	})
 	return boxListPointIn
 }
 
+export function transfromBoxSize2Visual(box: BoundingBox, scale: number, currentPosition: Point): BoundingBox {
+	let obj: BoundingBox = cloneDeep(box)
+	obj.startX = obj.startX * scale + currentPosition.x
+	obj.endX = obj.endX * scale + currentPosition.x
+	obj.startY = obj.startY * scale + currentPosition.y
+	obj.endY = obj.endY * scale + currentPosition.y
+	return obj
+}
+
+export function pointIsInBox(point: Point, box: BoundingBox) {
+	if (point.x > box.startX && point.x < box.endX && point.y > box.startY && point.y < box.endY) {
+		return true
+	}
+	return false
+}
 export function pointIsInRect(point: Point, rect: Rect) {
 	let rectPositionInfo = {
 		startX: rect[0],
@@ -204,13 +219,13 @@ export function pointIsInRect(point: Point, rect: Rect) {
 		endY: rect[1] + rect[3],
 	}
 	if (point.x > rectPositionInfo.startX && point.x < rectPositionInfo.endX && point.y > rectPositionInfo.startY && point.y < rectPositionInfo.endY) {
-		// console.log('PointInRect', point, rectPositionInfo)
 		return true
 	}
 	return false
 }
 
-export function transfromTwoPointsToLtwh(pointStart: Point, pointEnd: Point): Rect {
+//transfromTwoPoints2Rect
+export function transfromTwoPoints2Rect(pointStart: Point, pointEnd: Point): Rect {
 	let width = Math.abs(pointEnd.x - pointStart.x)
 	let height = Math.abs(pointEnd.y - pointStart.y)
 	let left = Math.min(pointStart.x, pointEnd.x)
@@ -228,14 +243,14 @@ export type BoundingBox = {
 	showOutLine?: boolean
 }
 
-type FixRectInfoReturn = {
+type FixBoxInfoReturn = {
 	info: BoundingBox
 	position: Rect
 }
 /*
 startX endX  负数相反不对的部分给修正
 */
-export function fixRectInfo(boundingBox: BoundingBox): FixRectInfoReturn {
+export function fixBoxInfo(boundingBox: BoundingBox): FixBoxInfoReturn {
 	let newInfo = cloneDeep(boundingBox)
 	let { startX, startY, endX, endY } = newInfo
 	let width = Math.abs(startX - endX)
@@ -251,10 +266,9 @@ export function fixRectInfo(boundingBox: BoundingBox): FixRectInfoReturn {
 		position: [startX, startY, width, height],
 	}
 }
-
-export function getTwoRectIntersectPart(rect1: BoundingBox, rect2: BoundingBox): BoundingBox | undefined {
-	let fixInfo1 = fixRectInfo(rect1)
-	let fixInfo2 = fixRectInfo(rect2)
+export function getTwoBoxIntersectPart(box1: BoundingBox, box2: BoundingBox): BoundingBox | undefined {
+	let fixInfo1 = fixBoxInfo(box1)
+	let fixInfo2 = fixBoxInfo(box2)
 	let minStartY = Math.min(fixInfo1.info.startY, fixInfo2.info.startY)
 	let maxEndY = Math.max(fixInfo1.info.endY, fixInfo2.info.endY)
 	let lengthY = Math.abs(maxEndY - minStartY)
@@ -293,7 +307,7 @@ export function getTwoRectIntersectPart(rect1: BoundingBox, rect2: BoundingBox):
 	return undefined
 }
 
-export function transfromBoundingBoxToLtwh(
+export function transfromBoxToRect(
 	position: BoundingBox,
 	scale = 1,
 	currentPosition: Point = {
@@ -301,15 +315,14 @@ export function transfromBoundingBoxToLtwh(
 		y: 0,
 	}
 ): Rect {
-	let fixResult = fixRectInfo(position)
+	let fixResult = fixBoxInfo(position)
 	let { startX, startY } = fixResult.info
 	let width = fixResult.position[2]
 	let height = fixResult.position[3]
 	return [startX * scale + currentPosition.x, startY * scale + currentPosition.y, width * scale, height * scale]
 }
-
-export function isRectValidity(rect: BoundingBox) {
-	let position = transfromBoundingBoxToLtwh(rect)
+export function isBoxValidity(box: BoundingBox) {
+	let position = transfromBoxToRect(box)
 	if (position[2] >= 5 && position[3] >= 5) {
 		return true
 	}
@@ -400,7 +413,7 @@ export function drawTagList(
 	let isReDraw = false
 	let redrawList: BoundingBox[] = []
 	list.forEach((tagInfo, index) => {
-		let positions = transfromBoundingBoxToLtwh(tagInfo, tagInfo.scale, currentPosition)
+		let positions = transfromBoxToRect(tagInfo, tagInfo.scale, currentPosition)
 		positions[0] += offsetInfo!.offsetX
 		positions[1] += offsetInfo!.offsetY
 		// if (debug) console.log(`DRAW ITEM${index}`, tagInfo, positions)
@@ -446,7 +459,7 @@ export function moveDrawCropRect(
 	config: Config
 ) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
-		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
+		let position = fixMoveRectPosition(transfromTwoPoints2Rect(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
 			drawCropList(ctx, cropList, currentPosition, config)
 			drawCropRect(ctx, ...position, config, true)
@@ -467,7 +480,7 @@ export function moveDrawTagRect(
 	config: Config
 ) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
-		let position = fixMoveRectPosition(transfromTwoPointsToLtwh(startPoint, endPoint), zoomScale, origin)
+		let position = fixMoveRectPosition(transfromTwoPoints2Rect(startPoint, endPoint), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
 			// if (debug) console.log('DRAW Tag', position)
 			drawTagList(ctx, tagArr, currentPosition, config)
@@ -477,8 +490,8 @@ export function moveDrawTagRect(
 	}
 	return undefined
 }
-
-export function twoPointsGetOffsetInfo(
+//getTwoPointsOffsetInfo
+export function getTwoPointsOffsetInfo(
 	startPoint: Point,
 	endPoint: Point,
 	zoomScale: number
@@ -486,7 +499,7 @@ export function twoPointsGetOffsetInfo(
 	isStartMove: boolean
 	offsetInfo: Offset
 } {
-	let position = transfromTwoPointsToLtwh(startPoint, endPoint)
+	let position = transfromTwoPoints2Rect(startPoint, endPoint)
 	let offsetX = ((endPoint.x - startPoint.x) / zoomScale) * DPI
 	let offsetY = ((endPoint.y - startPoint.y) / zoomScale) * DPI
 	let isStartMove = false
@@ -518,7 +531,7 @@ export function moveCanvas(
 	config: Config
 ): Offset | undefined {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
-		let offsetResult = twoPointsGetOffsetInfo(startPoint, endPoint, zoomScale)
+		let offsetResult = getTwoPointsOffsetInfo(startPoint, endPoint, zoomScale)
 		if (offsetResult.isStartMove) {
 			let { offsetX, offsetY } = offsetResult.offsetInfo
 			clearCanvas(ctx)
@@ -528,7 +541,7 @@ export function moveCanvas(
 			}
 
 			drawImage(ctx, img, newPosition.x, newPosition.y, imgWH.width * scale, imgWH.height * scale)
-			// let boundingBoxPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
+			// let boundingBoxPosition = transfromBoxToRect(cropInfo, cropScale, currentPosition)
 			// boundingBoxPosition[0] += offsetX
 			// boundingBoxPosition[1] += offsetY
 			// drawCropRect(ctx2, ...boundingBoxPosition)
@@ -598,7 +611,7 @@ export function moveDrawUnshowTagDashRect(
 		let touchPoint = getTouchPoint(e, zoomScale, origin, 'move')
 		let dashArr: BoundingBox[] = []
 		unShowArr.forEach(tag => {
-			let positions = transfromBoundingBoxToLtwh(tag, tag.scale, currentPosition)
+			let positions = transfromBoxToRect(tag, tag.scale, currentPosition)
 			if (pointIsInRect(touchPoint, positions)) {
 				// console.log('DETECT hasTouchPointInArr', positions, touchPoint, [positions[0] + origin.x, positions[1] + origin.y], this, origin, zoomScale)
 				dashArr.push(tag)
@@ -633,7 +646,7 @@ export type ResizeItem = {
 }
 
 export function getCropFourBorderRect(cropInfo: BoundingBox, currentPosition: Point, index: number) {
-	let positions = transfromBoundingBoxToLtwh(cropInfo, cropInfo.scale, currentPosition)
+	let positions = transfromBoxToRect(cropInfo, cropInfo.scale, currentPosition)
 	const BorderWidth = 6
 	let HalfBorder = BorderWidth / 2
 	let list: ResizeItem[] = [
@@ -806,7 +819,7 @@ export function moveResizeCrop(
 	config: Config
 ) {
 	if (startPoint && startPoint.x !== undefined && endPoint && endPoint.x !== undefined) {
-		let offsetResult = twoPointsGetOffsetInfo(startPoint, endPoint, zoomScale)
+		let offsetResult = getTwoPointsOffsetInfo(startPoint, endPoint, zoomScale)
 		if (offsetResult.isStartMove) {
 			let borderOrVertex = resizeCropHovering
 			let { offsetX, offsetY } = offsetResult.offsetInfo
@@ -819,7 +832,7 @@ export function moveResizeCrop(
 				borderOrVertex
 			)
 
-			let position = transfromBoundingBoxToLtwh(newCropInfo, cropScale, currentPosition)
+			let position = transfromBoxToRect(newCropInfo, cropScale, currentPosition)
 
 			drawCropList(ctx, cropList, currentPosition, config)
 			drawCropRect(ctx, ...position, config, true)
@@ -853,15 +866,15 @@ export function getTwoFingerTouchListDistence(
 	}
 }
 
-export function getRectInfoByPosition(position: Rect, currentPosition: Point, scale = 1) {
+export function transfromRect2Box(rect: Rect, currentPosition: Point, scale = 1) {
 	let zoom = scale
 	let rectInfo = {
-		startX: (position[0] - currentPosition.x) / zoom,
-		startY: (position[1] - currentPosition.y) / zoom,
-		endX: (position[0] + position[2] - currentPosition.x) / zoom,
-		endY: (position[1] + position[3] - currentPosition.y) / zoom,
+		startX: (rect[0] - currentPosition.x) / zoom,
+		startY: (rect[1] - currentPosition.y) / zoom,
+		endX: (rect[0] + rect[2] - currentPosition.x) / zoom,
+		endY: (rect[1] + rect[3] - currentPosition.y) / zoom,
 	}
-	return fixRectInfo(rectInfo).info
+	return fixBoxInfo(rectInfo).info
 }
 
 export function initBoundingArrScale(tagArr: BoundingBox[], scale: number) {

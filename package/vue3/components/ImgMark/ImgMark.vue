@@ -61,13 +61,13 @@ import {
 	loadImage,
 	debug,
 	initScale,
-	transfromBoundingBoxToLtwh,
+	transfromBoxToRect,
 	drawImage,
 	drawTagList,
 	clearCanvas,
-	getRectInfoByPosition,
-	isRectValidity,
-	getTwoRectIntersectPart,
+	transfromRect2Box,
+	isBoxValidity,
+	getTwoBoxIntersectPart,
 	detectEventIsTriggerOnCropBorderOrVertex,
 	findOneBorderOrVertex,
 	LayerTouchEvent,
@@ -85,7 +85,7 @@ import {
 	initBoundingArrScale,
 	TypePoint,
 	DPI,
-	fixRectInfo,
+	fixBoxInfo,
 	pointIsInBoxList,
 	DEFAULT_CONFIG,
 } from './util'
@@ -436,11 +436,11 @@ let hooks = {
 	},
 	onDoubleClick(touchPoint: TypePoint) {
 		if (props.mode === 'crop') {
-			let point = {
-				x: (touchPoint.x - currentPosition.x) * DPI,
-				y: (touchPoint.y - currentPosition.y) * DPI,
-			}
-			let removeCropList = pointIsInBoxList(point, cropArr)
+			// let point = {
+			// 	x: (touchPoint.x - currentPosition.x) * zoomScale * DPI,
+			// 	y: (touchPoint.y - currentPosition.y) * zoomScale * DPI,
+			// }
+			let removeCropList = pointIsInBoxList(touchPoint, cropArr, scale, currentPosition)
 			removeCropItems(removeCropList)
 		}
 	},
@@ -511,7 +511,7 @@ function initCropInfo() {
 			endY: -Infinity,
 		}
 		props.cropList.forEach(cropInfo => {
-			let rectInfo = fixRectInfo(cropInfo)
+			let rectInfo = fixBoxInfo(cropInfo)
 			if (rectInfo.info.startX < cropRect.startX) {
 				cropRect.startX = rectInfo.info.startX
 			}
@@ -590,7 +590,7 @@ async function initComponent() {
 		//处理有CropInfo的情况，放大裁剪区域至全屏中间
 		else {
 			// if (debug) console.log(cropInfo)
-			let cropBoxInfo = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
+			let cropBoxInfo = transfromBoxToRect(cropInfo, cropScale, currentPosition)
 			let whiteRate = 0.05
 			let widthRate = (canvasWH.width - canvasWH.width * whiteRate) / cropBoxInfo[2]
 			let heightRate = (canvasWH.height - canvasWH.height * whiteRate) / cropBoxInfo[3]
@@ -622,7 +622,7 @@ async function initComponent() {
 			)
 		}
 		drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
-		// let initPosition = transfromBoundingBoxToLtwh(cropInfo, cropScale, currentPosition)
+		// let initPosition = transfromBoxToRect(cropInfo, cropScale, currentPosition)
 		// if (debug) console.log('Crop Current', initPosition)
 		// drawCropRect(ctx2, ...initPosition)
 		cropArr = initBoundingArrScale(cropArr, scale)
@@ -765,7 +765,7 @@ function cleartMousePoints() {
 	if (status.isMouseUpDownPoints()) {
 		if (props.mode === 'crop') {
 			if (tmpCropPositionInfo) {
-				let newCropInfo = getRectInfoByPosition(tmpCropPositionInfo, currentPosition, scale)
+				let newCropInfo = transfromRect2Box(tmpCropPositionInfo, currentPosition, scale)
 				if (status.resizeCropHovering) {
 					cropArr[status.resizeCropHovering.index] = newCropInfo
 				} else {
@@ -777,7 +777,7 @@ function cleartMousePoints() {
 			}
 		} else {
 			if (tmpTagPositionInfo) {
-				let tagInfo = Object.assign(getRectInfoByPosition(tmpTagPositionInfo, currentPosition), {
+				let tagInfo = Object.assign(transfromRect2Box(tmpTagPositionInfo, currentPosition), {
 					scale: 1,
 					isShow: true,
 					__newAdd: true,
@@ -833,27 +833,28 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 		if (newTagInfo.scale === 1) {
 			delete newTagInfo.scale
 		}
-		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd) {
-			let tagStartXYinCropList = pointIsInBoxList(
-				{
-					x: newTagInfo.startX,
-					y: newTagInfo.startY,
-				},
-				cropList
-			)
-			let mousePointCropInfo = tagStartXYinCropList[0]
-			if (!mousePointCropInfo) return
-			let intersectPart = getTwoRectIntersectPart(newTagInfo, mousePointCropInfo)
-			if (!intersectPart) {
-				newTagInfo.__isValidity = false
-			} else {
-				if (!isRectValidity(intersectPart)) {
-					newTagInfo.__isValidity = false
-				} else {
-					Object.assign(newTagInfo, intersectPart)
-				}
-			}
-		}
+		//TODO
+		// if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd) {
+		// 	let tagStartXYinCropList = pointIsInBoxList(
+		// 		{
+		// 			x: newTagInfo.startX,
+		// 			y: newTagInfo.startY,
+		// 		},
+		// 		cropList
+		// 	)
+		// 	let mousePointCropInfo = tagStartXYinCropList[0]
+		// 	if (!mousePointCropInfo) return
+		// 	let intersectPart = getTwoBoxIntersectPart(newTagInfo, mousePointCropInfo)
+		// 	if (!intersectPart) {
+		// 		newTagInfo.__isValidity = false
+		// 	} else {
+		// 		if (!isBoxValidity(intersectPart)) {
+		// 			newTagInfo.__isValidity = false
+		// 		} else {
+		// 			Object.assign(newTagInfo, intersectPart)
+		// 		}
+		// 	}
+		// }
 		delete newTagInfo.__newAdd
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
 			let whObj = imageWH || imgWH
@@ -863,11 +864,11 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 				endX: whObj.width,
 				endY: whObj.height,
 			}
-			let intersectPart = getTwoRectIntersectPart(newTagInfo, imgRect)
+			let intersectPart = getTwoBoxIntersectPart(newTagInfo, imgRect)
 			if (!intersectPart) {
 				newTagInfo.__isValidity = false
 			} else {
-				if (!isRectValidity(intersectPart)) {
+				if (!isBoxValidity(intersectPart)) {
 					newTagInfo.__isValidity = false
 				} else {
 					Object.assign(newTagInfo, intersectPart)
@@ -897,11 +898,11 @@ function getCropListBounding(): BoundingBox[] {
 				endX: whObj.width,
 				endY: whObj.height,
 			}
-			let intersectPart = getTwoRectIntersectPart(result, imgRect)
+			let intersectPart = getTwoBoxIntersectPart(result, imgRect)
 			if (!intersectPart) {
 				result._del = true
 			} else {
-				if (isRectValidity(intersectPart)) {
+				if (isBoxValidity(intersectPart)) {
 					result = intersectPart
 				} else {
 					result._del = true
