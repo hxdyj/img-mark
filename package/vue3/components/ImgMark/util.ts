@@ -363,7 +363,7 @@ export function drawTagRect(
 		ctx.fillStyle = config.tagConfig.fillStyle
 		ctx.fillRect(left, top, width, height)
 		if (index) {
-			let fontsize = parseFloat(ctx.font.split(' ')[0].replace('px', ''))
+			let fontsize = parseFloat(ctx.font.split(' ')[0])
 			ctx.fillStyle = config.tagConfig.textFillStyle
 			ctx.fillText(index + '', left + 4, top + height / 2 + fontsize / 2)
 		}

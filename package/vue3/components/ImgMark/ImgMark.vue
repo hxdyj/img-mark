@@ -3,7 +3,6 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
-3. prop isShowTip
 5. README.md API
 
 User Options
@@ -27,7 +26,7 @@ User Options
 	>
 		<canvas class="canvas" ref="canvasRef"></canvas>
 		<canvas class="canvas2" ref="canvas2Ref"></canvas>
-		<div class="mode-panel">
+		<div class="mode-panel" v-if="props.isShowTip">
 			<div class="status">
 				<div class="circle" :class="{ crop: mode === 'crop', tag: mode === 'tag' }"></div>
 				<div class="text">{{ mode === 'crop' ? '裁剪模式' : '标记错误行' }}</div>
@@ -35,7 +34,7 @@ User Options
 			<div class="tip">
 				<kbd>Ctrl</kbd> +
 				<kbd>B</kbd>
-				<span style="font-size: 14px">切换模式</span>
+				<span style="font-size: 14px; margin-left: 10px">切换模式</span>
 			</div>
 		</div>
 	</div>
@@ -158,6 +157,7 @@ let props = withDefaults(
 		cropConfig?: CropConfig
 		layerConfig?: LayerConfig
 		tagConfig?: TagConfig
+		isShowTip?: boolean
 		enableCropResize?: boolean
 		//是否允许crop画到图片外
 		enableDrawCropOutOfImg?: boolean
@@ -174,6 +174,7 @@ let props = withDefaults(
 		tagConfig: () => DEFAULT_CONFIG.tagConfig,
 		layerConfig: () => DEFAULT_CONFIG.layerConfig,
 		cropConfig: () => DEFAULT_CONFIG.cropConfig,
+		isShowTip: false,
 		enableCropResize: true,
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
@@ -344,7 +345,8 @@ let actions = {
 
 		zoomScale *= zoom
 		//动态设置字体大小
-		ctx2.font = `${8 * zoomScale}px serif`
+		// ctx2.font = `${8 * zoomScale}px serif`
+		ctx2.font = `20px serif`
 		clearCanvas(ctx)
 		clearCanvas(ctx2)
 		drawImage(ctx, img, currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
