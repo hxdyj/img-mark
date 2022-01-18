@@ -2,6 +2,10 @@
 Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
+TODO
+1. enableCropCross
+2. tagBoxRelativeTo
+
 User Options
 1. Down Sapce Key and Drag Mouse Move to Draw
 2. Double Click Crop del crop
@@ -86,6 +90,8 @@ import {
 	getVertexPositionByTwoPoints,
 	getPointByBoxAndVertexPosition,
 	VertexPosition,
+	getBigBoxByBoxList,
+	getBoxIsIntersectWithBoxList,
 } from './util'
 
 let spaceKeyDown = false
@@ -155,6 +161,8 @@ let props = withDefaults(
 		layerConfig?: LayerConfig
 		tagConfig?: TagConfig
 		isShowTip?: boolean
+		tagBoxRelativeTo?: 'img' | 'crop'
+		enableCropCross?: boolean
 		enableCropResize?: boolean
 		//是否允许crop画到图片外
 		enableDrawCropOutOfImg?: boolean
@@ -172,10 +180,12 @@ let props = withDefaults(
 		layerConfig: () => DEFAULT_CONFIG.layerConfig,
 		cropConfig: () => DEFAULT_CONFIG.cropConfig,
 		isShowTip: false,
+		enableCropCross: true,
 		enableCropResize: true,
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
+		tagBoxRelativeTo: 'img',
 		mode: 'crop',
 		tagList: () => Array(),
 		cropList: () => Array(),
@@ -781,9 +791,24 @@ function cleartMousePoints() {
 				let newCropInfo = transfromRect2Box(tmpCropPositionInfo, currentPosition, scale)
 				if (status.resizeCropHovering) {
 					cropArr[status.resizeCropHovering.index] = newCropInfo
+					if (!props.enableCropCross && status.resizeCropHovering) {
+						let intersectFlag = getBoxIsIntersectWithBoxList(
+							newCropInfo,
+							cropArr.filter((item, index) => index !== status.resizeCropHovering?.index)
+						)
+						if (intersectFlag) {
+							removeCropItems([newCropInfo])
+						}
+					}
 				} else {
 					newCropInfo.scale = 1
-					cropArr.push(newCropInfo)
+					if (props.enableCropCross) {
+						cropArr.push(newCropInfo)
+					} else {
+						//判断crop是否和其他box相交，相交就不保存
+						let intersectFlag = getBoxIsIntersectWithBoxList(newCropInfo, cropArr)
+						if (!intersectFlag) cropArr.push(newCropInfo)
+					}
 				}
 				triggerCropListChange()
 				tmpCropPositionInfo = undefined

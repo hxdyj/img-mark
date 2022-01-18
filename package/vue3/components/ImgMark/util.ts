@@ -911,3 +911,31 @@ export function initBoundingArrScale(tagArr: BoundingBox[], scale: number) {
 		return tag
 	})
 }
+
+export function getBigBoxByBoxList(list: BoundingBox[]): BoundingBox | undefined {
+	if (list.length === 0) return undefined
+	let startXarr: number[] = []
+	let endXarr: number[] = []
+	let startYarr: number[] = []
+	let endYarr: number[] = []
+	list.forEach(box => {
+		startXarr.push(box.startX)
+		endXarr.push(box.endX)
+		startYarr.push(box.startY)
+		endYarr.push(box.endY)
+	})
+	return {
+		startX: Math.min(...startXarr),
+		endX: Math.max(...endXarr),
+		startY: Math.min(...startYarr),
+		endY: Math.max(...endYarr),
+	}
+}
+
+export function getBoxIsIntersectWithBoxList(box: BoundingBox, list: BoundingBox[]): boolean {
+	for (const item of list) {
+		let intersect = getTwoBoxIntersectPart(box, item)
+		if (intersect) return true
+	}
+	return false
+}
