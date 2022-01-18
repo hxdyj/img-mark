@@ -854,7 +854,7 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 		}
 		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd && newTagInfo.__vertexPosition) {
 			let tagStartXYinCropList = pointIsInBoxList(getPointByBoxAndVertexPosition(newTagInfo, newTagInfo.__vertexPosition), cropList)
-			let mousePointCropInfo = tagStartXYinCropList[0]
+			let mousePointCropInfo = tagStartXYinCropList.boxList[0]
 			if (!mousePointCropInfo) return
 			let intersectPart = getTwoBoxIntersectPart(newTagInfo, mousePointCropInfo)
 			if (!intersectPart) {
