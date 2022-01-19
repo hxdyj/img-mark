@@ -55,11 +55,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
-    tagBoxRelativeTo: {
-        type: StringConstructor;
-        required: false;
-        default: string;
-    };
     enableCropCross: {
         type: BooleanConstructor;
         required: false;
@@ -126,7 +121,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
         layerConfig: LayerConfig;
         tagConfig: TagConfig;
         isShowTip: boolean;
-        tagBoxRelativeTo: 'img' | 'crop';
         enableCropCross: boolean;
         enableCropResize: boolean;
         enableDrawCropOutOfImg: boolean;
@@ -239,7 +233,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     layerConfig?: unknown;
     tagConfig?: unknown;
     isShowTip?: unknown;
-    tagBoxRelativeTo?: unknown;
     enableCropCross?: unknown;
     enableCropResize?: unknown;
     enableDrawCropOutOfImg?: unknown;
@@ -254,7 +247,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     layerConfig: Record<string, any>;
     tagConfig: Record<string, any>;
     isShowTip: boolean;
-    tagBoxRelativeTo: string;
     enableCropCross: boolean;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
@@ -279,7 +271,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     layerConfig: Record<string, any>;
     tagConfig: Record<string, any>;
     isShowTip: boolean;
-    tagBoxRelativeTo: string;
     enableCropCross: boolean;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;

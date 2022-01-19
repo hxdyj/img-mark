@@ -164,39 +164,54 @@ type TagConfig = {
 	highlightLineWidth?: number
 	highlightLineDash?: number[]
 }
+
+type ResizeEmitType = {
+	index: number
+	box: BoundingBox
+}
 ```
 
-## 属性
+## 组件属性
 
-| 属性                      | 说明                          | 类型          | 可选值     | 默认值 |
-| ------------------------- | ----------------------------- | ------------- | ---------- | ------ |
-| src                       | 图片地址                      | string        | ——         | ——     |
-| mode/v-model:mode         | 模式                          | string        | crop/tag   | crop   |
-| cropList/v-model:cropList | 裁切区域集合                  | BoundingBox[] | ——         | []     |
-| tagList/v-model:tagList   | tag 区域集合                  | BoundingBox[] | ——         | []     |
-| enableDrawCropOutOfImg    | 是否允许 `Crop` 画到图片外    | boolean       | true/false | true   |
-| enableDrawTagOutOfCrop    | 是否允许 `Tag` 画到 `Crop` 外 | boolean       | true/false | true   |
-| enableDrawTagOutOfImg     | 是否允许 `Tag` 画到图片外     | boolean       | true/false | true   |
-| enableCropResize          | 是否允许 `Crop` 改变大小      | boolean       | true/false | true   |
-| isShowTip                 | 是否显示底部提示区域          | boolean       | true/false | false  |
-| layerConfig               | 浮层样式                      | LayerConfig   | ——         | ——     |
-| cropConfig                | `crop` 样式                   | CropConfig    | ——         | ——     |
-| tagConfig                 | `tag` 样式                    | TagConfig     | ——         | ——     |
+| 属性                      | 说明                                                                                         | 类型          | 可选值     | 默认值 |
+| ------------------------- | -------------------------------------------------------------------------------------------- | ------------- | ---------- | ------ |
+| src                       | 图片地址                                                                                     | string        | ——         | ——     |
+| mode/v-model:mode         | 模式                                                                                         | string        | crop/tag   | crop   |
+| cropList/v-model:cropList | 裁切区域集合                                                                                 | BoundingBox[] | ——         | []     |
+| tagList/v-model:tagList   | tag 区域集合                                                                                 | BoundingBox[] | ——         | []     |
+| enableDrawCropOutOfImg    | 是否允许 `crop` 画到图片外                                                                   | boolean       | true/false | true   |
+| enableDrawTagOutOfCrop    | 是否允许 `tag` 画到 `crop` 外                                                                | boolean       | true/false | true   |
+| enableDrawTagOutOfImg     | 是否允许 `tag` 画到图片外                                                                    | boolean       | true/false | true   |
+| enableCropResize          | 是否允许 `crop` 改变大小                                                                     | boolean       | true/false | true   |
+| enableCropCross           | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交就会移除当前 `crop`，即使是 resize 操作 | boolean       | true/false | true   |
+| isShowTip                 | 是否显示底部提示区域                                                                         | boolean       | true/false | false  |
+| layerConfig               | 浮层样式                                                                                     | LayerConfig   | ——         | ——     |
+| cropConfig                | `crop` 样式                                                                                  | CropConfig    | ——         | ——     |
+| tagConfig                 | `tag` 样式                                                                                   | TagConfig     | ——         | ——     |
 
-## 事件
+## 组件事件
 
-| 事件名           | 说明                            | 参数               |
-| ---------------- | ------------------------------- | ------------------ |
-| tagsStatusChange | 当点击 `tag` 项展示或隐藏时触发 | list:BoundingBox[] |
-| tagListChange    | 当添加或者删除了 `tag` 项触发   | list:BoundingBox[] |
-| cropListChange   | 当添加或者删除了 `crop` 项触发  | list:BoundingBox[] |
+| 事件名           | 说明                            | 参数                |
+| ---------------- | ------------------------------- | ------------------- |
+| tagsStatusChange | 当点击 `tag` 项展示或隐藏时触发 | list:BoundingBox[]  |
+| tagListChange    | 当添加或者删除了 `tag` 项触发   | list:BoundingBox[]  |
+| cropListChange   | 当添加或者删除了 `crop` 项触发  | list:BoundingBox[]  |
+| resizeStart      | `crop` 开始 resize 触发         | data:ResizeEmitType |
+| resizeEnd        | `crop` 结束 resize 触发         | data:ResizeEmitType |
+| delCrop          | 删除 `crop` 触发                | list:BoundingBox[]  |
 
-## 方法
+## 组件方法
 
-| 方法                       | 说明                                   | 参数               |
-| -------------------------- | -------------------------------------- | ------------------ |
-| removeTagItems             | 移除 `tag` 项                          | list:BoundingBox[] |
-| getTagListGroupByCropIndex | 获取 `tagList` 并按照 `CropIndex` 分组 | ——                 |
+| 方法                       | 说明                                 | 参数                                      |
+| -------------------------- | ------------------------------------ | ----------------------------------------- |
+| removeTagItems             | 移除 `tag` 项                        | list:BoundingBox[]                        |
+| getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组 | type: 'startPoint'/'allIn' = 'startPoint' |
+
+## Lib 方法
+
+| 方法                          | 说明                      | 参数                                                              |
+| ----------------------------- | ------------------------- | ----------------------------------------------------------------- |
+| transformTagListBoxRelativeTo | 转换 `Tag` 基于什么去定位 | type: 'img'/'crop', cropInfo: BoundingBox, tagList: BoundingBox[] |
 
 ## 操作
 

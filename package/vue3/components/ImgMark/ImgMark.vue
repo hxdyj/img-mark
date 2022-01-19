@@ -3,7 +3,6 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
-2. tagBoxRelativeTo
 2. Precision
 
 User Options
@@ -161,7 +160,6 @@ let props = withDefaults(
 		layerConfig?: LayerConfig
 		tagConfig?: TagConfig
 		isShowTip?: boolean
-		tagBoxRelativeTo?: 'img' | 'crop'
 		enableCropCross?: boolean
 		enableCropResize?: boolean
 		//是否允许crop画到图片外
@@ -185,7 +183,6 @@ let props = withDefaults(
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
-		tagBoxRelativeTo: 'img',
 		mode: 'crop',
 		tagList: () => Array(),
 		cropList: () => Array(),
