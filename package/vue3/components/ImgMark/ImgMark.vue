@@ -3,8 +3,8 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
-1. enableCropCross
 2. tagBoxRelativeTo
+2. Precision
 
 User Options
 1. Down Sapce Key and Drag Mouse Move to Draw
@@ -90,8 +90,8 @@ import {
 	getVertexPositionByTwoPoints,
 	getPointByBoxAndVertexPosition,
 	VertexPosition,
-	getBigBoxByBoxList,
 	getBoxIsIntersectWithBoxList,
+	boxAllInBoxList,
 } from './util'
 
 let spaceKeyDown = false
@@ -191,6 +191,12 @@ let props = withDefaults(
 		cropList: () => Array(),
 	}
 )
+
+export type ResizeEmitType = {
+	index: number
+	box: BoundingBox
+}
+
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
 	(e: 'cropListChange', list: BoundingBox[]): void
@@ -198,6 +204,9 @@ let emits = defineEmits<{
 	(e: 'tagListChange', list: BoundingBox[]): void
 	(e: 'update:mode', mode: Mode): void
 	(e: 'tagsStatusChange', list: BoundingBox[]): void
+	(e: 'resizeStart', data: ResizeEmitType): void
+	(e: 'resizeEnd', data: ResizeEmitType): void
+	(e: 'delCrop', list: BoundingBox[]): void
 }>()
 
 type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>
@@ -304,8 +313,8 @@ let actions = {
 		}
 
 		if (type == 'resizeCrop') {
-			if (props.enableCropResize) {
-				let clickedCrop = cropArr[status.resizeCropHovering?.index || 0]
+			if (props.enableCropResize && status.resizeCropHovering) {
+				let clickedCrop = cropArr[status.resizeCropHovering.index || 0]
 				if (!status.resizeCropHovering || !clickedCrop) return
 
 				tmpCropPositionInfo = moveResizeCrop(
@@ -779,6 +788,16 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	})
 }
 
+function setResizeCrop(newCropInfo: BoundingBox) {
+	if (status.resizeCropHovering) {
+		cropArr[status.resizeCropHovering.index] = newCropInfo
+		emits('resizeEnd', {
+			index: status.resizeCropHovering.index,
+			box: newCropInfo,
+		})
+	}
+}
+
 function cleartMousePoints() {
 	if (!inited) return
 	status.isMoving = false
@@ -790,15 +809,19 @@ function cleartMousePoints() {
 			if (tmpCropPositionInfo) {
 				let newCropInfo = transfromRect2Box(tmpCropPositionInfo, currentPosition, scale)
 				if (status.resizeCropHovering) {
-					cropArr[status.resizeCropHovering.index] = newCropInfo
-					if (!props.enableCropCross && status.resizeCropHovering) {
+					if (!props.enableCropCross) {
 						let intersectFlag = getBoxIsIntersectWithBoxList(
 							newCropInfo,
 							cropArr.filter((item, index) => index !== status.resizeCropHovering?.index)
 						)
 						if (intersectFlag) {
-							removeCropItems([newCropInfo])
+							let removeItem = cropArr[status.resizeCropHovering.index]
+							removeCropItems([removeItem])
+						} else {
+							setResizeCrop(newCropInfo)
 						}
+					} else {
+						setResizeCrop(newCropInfo)
 					}
 				} else {
 					newCropInfo.scale = 1
@@ -968,10 +991,14 @@ function onMouseDown(e: MouseEvent) {
 		y: event.layerY,
 	}
 	//检测是否点在了crop的border或者vertex上边
-	if (props.mode === 'crop' && !spaceKeyDown) {
+	if (props.mode === 'crop' && !spaceKeyDown && props.enableCropResize) {
 		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropArr, zoomScale, currentPosition, origin)
 		if (detectResult.hasIn) {
 			status.resizeCropHovering = findOneBorderOrVertex(detectResult.list)
+			emits('resizeStart', {
+				index: status.resizeCropHovering.index,
+				box: cropArr[status.resizeCropHovering.index],
+			})
 		}
 	}
 }
@@ -1120,17 +1147,20 @@ function removeTagItems(removeList: BoundingBox[]) {
 
 function removeCropItems(removeList: BoundingBox[]) {
 	if (removeList.length === 0) return
-	// console.log('remove', cloneDeep(removeList))
 	let newCropArr: BoundingBox[] = []
-	if (removeList.length !== 0) {
-		let currentList = getCropList()
-		currentList.forEach(tag => {
-			if (!removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
-				newCropArr.push(tag)
-			}
-		})
-	}
+	let removeCropArr: BoundingBox[] = []
+	let indexArr: number[] = []
+	let currentList = getCropList()
+	currentList.forEach((tag, index) => {
+		if (removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
+			removeCropArr.push(tag)
+		} else {
+			newCropArr.push(tag)
+		}
+	})
+
 	cropArr = initBoundingArrScale(newCropArr, scale)
+	emits('delCrop', removeCropArr)
 	nextTick(() => {
 		if (!ctx2) {
 			throw new Error(`ctx2  can't find on removeItem.`)
@@ -1141,20 +1171,30 @@ function removeCropItems(removeList: BoundingBox[]) {
 	})
 }
 
-function getTagListGroupByCropIndex(): {
+function getTagListGroupByCropIndex(type: 'startPoint' | 'allIn' = 'startPoint'): {
 	[index: number]: BoundingBox[]
 } {
 	let tags = getTagList()
 	let crops = getCropList()
 	tags.forEach(tag => {
-		let result = pointIsInBoxList(
-			{
-				x: tag.startX,
-				y: tag.startY,
-			},
-			crops
-		)
-		tag.__groupIndex = result.indexList[0]
+		if (type === 'startPoint') {
+			let result = pointIsInBoxList(
+				{
+					x: tag.startX,
+					y: tag.startY,
+				},
+				crops
+			)
+
+			//只取了第0个
+			tag.__groupIndex = result.indexList[0]
+		}
+
+		if (type === 'allIn') {
+			let result = boxAllInBoxList(tag, crops)
+			//只取了第0个
+			tag.__groupIndex = result.indexList[0]
+		}
 	})
 	console.log(tags, crops)
 	return groupBy(tags, '__groupIndex')

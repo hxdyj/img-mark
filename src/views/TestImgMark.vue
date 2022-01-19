@@ -9,6 +9,9 @@
 				v-model:cropList="cropList"
 				@cropListChange="cropListChange"
 				@tagsStatusChange="tagsStatusChange"
+				@resizeStart="resizeStart"
+				@resizeEnd="resizeEnd"
+				@delCrop="delCrop"
 				:enableDrawCropOutOfImg="false"
 				:enableDrawTagOutOfCrop="false"
 				:enableDrawTagOutOfImg="false"
@@ -34,7 +37,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ImgMark, Mode, BoundingBox } from 'img-mark'
+import { ImgMark, Mode, BoundingBox, ResizeEmitType } from 'img-mark'
 import { uid } from 'uid'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('crop')
@@ -75,6 +78,20 @@ let tagList = $ref<MyBoundingBox[]>([
 ])
 
 let imgMarkRef = $ref<InstanceType<typeof ImgMark>>()
+
+function resizeStart(data: ResizeEmitType) {
+	console.log('resizeStart', data)
+}
+function resizeEnd(data: ResizeEmitType) {
+	console.log('resizeEnd', data)
+	let group = imgMarkRef.getTagListGroupByCropIndex('allIn')
+	console.log('group', group)
+}
+
+function delCrop(data: MyBoundingBox[]) {
+	console.log('delCrop', data)
+	//del后重新获取，然后把不在框里的tag删除
+}
 
 function removeTag(data?: BoundingBox[]) {
 	if (data) {

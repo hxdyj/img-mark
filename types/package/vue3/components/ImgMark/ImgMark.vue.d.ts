@@ -22,6 +22,10 @@ export declare type Config = {
     layerConfig: Required<LayerConfig>;
     tagConfig: Required<TagConfig>;
 };
+export declare type ResizeEmitType = {
+    index: number;
+    box: BoundingBox;
+};
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -47,6 +51,16 @@ declare const _sfc_main: import("vue").DefineComponent<{
         default: () => Required<TagConfig>;
     };
     isShowTip: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    tagBoxRelativeTo: {
+        type: StringConstructor;
+        required: false;
+        default: string;
+    };
+    enableCropCross: {
         type: BooleanConstructor;
         required: false;
         default: boolean;
@@ -112,6 +126,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
         layerConfig: LayerConfig;
         tagConfig: TagConfig;
         isShowTip: boolean;
+        tagBoxRelativeTo: 'img' | 'crop';
+        enableCropCross: boolean;
         enableCropResize: boolean;
         enableDrawCropOutOfImg: boolean;
         enableDrawTagOutOfCrop: boolean;
@@ -128,6 +144,9 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'tagListChange', list: BoundingBox[]): void;
         (e: 'update:mode', mode: Mode): void;
         (e: 'tagsStatusChange', list: BoundingBox[]): void;
+        (e: 'resizeStart', data: ResizeEmitType): void;
+        (e: 'resizeEnd', data: ResizeEmitType): void;
+        (e: 'delCrop', list: BoundingBox[]): void;
     };
     inited: boolean;
     ctx: null;
@@ -195,6 +214,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     resizeRender: () => Promise<undefined>;
     onWindowResize: () => void;
     onMouseWheel: (e: MouseEvent, privateCall?: boolean | undefined) => void;
+    setResizeCrop: (newCropInfo: BoundingBox) => void;
     cleartMousePoints: () => void;
     triggerCropListChange: () => void;
     triggerTagListChange: () => void;
@@ -211,14 +231,16 @@ declare const _sfc_main: import("vue").DefineComponent<{
     refreshDrawTags: () => void;
     removeTagItems: (removeList: BoundingBox[]) => void;
     removeCropItems: (removeList: BoundingBox[]) => void;
-    getTagListGroupByCropIndex: () => {
+    getTagListGroupByCropIndex: (type?: 'startPoint' | 'allIn') => {
         [index: number]: BoundingBox[];
     };
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "resizeStart" | "resizeEnd" | "delCrop")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "resizeStart" | "resizeEnd" | "delCrop", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
     cropConfig?: unknown;
     layerConfig?: unknown;
     tagConfig?: unknown;
     isShowTip?: unknown;
+    tagBoxRelativeTo?: unknown;
+    enableCropCross?: unknown;
     enableCropResize?: unknown;
     enableDrawCropOutOfImg?: unknown;
     enableDrawTagOutOfCrop?: unknown;
@@ -232,6 +254,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
     layerConfig: Record<string, any>;
     tagConfig: Record<string, any>;
     isShowTip: boolean;
+    tagBoxRelativeTo: string;
+    enableCropCross: boolean;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
@@ -247,11 +271,16 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onTagListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:mode"?: ((...args: any[]) => any) | undefined;
     onTagsStatusChange?: ((...args: any[]) => any) | undefined;
+    onResizeStart?: ((...args: any[]) => any) | undefined;
+    onResizeEnd?: ((...args: any[]) => any) | undefined;
+    onDelCrop?: ((...args: any[]) => any) | undefined;
 }, {
     cropConfig: Record<string, any>;
     layerConfig: Record<string, any>;
     tagConfig: Record<string, any>;
     isShowTip: boolean;
+    tagBoxRelativeTo: string;
+    enableCropCross: boolean;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;

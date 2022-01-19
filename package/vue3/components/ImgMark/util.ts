@@ -939,3 +939,32 @@ export function getBoxIsIntersectWithBoxList(box: BoundingBox, list: BoundingBox
 	}
 	return false
 }
+
+export function boxIsAllInOtherBox(box: BoundingBox, otherBox: BoundingBox) {
+	let intersectPart = getTwoBoxIntersectPart(box, otherBox)
+	if (
+		intersectPart &&
+		intersectPart.startX === box.startX &&
+		intersectPart.endX === box.endX &&
+		intersectPart.startY === box.startY &&
+		intersectPart.endY === box.endY
+	) {
+		return true
+	} else {
+		return false
+	}
+}
+export function boxAllInBoxList(box: BoundingBox, list: BoundingBox[]) {
+	let indexList: number[] = []
+	let boxList: BoundingBox[] = []
+	list.forEach((item, index) => {
+		if (boxIsAllInOtherBox(box, item)) {
+			boxList.push(item)
+			indexList.push(index)
+		}
+	})
+	return {
+		boxList,
+		indexList,
+	}
+}
