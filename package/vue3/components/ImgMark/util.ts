@@ -969,12 +969,12 @@ export function boxAllInBoxList(box: BoundingBox, list: BoundingBox[]) {
 	}
 }
 type TagBoxRelativeTo = 'img' | 'crop'
-export function transformTagListBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tagList: BoundingBox[]) {
+export function transformTagListBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tagList: BoundingBox[]): BoundingBox[] {
 	return tagList.map(item => {
 		return transformTagBoxRelativeTo(type, cropInfo, item)
 	})
 }
-export function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tag: BoundingBox) {
+export function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tag: BoundingBox): BoundingBox {
 	let item = cloneDeep(tag)
 	if (type === 'img') {
 		item.startX = item.startX + cropInfo.startX
