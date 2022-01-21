@@ -4,7 +4,6 @@ Known issues
 
 TODO
 1. 移动端适配
-2. Precision
 
 User Options
 1. Down Sapce Key and Drag Mouse Move to Draw

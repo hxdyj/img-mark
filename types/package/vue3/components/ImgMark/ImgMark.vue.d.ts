@@ -60,6 +60,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    handleResizeCropCross: {
+        type: StringConstructor;
+        required: false;
+        default: string;
+    };
     enableCropResize: {
         type: BooleanConstructor;
         required: false;
@@ -92,12 +97,17 @@ declare const _sfc_main: import("vue").DefineComponent<{
     };
     mode: {
         type: null;
-        required: true;
+        required: false;
         default: string;
     };
     src: {
         type: StringConstructor;
         required: true;
+    };
+    precision: {
+        type: NumberConstructor;
+        required: false;
+        default: number;
     };
 }, {
     spaceKeyDown: boolean;
@@ -122,6 +132,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         tagConfig: TagConfig;
         isShowTip: boolean;
         enableCropCross: boolean;
+        handleResizeCropCross: 'delete' | 'reset';
         enableCropResize: boolean;
         enableDrawCropOutOfImg: boolean;
         enableDrawTagOutOfCrop: boolean;
@@ -130,6 +141,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         tagList: BoundingBox[];
         mode: Mode;
         src: string;
+        precision: number;
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
@@ -205,6 +217,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     initCropInfo: () => void;
     initComponent: () => Promise<boolean>;
     initResizeVar: () => void;
+    renderCtx2: () => void;
     resizeRender: () => Promise<undefined>;
     onWindowResize: () => void;
     onMouseWheel: (e: MouseEvent, privateCall?: boolean | undefined) => void;
@@ -234,6 +247,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     tagConfig?: unknown;
     isShowTip?: unknown;
     enableCropCross?: unknown;
+    handleResizeCropCross?: unknown;
     enableCropResize?: unknown;
     enableDrawCropOutOfImg?: unknown;
     enableDrawTagOutOfCrop?: unknown;
@@ -242,12 +256,14 @@ declare const _sfc_main: import("vue").DefineComponent<{
     tagList?: unknown;
     mode?: unknown;
     src?: unknown;
+    precision?: unknown;
 } & {
     cropConfig: Record<string, any>;
     layerConfig: Record<string, any>;
     tagConfig: Record<string, any>;
     isShowTip: boolean;
     enableCropCross: boolean;
+    handleResizeCropCross: string;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
@@ -256,6 +272,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     tagList: unknown[];
     mode: any;
     src: string;
+    precision: number;
 } & {}> & {
     "onUpdate:cropList"?: ((...args: any[]) => any) | undefined;
     onCropListChange?: ((...args: any[]) => any) | undefined;
@@ -272,6 +289,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     tagConfig: Record<string, any>;
     isShowTip: boolean;
     enableCropCross: boolean;
+    handleResizeCropCross: string;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
@@ -279,5 +297,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     cropList: unknown[];
     tagList: unknown[];
     mode: any;
+    precision: number;
 }>;
 export default _sfc_main;

@@ -151,4 +151,5 @@ export declare function boxAllInBoxList(box: BoundingBox, list: BoundingBox[]): 
 };
 declare type TagBoxRelativeTo = 'img' | 'crop';
 export declare function transformTagListBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tagList: BoundingBox[]): BoundingBox[];
+export declare function transformPrecision(list: BoundingBox[], precision: number): BoundingBox[];
 export {};
