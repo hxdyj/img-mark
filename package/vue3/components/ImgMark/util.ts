@@ -971,16 +971,20 @@ export function boxAllInBoxList(box: BoundingBox, list: BoundingBox[]) {
 type TagBoxRelativeTo = 'img' | 'crop'
 export function transformTagListBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tagList: BoundingBox[]) {
 	return tagList.map(item => {
-		if (type === 'img') {
-			item.startX = item.startX + cropInfo.startX
-			item.startY = item.startY + cropInfo.startY
-		}
-		if (type === 'crop') {
-			item.startX = item.startX - cropInfo.startX
-			item.startY = item.startY - cropInfo.startY
-		}
-		return item
+		return transformTagBoxRelativeTo(type, cropInfo, item)
 	})
+}
+export function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tag: BoundingBox) {
+	let item = cloneDeep(tag)
+	if (type === 'img') {
+		item.startX = item.startX + cropInfo.startX
+		item.startY = item.startY + cropInfo.startY
+	}
+	if (type === 'crop') {
+		item.startX = item.startX - cropInfo.startX
+		item.startY = item.startY - cropInfo.startY
+	}
+	return item
 }
 
 export function transformPrecision(list: BoundingBox[], precision: number) {

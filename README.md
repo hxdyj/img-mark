@@ -211,9 +211,10 @@ type ResizeEmitType = {
 
 ## Lib 方法
 
-| 方法                          | 说明                      | 参数                                                              |
-| ----------------------------- | ------------------------- | ----------------------------------------------------------------- |
-| transformTagListBoxRelativeTo | 转换 `Tag` 基于什么去定位 | type: 'img'/'crop', cropInfo: BoundingBox, tagList: BoundingBox[] |
+| 方法                          | 说明                           | 参数                                                              |
+| ----------------------------- | ------------------------------ | ----------------------------------------------------------------- |
+| transformTagListBoxRelativeTo | 转换 `tag` list 基于什么去定位 | type: 'img'/'crop', cropInfo: BoundingBox, tagList: BoundingBox[] |
+| transformTagBoxRelativeTo     | 转换单个 `tag` 基于什么去定位  | type: 'img'/'crop', cropInfo: BoundingBox, tag: BoundingBox       |
 
 ## 操作
 

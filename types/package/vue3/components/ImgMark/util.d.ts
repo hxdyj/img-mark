@@ -150,6 +150,7 @@ export declare function boxAllInBoxList(box: BoundingBox, list: BoundingBox[]): 
     indexList: number[];
 };
 declare type TagBoxRelativeTo = 'img' | 'crop';
-export declare function transformTagListBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tagList: BoundingBox[]): BoundingBox[];
+export declare function transformTagListBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tagList: BoundingBox[]): any[];
+export declare function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tag: BoundingBox): any;
 export declare function transformPrecision(list: BoundingBox[], precision: number): BoundingBox[];
 export {};
