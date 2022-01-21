@@ -179,6 +179,7 @@ type ResizeEmitType = {
 | mode/v-model:mode         | 模式                                                                                                                                                 | string        | crop/tag     | crop   |
 | cropList/v-model:cropList | 裁切区域集合，相对于`img`左上角开始定位                                                                                                              | BoundingBox[] | ——           | []     |
 | tagList/v-model:tagList   | tag 区域集合,相对于`img`左上角开始定位                                                                                                               | BoundingBox[] | ——           | []     |
+| precision                 | BoundingBox 精度                                                                                                                                     | number        | ——           | 0      |
 | enableDrawCropOutOfImg    | 是否允许 `crop` 画到图片外                                                                                                                           | boolean       | true/false   | true   |
 | enableDrawTagOutOfCrop    | 是否允许 `tag` 画到 `crop` 外                                                                                                                        | boolean       | true/false   | true   |
 | enableDrawTagOutOfImg     | 是否允许 `tag` 画到图片外                                                                                                                            | boolean       | true/false   | true   |
