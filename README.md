@@ -175,7 +175,7 @@ type ResizeEmitType = {
 
 | 属性                      | 说明                                                                                                                                                 | 类型          | 可选值       | 默认值 |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------ | ------ |
-| src                       | 图片地址                                                                                                                                             | string        | ——           | ——     |
+| src                       | 图片地址, 必选参数                                                                                                                                   | string        | ——           | ——     |
 | mode/v-model:mode         | 模式                                                                                                                                                 | string        | crop/tag     | crop   |
 | cropList/v-model:cropList | 裁切区域集合                                                                                                                                         | BoundingBox[] | ——           | []     |
 | tagList/v-model:tagList   | tag 区域集合                                                                                                                                         | BoundingBox[] | ——           | []     |
@@ -185,11 +185,10 @@ type ResizeEmitType = {
 | enableCropResize          | 是否允许 `crop` 改变大小                                                                                                                             | boolean       | true/false   | true   |
 | enableCropCross           | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交，新画的`crop`会不添加，如果是 resize 操作相交以后，按照下方 `handleResizeCropCross` 属性去处理 | boolean       | true/false   | true   |
 | handleResizeCropCross     | 当`enableCropCross`属性为 false，resize 操作相交后该如何处理进行 resize 操作的`crop`                                                                 | string        | delete/reset | reset  |
-
-| isShowTip | 是否显示底部提示区域 | boolean | true/false | false |
-| layerConfig | 浮层样式 | LayerConfig | —— | —— |
-| cropConfig | `crop` 样式 | CropConfig | —— | —— |
-| tagConfig | `tag` 样式 | TagConfig | —— | —— |
+| isShowTip                 | 是否显示底部提示区域                                                                                                                                 | boolean       | true/false   | false  |
+| layerConfig               | 浮层样式                                                                                                                                             | LayerConfig   | ——           | ——     |
+| cropConfig                | `crop` 样式                                                                                                                                          | CropConfig    | ——           | ——     |
+| tagConfig                 | `tag` 样式                                                                                                                                           | TagConfig     | ——           | ——     |
 
 ## 组件事件
 

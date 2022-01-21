@@ -92,6 +92,7 @@ import {
 	VertexPosition,
 	getBoxIsIntersectWithBoxList,
 	boxAllInBoxList,
+	transformPrecision,
 } from './util'
 
 let spaceKeyDown = false
@@ -172,8 +173,9 @@ let props = withDefaults(
 		enableDrawTagOutOfImg?: boolean
 		cropList?: BoundingBox[]
 		tagList?: BoundingBox[]
-		mode: Mode
+		mode?: Mode
 		src: string
+		precision?: number
 	}>(),
 	{
 		tagConfig: () => DEFAULT_CONFIG.tagConfig,
@@ -187,6 +189,7 @@ let props = withDefaults(
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
 		mode: 'crop',
+		precision: 0,
 		tagList: () => Array(),
 		cropList: () => Array(),
 	}
@@ -567,8 +570,8 @@ async function initComponent() {
 	await nextTick()
 	//初始化prop到data
 	initCropInfo()
-	tagArr = props.tagList
-	cropArr = props.cropList
+	tagArr = transformPrecision(props.tagList, props.precision)
+	cropArr = transformPrecision(props.cropList, props.precision)
 	let containerRectInfo = containerRef.getBoundingClientRect()
 	containerInfo = {
 		top: containerRectInfo.top,
@@ -872,14 +875,16 @@ function cleartMousePoints() {
 function triggerCropListChange() {
 	nextTick().then(() => {
 		let list = getCropList()
+		list = transformPrecision(list, props.precision)
 		emits('update:cropList', list)
 		emits('cropListChange', list)
 	})
 }
 
 function triggerTagListChange() {
-	let list = getTagList()
 	nextTick().then(() => {
+		let list = getTagList()
+		list = transformPrecision(list, props.precision)
 		emits('update:tagList', list)
 		emits('tagListChange', list)
 	})
