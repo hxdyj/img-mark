@@ -3,6 +3,7 @@ Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
 TODO
+1. 移动端适配
 2. Precision
 
 User Options
@@ -161,6 +162,7 @@ let props = withDefaults(
 		tagConfig?: TagConfig
 		isShowTip?: boolean
 		enableCropCross?: boolean
+		handleResizeCropCross?: 'delete' | 'reset'
 		enableCropResize?: boolean
 		//是否允许crop画到图片外
 		enableDrawCropOutOfImg?: boolean
@@ -178,7 +180,8 @@ let props = withDefaults(
 		layerConfig: () => DEFAULT_CONFIG.layerConfig,
 		cropConfig: () => DEFAULT_CONFIG.cropConfig,
 		isShowTip: false,
-		enableCropCross: true,
+		enableCropCross: false,
+		handleResizeCropCross: 'reset',
 		enableCropResize: true,
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
@@ -362,8 +365,7 @@ let actions = {
 		clearCanvas(ctx)
 		clearCanvas(ctx2)
 		drawImage(ctx, img, currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
-		drawCropList(ctx2, cropArr, currentPosition, config)
-		drawTagList(ctx2, tagArr, currentPosition, config)
+		renderCtx2()
 		hasHoverRectInTagItem = false
 		status.isScaleing = false
 	},
@@ -478,8 +480,7 @@ let hooks = {
 		drawCropList(ctx2, cropArr, currentPosition, config)
 		let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, config, undefined, touchPoint)
 		if (isReDraw) {
-			drawCropList(ctx2, cropArr, currentPosition, config)
-			drawTagList(ctx2, tagArr, currentPosition, config)
+			renderCtx2()
 			triggerTagListChange()
 			emits('tagsStatusChange', getTagList(redrawList))
 		}
@@ -652,9 +653,8 @@ async function initComponent() {
 		// if (debug) console.log('Crop Current', initPosition)
 		// drawCropRect(ctx2, ...initPosition)
 		cropArr = initBoundingArrScale(cropArr, scale)
-		drawCropList(ctx2, cropArr, currentPosition, config)
 		tagArr = initBoundingArrScale(tagArr, scale)
-		drawTagList(ctx2, tagArr, currentPosition, config)
+		renderCtx2()
 		return true
 	})
 }
@@ -665,6 +665,12 @@ function initResizeVar() {
 	startMousePoint = cloneDeep(defaultPoint)
 	endMousePoint = cloneDeep(defaultPoint)
 	containerInfo = undefined
+}
+
+function renderCtx2() {
+	if (!ctx2) return
+	drawCropList(ctx2, cropArr, currentPosition, config)
+	drawTagList(ctx2, tagArr, currentPosition, config)
 }
 
 async function resizeRender() {
@@ -696,9 +702,8 @@ async function resizeRender() {
 	ctx2.translate(-origin.x, -origin.y)
 	drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
 	cropArr = initBoundingArrScale(cropArr, scale)
-	drawCropList(ctx2, cropArr, currentPosition, config)
 	tagArr = initBoundingArrScale(tagArr, scale)
-	drawTagList(ctx2, tagArr, currentPosition, config)
+	renderCtx2()
 	inited = true
 }
 
@@ -735,10 +740,8 @@ watch(
 watch(
 	() => props.tagList,
 	list => {
-		if (!ctx2) return
-		drawCropList(ctx2, cropArr, currentPosition, config)
 		tagArr = initBoundingArrScale(list, scale)
-		drawTagList(ctx2, tagArr, currentPosition, config)
+		renderCtx2()
 	},
 	{
 		deep: true,
@@ -749,9 +752,7 @@ watch(
 	() => props.cropList,
 	list => {
 		cropArr = initBoundingArrScale(list, scale)
-		if (!ctx2) return
-		drawCropList(ctx2, cropArr, currentPosition, config)
-		drawTagList(ctx2, tagArr, currentPosition, config)
+		renderCtx2()
 	}
 )
 function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
@@ -792,6 +793,7 @@ function setResizeCrop(newCropInfo: BoundingBox) {
 			index: status.resizeCropHovering.index,
 			box: newCropInfo,
 		})
+		triggerCropListChange()
 	}
 }
 
@@ -812,8 +814,13 @@ function cleartMousePoints() {
 							cropArr.filter((item, index) => index !== status.resizeCropHovering?.index)
 						)
 						if (intersectFlag) {
-							let removeItem = cropArr[status.resizeCropHovering.index]
-							removeCropItems([removeItem])
+							if (props.handleResizeCropCross === 'reset') {
+								renderCtx2()
+							}
+							if (props.handleResizeCropCross === 'delete') {
+								let removeItem = cropArr[status.resizeCropHovering.index]
+								removeCropItems([removeItem])
+							}
 						} else {
 							setResizeCrop(newCropInfo)
 						}
@@ -824,13 +831,18 @@ function cleartMousePoints() {
 					newCropInfo.scale = 1
 					if (props.enableCropCross) {
 						cropArr.push(newCropInfo)
+						triggerCropListChange()
 					} else {
 						//判断crop是否和其他box相交，相交就不保存
 						let intersectFlag = getBoxIsIntersectWithBoxList(newCropInfo, cropArr)
-						if (!intersectFlag) cropArr.push(newCropInfo)
+						if (!intersectFlag) {
+							cropArr.push(newCropInfo)
+							triggerCropListChange()
+						} else {
+							renderCtx2()
+						}
 					}
 				}
-				triggerCropListChange()
 				tmpCropPositionInfo = undefined
 			}
 		} else {
@@ -1114,11 +1126,9 @@ function onTouchEnd(event) {
 
 /* API */
 function refreshDrawTags() {
-	if (!ctx2) return
 	cropArr = initBoundingArrScale(props.cropList, scale)
-	drawCropList(ctx2, cropArr, currentPosition, config)
 	tagArr = initBoundingArrScale(props.tagList, scale)
-	drawTagList(ctx2, tagArr, currentPosition, config)
+	renderCtx2()
 }
 /* API */
 function removeTagItems(removeList: BoundingBox[]) {
@@ -1133,11 +1143,7 @@ function removeTagItems(removeList: BoundingBox[]) {
 	}
 	tagArr = initBoundingArrScale(newTagArr, scale)
 	nextTick(() => {
-		if (!ctx2) {
-			throw new Error(`ctx2  can't find on removeItem.`)
-		}
-		drawCropList(ctx2, cropArr, currentPosition, config)
-		drawTagList(ctx2, tagArr, currentPosition, config)
+		renderCtx2()
 		triggerTagListChange()
 	})
 }
@@ -1146,7 +1152,6 @@ function removeCropItems(removeList: BoundingBox[]) {
 	if (removeList.length === 0) return
 	let newCropArr: BoundingBox[] = []
 	let removeCropArr: BoundingBox[] = []
-	let indexArr: number[] = []
 	let currentList = getCropList()
 	currentList.forEach((tag, index) => {
 		if (removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
@@ -1159,11 +1164,7 @@ function removeCropItems(removeList: BoundingBox[]) {
 	cropArr = initBoundingArrScale(newCropArr, scale)
 	emits('delCrop', removeCropArr)
 	nextTick(() => {
-		if (!ctx2) {
-			throw new Error(`ctx2  can't find on removeItem.`)
-		}
-		drawCropList(ctx2, cropArr, currentPosition, config)
-		drawTagList(ctx2, tagArr, currentPosition, config)
+		renderCtx2()
 		triggerCropListChange()
 	})
 }
