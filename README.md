@@ -215,6 +215,7 @@ type ResizeEmitType = {
 | ----------------------------- | ------------------------------ | ----------------------------------------------------------------- |
 | transformTagListBoxRelativeTo | 转换 `tag` list 基于什么去定位 | type: 'img'/'crop', cropInfo: BoundingBox, tagList: BoundingBox[] |
 | transformTagBoxRelativeTo     | 转换单个 `tag` 基于什么去定位  | type: 'img'/'crop', cropInfo: BoundingBox, tag: BoundingBox       |
+| boxIsAllInOtherBox            | box 是否完全包含在另一个 box   | box: BoundingBox, otherBox: BoundingBox                           |
 
 ## 操作
 
