@@ -169,6 +169,11 @@ type ResizeEmitType = {
 	index: number
 	box: BoundingBox
 }
+
+type TagListGroupByCropIndex = {
+	[key: number]: BoundingBox[]
+	undefined: BoundingBox[]
+}
 ```
 
 ## 组件属性
@@ -193,29 +198,28 @@ type ResizeEmitType = {
 
 ## 组件事件
 
-| 事件名           | 说明                            | 参数                |
-| ---------------- | ------------------------------- | ------------------- |
-| tagsStatusChange | 当点击 `tag` 项展示或隐藏时触发 | list:BoundingBox[]  |
-| tagListChange    | 当添加或者删除了 `tag` 项触发   | list:BoundingBox[]  |
-| cropListChange   | 当添加或者删除了 `crop` 项触发  | list:BoundingBox[]  |
-| resizeStart      | `crop` 开始 resize 触发         | data:ResizeEmitType |
-| resizeEnd        | `crop` 结束 resize 触发         | data:ResizeEmitType |
-| delCrop          | 删除 `crop` 触发                | list:BoundingBox[]  |
+| 事件名         | 说明                                        | 参数                                                      |
+| -------------- | ------------------------------------------- | --------------------------------------------------------- |
+| tagListChange  | 当添加或者删除或者改变组件状态 `tag` 项触发 | {type:'add'/'delete'/'statusChange', list:BoundingBox[] } |
+| cropListChange | 当添加或者删除了 `crop` 项触发              | list:BoundingBox[]                                        |
+| resizeStart    | `crop` 开始 resize 触发                     | data:ResizeEmitType                                       |
+| resizeEnd      | `crop` 结束 resize 触发                     | data:ResizeEmitType                                       |
+| delCrop        | 删除 `crop` 触发                            | list:BoundingBox[]                                        |
 
 ## 组件方法
 
-| 方法                       | 说明                                 | 参数                                      |
-| -------------------------- | ------------------------------------ | ----------------------------------------- |
-| removeTagItems             | 移除 `tag` 项                        | list:BoundingBox[]                        |
-| getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组 | type: 'startPoint'/'allIn' = 'startPoint' |
+| 方法                       | 说明                                 | 参数                                      | 返回类型                |
+| -------------------------- | ------------------------------------ | ----------------------------------------- | ----------------------- |
+| removeTagItems             | 移除 `tag` 项                        | list:BoundingBox[]                        | void                    |
+| getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组 | type: 'startPoint'/'allIn' = 'startPoint' | TagListGroupByCropIndex |
 
 ## Lib 方法
 
-| 方法                          | 说明                           | 参数                                                              |
-| ----------------------------- | ------------------------------ | ----------------------------------------------------------------- |
-| transformTagListBoxRelativeTo | 转换 `tag` list 基于什么去定位 | type: 'img'/'crop', cropInfo: BoundingBox, tagList: BoundingBox[] |
-| transformTagBoxRelativeTo     | 转换单个 `tag` 基于什么去定位  | type: 'img'/'crop', cropInfo: BoundingBox, tag: BoundingBox       |
-| boxIsAllInOtherBox            | box 是否完全包含在另一个 box   | box: BoundingBox, otherBox: BoundingBox                           |
+| 方法                          | 说明                           | 参数                                                              | 返回类型      |
+| ----------------------------- | ------------------------------ | ----------------------------------------------------------------- | ------------- |
+| transformTagListBoxRelativeTo | 转换 `tag` list 基于什么去定位 | type: 'img'/'crop', cropInfo: BoundingBox, tagList: BoundingBox[] | BoundingBox[] |
+| transformTagBoxRelativeTo     | 转换单个 `tag` 基于什么去定位  | type: 'img'/'crop', cropInfo: BoundingBox, tag: BoundingBox       | BoundingBox   |
+| boxIsAllInOtherBox            | box 是否完全包含在另一个 box   | box: BoundingBox, otherBox: BoundingBox                           | boolean       |
 
 ## 操作
 

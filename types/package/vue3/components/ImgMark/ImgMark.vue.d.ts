@@ -26,6 +26,7 @@ export declare type ResizeEmitType = {
     index: number;
     box: BoundingBox;
 };
+declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -147,9 +148,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'update:cropList', list: BoundingBox[]): void;
         (e: 'cropListChange', list: BoundingBox[]): void;
         (e: 'update:tagList', list: BoundingBox[]): void;
-        (e: 'tagListChange', list: BoundingBox[]): void;
+        (e: 'tagListChange', data: {
+            type: TagListChangeType;
+            list: BoundingBox[];
+        }): void;
         (e: 'update:mode', mode: Mode): void;
-        (e: 'tagsStatusChange', list: BoundingBox[]): void;
         (e: 'resizeStart', data: ResizeEmitType): void;
         (e: 'resizeEnd', data: ResizeEmitType): void;
         (e: 'delCrop', list: BoundingBox[]): void;
@@ -224,7 +227,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     setResizeCrop: (newCropInfo: BoundingBox) => void;
     cleartMousePoints: () => void;
     triggerCropListChange: () => void;
-    triggerTagListChange: () => void;
+    triggerTagListChange: (type: TagListChangeType, changedList: BoundingBox[]) => void;
     getTagList: (tagList?: BoundingBox[] | undefined, _cropList?: BoundingBox[] | undefined, initScale?: number | undefined, imageWH?: WH | undefined) => TagItemTmp[];
     getCropList: () => BoundingBox[];
     onMouseDown: (e: MouseEvent) => void;
@@ -241,7 +244,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagListGroupByCropIndex: (type?: 'startPoint' | 'allIn') => {
         [index: number]: BoundingBox[];
     };
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "resizeStart" | "resizeEnd" | "delCrop")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "tagsStatusChange" | "resizeStart" | "resizeEnd" | "delCrop", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "resizeStart" | "resizeEnd" | "delCrop")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "resizeStart" | "resizeEnd" | "delCrop", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
     cropConfig?: unknown;
     layerConfig?: unknown;
     tagConfig?: unknown;
@@ -279,7 +282,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     "onUpdate:tagList"?: ((...args: any[]) => any) | undefined;
     onTagListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:mode"?: ((...args: any[]) => any) | undefined;
-    onTagsStatusChange?: ((...args: any[]) => any) | undefined;
     onResizeStart?: ((...args: any[]) => any) | undefined;
     onResizeEnd?: ((...args: any[]) => any) | undefined;
     onDelCrop?: ((...args: any[]) => any) | undefined;

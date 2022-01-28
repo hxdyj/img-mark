@@ -198,14 +198,19 @@ export type ResizeEmitType = {
 	index: number
 	box: BoundingBox
 }
-
+type TagListChangeType = 'add' | 'delete' | 'statusChange'
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
 	(e: 'cropListChange', list: BoundingBox[]): void
 	(e: 'update:tagList', list: BoundingBox[]): void
-	(e: 'tagListChange', list: BoundingBox[]): void
+	(
+		e: 'tagListChange',
+		data: {
+			type: TagListChangeType
+			list: BoundingBox[]
+		}
+	): void
 	(e: 'update:mode', mode: Mode): void
-	(e: 'tagsStatusChange', list: BoundingBox[]): void
 	(e: 'resizeStart', data: ResizeEmitType): void
 	(e: 'resizeEnd', data: ResizeEmitType): void
 	(e: 'delCrop', list: BoundingBox[]): void
@@ -416,9 +421,7 @@ let hooks = {
 		if (!status.isMoving && !status.resizeCropHovering) {
 			actions.dragCreatRectInterrupt()
 		}
-		nextTick().then(() => {
-			spaceKeyDown = false
-		})
+		spaceKeyDown = false
 	},
 	onKeyDownSpace() {
 		containerRef.style.cursor = 'crosshair'
@@ -483,8 +486,8 @@ let hooks = {
 		let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, config, undefined, touchPoint)
 		if (isReDraw) {
 			renderCtx2()
-			triggerTagListChange()
-			emits('tagsStatusChange', getTagList(redrawList))
+			triggerTagListChange('statusChange', getTagList(redrawList))
+			// emits('tagsStatusChange', getTagList(redrawList))
 		}
 	},
 	onWheel(zoom: number, mouse: Point) {
@@ -858,7 +861,7 @@ function cleartMousePoints() {
 					__vertexPosition: vertexPosition,
 				})
 				tagArr.push(tagInfo)
-				triggerTagListChange()
+				triggerTagListChange('add', getTagList([tagInfo]))
 				tmpTagPositionInfo = undefined
 			}
 		}
@@ -872,20 +875,19 @@ function cleartMousePoints() {
 }
 
 function triggerCropListChange() {
-	nextTick().then(() => {
-		let list = getCropList()
-		list = transformPrecision(list, props.precision)
-		emits('update:cropList', list)
-		emits('cropListChange', list)
-	})
+	let list = getCropList()
+	list = transformPrecision(list, props.precision)
+	emits('update:cropList', list)
+	emits('cropListChange', list)
 }
 
-function triggerTagListChange() {
-	nextTick().then(() => {
-		let list = getTagList()
-		list = transformPrecision(list, props.precision)
-		emits('update:tagList', list)
-		emits('tagListChange', list)
+function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[]) {
+	let list = getTagList(tagArr)
+	list = transformPrecision(list, props.precision)
+	emits('update:tagList', list)
+	emits('tagListChange', {
+		type,
+		list: changedList,
 	})
 }
 
@@ -1104,7 +1106,6 @@ async function onTouchMove(event: TouchEvent) {
 		let zoom = -distance
 		// console.log('Touch Zoom', zoom, hypotenuse, this.hypotenuse)
 		hypotenuse = _hypotenuse
-		await nextTick()
 		onMouseWheel({
 			onTouchMove: true,
 			deltaY: zoom,
@@ -1137,19 +1138,21 @@ function refreshDrawTags() {
 /* API */
 function removeTagItems(removeList: BoundingBox[]) {
 	let newTagArr: BoundingBox[] = []
+	let delTagArr: BoundingBox[] = []
 	if (removeList.length !== 0) {
 		let currentList = getTagList()
 		currentList.forEach(tag => {
 			if (!removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
 				newTagArr.push(tag)
+			} else {
+				delTagArr.push(tag)
 			}
 		})
 	}
 	tagArr = initBoundingArrScale(newTagArr, scale)
-	nextTick(() => {
-		renderCtx2()
-		triggerTagListChange()
-	})
+
+	renderCtx2()
+	triggerTagListChange('delete', delTagArr)
 }
 
 function removeCropItems(removeList: BoundingBox[]) {
@@ -1167,10 +1170,8 @@ function removeCropItems(removeList: BoundingBox[]) {
 
 	cropArr = initBoundingArrScale(newCropArr, scale)
 	emits('delCrop', removeCropArr)
-	nextTick(() => {
-		renderCtx2()
-		triggerCropListChange()
-	})
+	renderCtx2()
+	triggerCropListChange()
 }
 
 function getTagListGroupByCropIndex(type: 'startPoint' | 'allIn' = 'startPoint'): {
@@ -1198,7 +1199,6 @@ function getTagListGroupByCropIndex(type: 'startPoint' | 'allIn' = 'startPoint')
 			tag.__groupIndex = result.indexList[0]
 		}
 	})
-	console.log(tags, crops)
 	return groupBy(tags, '__groupIndex')
 }
 
