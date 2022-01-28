@@ -26,7 +26,7 @@ export declare type ResizeEmitType = {
     index: number;
     box: BoundingBox;
 };
-declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
+export declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;

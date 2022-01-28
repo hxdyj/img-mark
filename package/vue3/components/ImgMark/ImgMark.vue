@@ -198,7 +198,7 @@ export type ResizeEmitType = {
 	index: number
 	box: BoundingBox
 }
-type TagListChangeType = 'add' | 'delete' | 'statusChange'
+export type TagListChangeType = 'add' | 'delete' | 'statusChange'
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
 	(e: 'cropListChange', list: BoundingBox[]): void
