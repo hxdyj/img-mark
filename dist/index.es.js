@@ -3034,9 +3034,9 @@ var ImgMark_vue_vue_type_style_index_0_scoped_true_lang = "", _export_sfc = (t, 
     e[r] = o;
   return e;
 };
-const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousedown", "onClick", "onMouseup", "onMousemove", "onMouseout", "onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = _withScopeId(() => createElementVNode("div", { class: "tip" }, [createElementVNode("kbd", null, "Ctrl"), createTextVNode(" + "), createElementVNode("kbd", null, "B"), createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F")], -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "resizeStart", "resizeEnd", "delCrop"], setup(e, { expose: t, emit: o }) {
+const _withScopeId = (t) => (pushScopeId("data-v-2084cfbe"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousedown", "onClick", "onMouseup", "onMousemove", "onMouseout", "onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = _withScopeId(() => createElementVNode("div", { class: "tip" }, [createElementVNode("kbd", null, "Ctrl"), createTextVNode(" + "), createElementVNode("kbd", null, "B"), createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F")], -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "resizeStart", "resizeEnd", "delCrop"], setup(e, { expose: t, emit: i }) {
   const f = e;
-  let r = false, i = void 0, u = void 0, a = { last: { down: void 0, up: void 0 }, prev: { down: void 0, up: void 0 } }, c = 0.1, s = false;
+  let r = false, o = void 0, u = void 0, a = { last: { down: void 0, up: void 0 }, prev: { down: void 0, up: void 0 } }, c = 0.1, s = false;
   function n() {
     s = false, c = 0.1, X.resizeCropHovering = void 0;
   }
@@ -3052,7 +3052,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
       return n2 !== ((_a = X.resizeCropHovering) == null ? void 0 : _a.index);
     }), z.value))) : M.move()));
   }, changeMode() {
-    f.mode === "tag" ? o("update:mode", "crop") : o("update:mode", "tag");
+    f.mode === "tag" ? i("update:mode", "crop") : i("update:mode", "tag");
   }, scale(t2, n2) {
     if (!d || !h || !p)
       throw new Error("can't find canvas ctx or img");
@@ -3139,7 +3139,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
     (l || e2.__zoom) && (e2.preventDefault(), X.isDrawRecting || X.isMoving || (r2 = n2 ? 0 : (e2.clientX - L.left) * DPI, o2 = n2 ? 0 : (e2.clientY - L.top) * DPI, t2 = e2.deltaY < 0 ? 1 : -1, t2 = n2 ? e2.__zoom : Math.exp(t2 * c), D * t2 < 0.2 || k.onWheel(t2, { x: r2, y: o2 })));
   }
   function H(t2) {
-    X.resizeCropHovering && (O[X.resizeCropHovering.index] = t2, o("resizeEnd", { index: X.resizeCropHovering.index, box: t2 }), $());
+    X.resizeCropHovering && (O[X.resizeCropHovering.index] = t2, i("resizeEnd", { index: X.resizeCropHovering.index, box: t2 }), $());
   }
   function N() {
     if (l) {
@@ -3160,11 +3160,11 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
   }
   function $() {
     var t2 = K();
-    o("update:cropList", t2), o("cropListChange", t2);
+    i("update:cropList", t2), i("cropListChange", t2);
   }
   function q(t2, n2) {
     var e2 = G(A);
-    o("update:tagList", e2), o("tagListChange", { type: t2, list: n2 });
+    i("update:tagList", e2), i("tagListChange", { type: t2, list: n2 });
   }
   function G(t2, n2, o2, i2) {
     let e2 = t2 || A, u2 = n2 || O, a2 = [];
@@ -3192,7 +3192,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
   }
   function Z(t2) {
     var n2;
-    l && h && p && (n2 = new Date().getTime(), i = n2, a.prev.down ? a.last.down = n2 : a.prev.down = n2, t2 = t2, _ = { x: t2.layerX, y: t2.layerY }, f.mode !== "crop" || r || !f.enableCropResize || (t2 = detectEventIsTriggerOnCropBorderOrVertex(t2, O, D, m, b)).hasIn && (X.resizeCropHovering = findOneBorderOrVertex(t2.list), o("resizeStart", { index: X.resizeCropHovering.index, box: O[X.resizeCropHovering.index] })));
+    l && h && p && (n2 = new Date().getTime(), o = n2, a.prev.down ? a.last.down = n2 : a.prev.down = n2, t2 = t2, _ = { x: t2.layerX, y: t2.layerY }, f.mode !== "crop" || r || !f.enableCropResize || (t2 = detectEventIsTriggerOnCropBorderOrVertex(t2, O, D, m, b)).hasIn && (X.resizeCropHovering = findOneBorderOrVertex(t2.list), i("resizeStart", { index: X.resizeCropHovering.index, box: O[X.resizeCropHovering.index] })));
   }
   function J(t2) {
     l && (t2 = t2, u = new Date().getTime(), k.onMouseOverMove(t2));
@@ -3206,10 +3206,10 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
   }
   function nt(t2) {
     var n2;
-    l && (n2 = getTouchPoint(t2, D, b, "click"), t2 = u && i ? u - i : 0, i = void 0, u = void 0, 100 < t2 || (k.onCick(n2), a.prev.up && a.prev.down && a.last.up && a.last.down && (a.last.up - a.prev.down < 360 && k.onDoubleClick(n2), a.prev.down = a.last.down, a.prev.up = a.last.up, a.last.down = void 0, a.last.up = void 0)));
+    l && (n2 = getTouchPoint(t2, D, b, "click"), t2 = u && o ? u - o : 0, o = void 0, u = void 0, 100 < t2 || (k.onCick(n2), a.prev.up && a.prev.down && a.last.up && a.last.down && (a.last.up - a.prev.down < 360 && k.onDoubleClick(n2), a.prev.down = a.last.down, a.prev.up = a.last.up, a.last.down = void 0, a.last.up = void 0)));
   }
   function et(t2) {
-    i = new Date().getTime();
+    o = new Date().getTime();
     var n2 = amendMobileTouchEventDpi(t2);
     t2.touches.length === 1 && Z({ layerX: n2[0].clientX, layerY: n2[0].clientY }), t2.touches.length == 2 && (getTwoFingerTouchListDistence(n2), x = { x: (n2[0].clientX + n2[1].clientX) / 2, y: (n2[0].clientY + n2[1].clientY) / 2 });
   }
@@ -3223,12 +3223,13 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
   function ot(t2) {
     Q();
   }
-  function it(r2) {
-    if (r2.length !== 0) {
-      let t2 = [], e2 = [], n2 = K();
-      n2.forEach((n3) => {
-        (r2.find((t3) => t3.startX === n3.startX && t3.endX === n3.endX && t3.startY === n3.startY && t3.endY === n3.endY) ? e2 : t2).push(n3);
-      }), O = initBoundingArrScale(t2, C, f.precision), o("delCrop", e2), F(), $();
+  function it(o2) {
+    if (o2.length !== 0) {
+      let e2 = [], r2 = [], t2 = K();
+      t2.forEach((t3) => {
+        let n2 = fixBoxInfo(t3).info;
+        (o2.find((t4) => t4.startX === n2.startX && t4.endX === n2.endX && t4.startY === n2.startY && t4.endY === n2.endY) ? r2 : e2).push(n2);
+      }), O = initBoundingArrScale(e2, C, f.precision), i("delCrop", r2), F(), $();
     }
   }
   return onBeforeUnmount(() => {
@@ -3247,8 +3248,9 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
     let r2 = [], o2 = [];
     if (e2.length !== 0) {
       let t2 = G();
-      t2.forEach((n2) => {
-        (e2.find((t3) => t3.startX === n2.startX && t3.endX === n2.endX && t3.startY === n2.startY && t3.endY === n2.endY) ? o2 : r2).push(n2);
+      t2.forEach((t3) => {
+        let n2 = fixBoxInfo(t3).info;
+        (e2.find((t4) => t4.startX === n2.startX && t4.endX === n2.endX && t4.startY === n2.startY && t4.endY === n2.endY) ? o2 : r2).push(n2);
       });
     }
     A = initBoundingArrScale(r2, C, f.precision), F(), q("delete", o2);
@@ -3260,5 +3262,5 @@ const _withScopeId = (t) => (pushScopeId("data-v-1c034772"), t = t(), popScopeId
     }), lodash.exports.groupBy(t2, "__groupIndex");
   } }), (t2, n2) => (openBlock(), createElementBlock("div", { class: "comp-ocr-img", ref_key: "containerRef", ref: Y, onMousedown: withModifiers(Z, ["stop"]), onClick: withModifiers(nt, ["stop"]), onMouseup: withModifiers(Q, ["stop"]), onMousemove: withModifiers(J, ["stop"]), onMouseout: withModifiers(tt, ["stop"]), onMousewheel: withModifiers(V, ["stop"]), onTouchmove: withModifiers(rt, ["stop", "prevent"]), onTouchstart: withModifiers(et, ["stop"]), onTouchend: withModifiers(ot, ["stop"]) }, [createElementVNode("canvas", { class: "canvas", ref_key: "canvasRef", ref: E }, null, 512), createElementVNode("canvas", { class: "canvas2", ref_key: "canvas2Ref", ref: j }, null, 512), unref(f).isShowTip ? (openBlock(), createElementBlock("div", _hoisted_2, [createElementVNode("div", _hoisted_3, [createElementVNode("div", { class: normalizeClass(["circle", { crop: e.mode === "crop", tag: e.mode === "tag" }]) }, null, 2), createElementVNode("div", _hoisted_4, toDisplayString(e.mode === "crop" ? "\u88C1\u526A\u6A21\u5F0F" : "\u6807\u8BB0\u9519\u8BEF\u884C"), 1)]), _hoisted_5])) : createCommentVNode("", true)], 40, _hoisted_1));
 } });
-var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-1c034772"]]);
+var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-2084cfbe"]]);
 export { ImgMark, boxIsAllInOtherBox, transformTagBoxRelativeTo, transformTagListBoxRelativeTo };
