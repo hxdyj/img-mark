@@ -1,6 +1,6 @@
 {
 	"name": "img-mark",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"description": "",
 	"main": "./dist/index.umd.js",
 	"module": "./dist/index.es.js",
@@ -24,9 +24,6 @@
 		"vite-plugin-dts": "^0.9.9",
 		"vue": "^3.2.26",
 		"vue-router": "^4.0.12"
-	},
-	"dependencies": {
-		"img-mark": "^0.0.1"
 	},
 	"types": "types/package/index.d.ts",
 	"style": "./dist/style.css",
