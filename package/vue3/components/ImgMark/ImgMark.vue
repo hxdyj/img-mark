@@ -633,12 +633,15 @@ async function initComponent() {
 			let boxStretchScale = cropBoxInfo[2] >= cropBoxInfo[3] ? widthRate : heightRate // 长边尽量展示出来
 			let canvasZoom = boxStretchScale
 
+			let cropX = cropBoxInfo[0] + cropBoxInfo[2]
+			let cropY = cropBoxInfo[1] + cropBoxInfo[3]
+
 			if (boxStretchScale === widthRate) {
-				currentPosition.x = (canvasWH.width * whiteRate) / 2 / canvasZoom
-				currentPosition.y = (canvasWH.height / canvasZoom - cropBoxInfo[3]) / 2
+				currentPosition.x = canvasWH.width / canvasZoom - cropX - ((canvasWH.width / canvasZoom) * whiteRate) / 2
+				currentPosition.y = (canvasWH.height / canvasZoom - cropBoxInfo[3]) / 2 - cropBoxInfo[1]
 			} else {
-				currentPosition.x = (canvasWH.width / canvasZoom - cropBoxInfo[2]) / 2
-				currentPosition.y = (canvasWH.height * whiteRate) / 2 / canvasZoom
+				currentPosition.x = (canvasWH.width / canvasZoom - cropBoxInfo[2]) / 2 - cropBoxInfo[0]
+				currentPosition.y = canvasWH.height / canvasZoom - cropY - ((canvasWH.height / canvasZoom) * whiteRate) / 2
 			}
 
 			onMouseWheel(
