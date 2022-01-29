@@ -1145,9 +1145,13 @@ function removeTagItems(removeList: BoundingBox[]) {
 	let delTagArr: BoundingBox[] = []
 	if (removeList.length !== 0) {
 		let currentList = getTagList()
-		currentList.forEach(tagOrigin => {
-			let tag = fixBoxInfo(tagOrigin).info
-			if (!removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
+		currentList.forEach(tag => {
+			if (
+				!removeList.find(item => {
+					let i = fixBoxInfo(item).info
+					return i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY
+				})
+			) {
 				newTagArr.push(tag)
 			} else {
 				delTagArr.push(tag)
@@ -1165,9 +1169,13 @@ function removeCropItems(removeList: BoundingBox[]) {
 	let newCropArr: BoundingBox[] = []
 	let removeCropArr: BoundingBox[] = []
 	let currentList = getCropList()
-	currentList.forEach(tagOrigin => {
-		let tag = fixBoxInfo(tagOrigin).info
-		if (removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
+	currentList.forEach(tag => {
+		if (
+			removeList.find(item => {
+				let i = fixBoxInfo(item).info
+				return i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY
+			})
+		) {
 			removeCropArr.push(tag)
 		} else {
 			newCropArr.push(tag)
