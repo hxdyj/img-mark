@@ -903,12 +903,12 @@ export function transfromRect2Box(rect: Rect, currentPosition: Point, scale = 1)
 	return fixBoxInfo(rectInfo).info
 }
 
-export function initBoundingArrScale(tagArr: BoundingBox[], scale: number) {
+export function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number) {
 	return tagArr.map(tag => {
 		if (tag.scale !== 1) {
 			tag.scale = scale
 		}
-		return tag
+		return fixBoxInfo(transformBoxPrecision(tag, precision)).info
 	})
 }
 

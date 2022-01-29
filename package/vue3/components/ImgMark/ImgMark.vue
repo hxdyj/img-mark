@@ -91,7 +91,6 @@ import {
 	VertexPosition,
 	getBoxIsIntersectWithBoxList,
 	boxAllInBoxList,
-	transformPrecision,
 	transformBoxPrecision,
 } from './util'
 
@@ -573,8 +572,8 @@ async function initComponent() {
 	await nextTick()
 	//初始化prop到data
 	initCropInfo()
-	tagArr = transformPrecision(props.tagList, props.precision)
-	cropArr = transformPrecision(props.cropList, props.precision)
+	tagArr = cloneDeep(props.tagList)
+	cropArr = cloneDeep(props.cropList)
 	let containerRectInfo = containerRef.getBoundingClientRect()
 	containerInfo = {
 		top: containerRectInfo.top,
@@ -661,8 +660,8 @@ async function initComponent() {
 		// let initPosition = transfromBoxToRect(cropInfo, cropScale, currentPosition)
 		// if (debug) console.log('Crop Current', initPosition)
 		// drawCropRect(ctx2, ...initPosition)
-		cropArr = initBoundingArrScale(cropArr, scale)
-		tagArr = initBoundingArrScale(tagArr, scale)
+		cropArr = initBoundingArrScale(cropArr, scale, props.precision)
+		tagArr = initBoundingArrScale(tagArr, scale, props.precision)
 		renderCtx2()
 		return true
 	})
@@ -710,8 +709,8 @@ async function resizeRender() {
 	ctx.translate(-origin.x, -origin.y)
 	ctx2.translate(-origin.x, -origin.y)
 	drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
-	cropArr = initBoundingArrScale(cropArr, scale)
-	tagArr = initBoundingArrScale(tagArr, scale)
+	cropArr = initBoundingArrScale(cropArr, scale, props.precision)
+	tagArr = initBoundingArrScale(tagArr, scale, props.precision)
 	renderCtx2()
 	inited = true
 }
@@ -749,7 +748,7 @@ watch(
 watch(
 	() => props.tagList,
 	list => {
-		tagArr = initBoundingArrScale(list, scale)
+		tagArr = initBoundingArrScale(list, scale, props.precision)
 		renderCtx2()
 	},
 	{
@@ -760,7 +759,7 @@ watch(
 watch(
 	() => props.cropList,
 	list => {
-		cropArr = initBoundingArrScale(list, scale)
+		cropArr = initBoundingArrScale(list, scale, props.precision)
 		renderCtx2()
 	}
 )
@@ -1136,8 +1135,8 @@ function onTouchEnd(event) {
 
 /* API */
 function refreshDrawTags() {
-	cropArr = initBoundingArrScale(props.cropList, scale)
-	tagArr = initBoundingArrScale(props.tagList, scale)
+	cropArr = initBoundingArrScale(props.cropList, scale, props.precision)
+	tagArr = initBoundingArrScale(props.tagList, scale, props.precision)
 	renderCtx2()
 }
 /* API */
@@ -1154,7 +1153,7 @@ function removeTagItems(removeList: BoundingBox[]) {
 			}
 		})
 	}
-	tagArr = initBoundingArrScale(newTagArr, scale)
+	tagArr = initBoundingArrScale(newTagArr, scale, props.precision)
 
 	renderCtx2()
 	triggerTagListChange('delete', delTagArr)
@@ -1165,7 +1164,7 @@ function removeCropItems(removeList: BoundingBox[]) {
 	let newCropArr: BoundingBox[] = []
 	let removeCropArr: BoundingBox[] = []
 	let currentList = getCropList()
-	currentList.forEach((tag, index) => {
+	currentList.forEach(tag => {
 		if (removeList.find(i => i.startX === tag.startX && i.endX === tag.endX && i.startY === tag.startY && i.endY === tag.endY)) {
 			removeCropArr.push(tag)
 		} else {
@@ -1173,7 +1172,7 @@ function removeCropItems(removeList: BoundingBox[]) {
 		}
 	})
 
-	cropArr = initBoundingArrScale(newCropArr, scale)
+	cropArr = initBoundingArrScale(newCropArr, scale, props.precision)
 	emits('delCrop', removeCropArr)
 	renderCtx2()
 	triggerCropListChange()

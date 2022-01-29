@@ -141,7 +141,7 @@ export declare function getTwoFingerTouchListDistence(touchList: Array<{
     height: number;
 };
 export declare function transfromRect2Box(rect: Rect, currentPosition: Point, scale?: number): BoundingBox;
-export declare function initBoundingArrScale(tagArr: BoundingBox[], scale: number): BoundingBox[];
+export declare function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number): BoundingBox[];
 export declare function getBigBoxByBoxList(list: BoundingBox[]): BoundingBox | undefined;
 export declare function getBoxIsIntersectWithBoxList(box: BoundingBox, list: BoundingBox[]): boolean;
 export declare function boxIsAllInOtherBox(box: BoundingBox, otherBox: BoundingBox): boolean;
