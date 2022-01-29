@@ -92,6 +92,7 @@ import {
 	getBoxIsIntersectWithBoxList,
 	boxAllInBoxList,
 	transformPrecision,
+	transformBoxPrecision,
 } from './util'
 
 let spaceKeyDown = false
@@ -876,14 +877,12 @@ function cleartMousePoints() {
 
 function triggerCropListChange() {
 	let list = getCropList()
-	list = transformPrecision(list, props.precision)
 	emits('update:cropList', list)
 	emits('cropListChange', list)
 }
 
 function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[]) {
 	let list = getTagList(tagArr)
-	list = transformPrecision(list, props.precision)
 	emits('update:tagList', list)
 	emits('tagListChange', {
 		type,
@@ -950,7 +949,8 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 				}
 			}
 		}
-		resultList.push(newTagInfo)
+		let fixBox = fixBoxInfo(newTagInfo)
+		resultList.push(transformBoxPrecision(fixBox.info, props.precision))
 	})
 	return resultList.filter(i => i.__isValidity !== false)
 }
@@ -984,7 +984,9 @@ function getCropList(): BoundingBox[] {
 				}
 			}
 		}
-		return result
+		let fixBox = fixBoxInfo(result)
+
+		return transformBoxPrecision(fixBox.info, props.precision) as BoundingBox & { _del?: boolean }
 	})
 	return list.filter(i => !i._del)
 }

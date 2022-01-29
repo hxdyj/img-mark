@@ -988,11 +988,12 @@ export function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: Boun
 }
 
 export function transformPrecision(list: BoundingBox[], precision: number) {
-	return list.map(box => {
-		box.startX = parseFloat(box.startX.toFixed(precision))
-		box.endX = parseFloat(box.endX.toFixed(precision))
-		box.startY = parseFloat(box.startY.toFixed(precision))
-		box.endY = parseFloat(box.endY.toFixed(precision))
-		return box
-	})
+	return list.map(box => transformBoxPrecision(box, precision))
+}
+export function transformBoxPrecision(box: BoundingBox, precision: number) {
+	box.startX = parseFloat(box.startX.toFixed(precision))
+	box.endX = parseFloat(box.endX.toFixed(precision))
+	box.startY = parseFloat(box.startY.toFixed(precision))
+	box.endY = parseFloat(box.endY.toFixed(precision))
+	return box
 }
