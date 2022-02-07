@@ -79,6 +79,7 @@ let tagList = $ref<BoundingBox[]>([
 		endX: 100,
 		endY: 50,
 		isShow: true,
+		labelText: 'customTagLabelText',
 	},
 	{
 		startX: 0,
@@ -142,6 +143,7 @@ type BoundingBox = {
 	endY: number
 	isShow?: boolean //tag是否显示
 	showOutLine?: boolean //tag是否边框是否高亮
+	labelText?: string //tag的标签文字
 }
 
 type CropConfig = {

@@ -66,6 +66,7 @@ let tagList = $ref<MyBoundingBox[]>([
 		endY: 50,
 		isShow: true,
 		type: 1,
+		labelText: 'haha',
 	},
 	{
 		startX: 0,

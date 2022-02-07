@@ -256,6 +256,7 @@ export type BoundingBox = {
 	scale?: number
 	isShow?: boolean
 	showOutLine?: boolean
+	labelText?: string
 }
 
 type FixBoxInfoReturn = {
@@ -358,7 +359,8 @@ export function drawTagRect(
 	index?: number,
 	touchPoint?: TypePoint,
 	isShow?: boolean,
-	showOutLine?: boolean
+	showOutLine?: boolean,
+	tagLabel?: string
 ):
 	| {
 			isShow: boolean
@@ -373,7 +375,7 @@ export function drawTagRect(
 		if (index) {
 			let fontsize = parseFloat(ctx.font.split(' ')[0])
 			ctx.fillStyle = config.tagConfig.textFillStyle
-			ctx.fillText(index + '', left + 4, top + height / 2 + fontsize / 2)
+			ctx.fillText(tagLabel || index + '', left + 4, top + height / 2 + fontsize / 2)
 		}
 	}
 	if (showOutLine) {
@@ -427,7 +429,7 @@ export function drawTagList(
 		positions[0] += offsetInfo!.offsetX
 		positions[1] += offsetInfo!.offsetY
 		// if (debug) console.log(`DRAW ITEM${index}`, tagInfo, positions)
-		let drawTagInfo = drawTagRect(ctx, ...positions, config, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine)
+		let drawTagInfo = drawTagRect(ctx, ...positions, config, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine, tagInfo.labelText)
 		if (drawTagInfo !== undefined) {
 			tagInfo.isShow = drawTagInfo.isShow
 			if (drawTagInfo.isCrash) {

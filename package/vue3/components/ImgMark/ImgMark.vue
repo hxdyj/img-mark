@@ -128,17 +128,17 @@ function initVar() {
 	status.resizeCropHovering = undefined
 }
 
-type CropConfig = {
+export type CropConfig = {
 	lineDash?: number[]
 	strokeStyle?: string
 	lineWidth?: number
 }
 
-type LayerConfig = {
+export type LayerConfig = {
 	fillStyle?: string
 }
 
-type TagConfig = {
+export type TagConfig = {
 	fillStyle?: string
 	textFillStyle?: string
 	hoverStrokeStyle?: string

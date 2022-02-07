@@ -63,6 +63,7 @@ export declare type BoundingBox = {
     scale?: number;
     isShow?: boolean;
     showOutLine?: boolean;
+    labelText?: string;
 };
 declare type FixBoxInfoReturn = {
     info: BoundingBox;
@@ -76,7 +77,7 @@ declare type TouchType = 'move' | 'click';
 export declare type TypePoint = Point & {
     type: TouchType;
 };
-export declare function drawTagRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, index?: number, touchPoint?: TypePoint, isShow?: boolean, showOutLine?: boolean): {
+export declare function drawTagRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, index?: number, touchPoint?: TypePoint, isShow?: boolean, showOutLine?: boolean, tagLabel?: string): {
     isShow: boolean;
     isCrash: boolean;
 } | undefined;

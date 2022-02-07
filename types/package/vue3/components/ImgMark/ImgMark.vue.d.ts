@@ -1,13 +1,13 @@
 import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
-declare type CropConfig = {
+export declare type CropConfig = {
     lineDash?: number[];
     strokeStyle?: string;
     lineWidth?: number;
 };
-declare type LayerConfig = {
+export declare type LayerConfig = {
     fillStyle?: string;
 };
-declare type TagConfig = {
+export declare type TagConfig = {
     fillStyle?: string;
     textFillStyle?: string;
     hoverStrokeStyle?: string;
