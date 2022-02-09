@@ -434,7 +434,9 @@ let hooks = {
 		spaceKeyDown = false
 	},
 	onKeyDownSpace() {
-		containerRef.style.cursor = 'crosshair'
+		if (props.enableDraw) {
+			containerRef.style.cursor = 'crosshair'
+		}
 		if (!status.isMouseDown()) {
 			spaceKeyDown = true
 		}
