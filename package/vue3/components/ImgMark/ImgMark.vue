@@ -161,8 +161,13 @@ let props = withDefaults(
 		layerConfig?: LayerConfig
 		tagConfig?: TagConfig
 		isShowTip?: boolean
+		enableScale?: boolean
+		enableMove?: boolean
+		enableDraw?: boolean
+		enableInteractiveTagChangeStatus?: boolean
 		enableCropCross?: boolean
 		handleResizeCropCross?: 'delete' | 'reset'
+		enableInteractiveCropDelete?: boolean
 		enableCropResize?: boolean
 		//是否允许crop画到图片外
 		enableDrawCropOutOfImg?: boolean
@@ -181,9 +186,14 @@ let props = withDefaults(
 		layerConfig: () => DEFAULT_CONFIG.layerConfig,
 		cropConfig: () => DEFAULT_CONFIG.cropConfig,
 		isShowTip: false,
+		enableMove: true,
+		enableScale: true,
+		enableDraw: true,
 		enableCropCross: false,
+		enableInteractiveTagChangeStatus: true,
 		handleResizeCropCross: 'reset',
 		enableCropResize: true,
+		enableInteractiveCropDelete: true,
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
@@ -377,7 +387,7 @@ let actions = {
 		status.isScaleing = false
 	},
 	move() {
-		if (!ctx || !ctx2 || !img || status.isScaleing) return
+		if (!props.enableMove || !ctx || !ctx2 || !img || status.isScaleing) return
 		status.isMoving = true
 		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr, config)
 		if (offsetInfo) {
@@ -440,10 +450,12 @@ let hooks = {
 	},
 	/* 按着空格移动 */
 	onSpaceMove() {
-		if (props.mode === 'crop') {
-			actions.dragCreatOrResizeRect('drawCrop')
-		} else {
-			actions.dragCreatOrResizeRect('drawTag')
+		if (props.enableDraw) {
+			if (props.mode === 'crop') {
+				actions.dragCreatOrResizeRect('drawCrop')
+			} else {
+				actions.dragCreatOrResizeRect('drawTag')
+			}
 		}
 	},
 	onHoldMouseLeftBtnMove(event: LayerTouchEvent) {
@@ -470,18 +482,14 @@ let hooks = {
 		}
 	},
 	onDoubleClick(touchPoint: TypePoint) {
-		if (props.mode === 'crop') {
-			// let point = {
-			// 	x: (touchPoint.x - currentPosition.x) * zoomScale * DPI,
-			// 	y: (touchPoint.y - currentPosition.y) * zoomScale * DPI,
-			// }
+		if (props.mode === 'crop' && props.enableInteractiveCropDelete) {
 			let removeCropInfo = pointIsInBoxList(touchPoint, cropArr, scale, currentPosition)
 			removeCropItems(removeCropInfo.boxList)
 		}
 	},
 	onCick(touchPoint: TypePoint) {
 		if (props.mode !== 'tag') return
-		if (!ctx2) return
+		if (!ctx2 || !props.enableInteractiveTagChangeStatus) return
 		drawCropList(ctx2, cropArr, currentPosition, config)
 		let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, config, undefined, touchPoint)
 		if (isReDraw) {
@@ -490,8 +498,10 @@ let hooks = {
 			// emits('tagsStatusChange', getTagList(redrawList))
 		}
 	},
-	onWheel(zoom: number, mouse: Point) {
-		actions.scale(zoom, mouse)
+	onWheel(zoom: number, mouse: Point, privateCall?: boolean) {
+		if (props.enableScale || privateCall) {
+			actions.scale(zoom, mouse)
+		}
 	},
 	/* 初始化 */
 	init() {
@@ -788,10 +798,14 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 
 	//缩放系数过小，不能缩放
 	if (zoomScale * zoom < 0.2) return
-	hooks.onWheel(zoom, {
-		x: mousex,
-		y: mousey,
-	})
+	hooks.onWheel(
+		zoom,
+		{
+			x: mousex,
+			y: mousey,
+		},
+		privateCall
+	)
 }
 
 function setResizeCrop(newCropInfo: BoundingBox) {

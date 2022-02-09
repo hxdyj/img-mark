@@ -56,6 +56,26 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    enableScale: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableMove: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableDraw: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableInteractiveTagChangeStatus: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     enableCropCross: {
         type: BooleanConstructor;
         required: false;
@@ -65,6 +85,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         type: StringConstructor;
         required: false;
         default: string;
+    };
+    enableInteractiveCropDelete: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
     };
     enableCropResize: {
         type: BooleanConstructor;
@@ -132,8 +157,13 @@ declare const _sfc_main: import("vue").DefineComponent<{
         layerConfig: LayerConfig;
         tagConfig: TagConfig;
         isShowTip: boolean;
+        enableScale: boolean;
+        enableMove: boolean;
+        enableDraw: boolean;
+        enableInteractiveTagChangeStatus: boolean;
         enableCropCross: boolean;
         handleResizeCropCross: 'delete' | 'reset';
+        enableInteractiveCropDelete: boolean;
         enableCropResize: boolean;
         enableDrawCropOutOfImg: boolean;
         enableDrawTagOutOfCrop: boolean;
@@ -209,7 +239,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         onHoldMouseLeftBtnMove(event: LayerTouchEvent): void;
         onDoubleClick(touchPoint: TypePoint): void;
         onCick(touchPoint: TypePoint): void;
-        onWheel(zoom: number, mouse: Point): void;
+        onWheel(zoom: number, mouse: Point, privateCall?: boolean | undefined): void;
         init(): void;
         resize(): void;
     };
@@ -249,8 +279,13 @@ declare const _sfc_main: import("vue").DefineComponent<{
     layerConfig?: unknown;
     tagConfig?: unknown;
     isShowTip?: unknown;
+    enableScale?: unknown;
+    enableMove?: unknown;
+    enableDraw?: unknown;
+    enableInteractiveTagChangeStatus?: unknown;
     enableCropCross?: unknown;
     handleResizeCropCross?: unknown;
+    enableInteractiveCropDelete?: unknown;
     enableCropResize?: unknown;
     enableDrawCropOutOfImg?: unknown;
     enableDrawTagOutOfCrop?: unknown;
@@ -265,8 +300,13 @@ declare const _sfc_main: import("vue").DefineComponent<{
     layerConfig: Record<string, any>;
     tagConfig: Record<string, any>;
     isShowTip: boolean;
+    enableScale: boolean;
+    enableMove: boolean;
+    enableDraw: boolean;
+    enableInteractiveTagChangeStatus: boolean;
     enableCropCross: boolean;
     handleResizeCropCross: string;
+    enableInteractiveCropDelete: boolean;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
@@ -290,8 +330,13 @@ declare const _sfc_main: import("vue").DefineComponent<{
     layerConfig: Record<string, any>;
     tagConfig: Record<string, any>;
     isShowTip: boolean;
+    enableScale: boolean;
+    enableMove: boolean;
+    enableDraw: boolean;
+    enableInteractiveTagChangeStatus: boolean;
     enableCropCross: boolean;
     handleResizeCropCross: string;
+    enableInteractiveCropDelete: boolean;
     enableCropResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;

@@ -180,23 +180,28 @@ type TagListGroupByCropIndex = {
 
 ## 组件属性
 
-| 属性                      | 说明                                                                                                                                                 | 类型          | 可选值       | 默认值 |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------ | ------ |
-| src                       | 图片地址, 必选参数                                                                                                                                   | string        | ——           | ——     |
-| mode/v-model:mode         | 模式                                                                                                                                                 | string        | crop/tag     | crop   |
-| cropList/v-model:cropList | 裁切区域集合，相对于`img`左上角开始定位                                                                                                              | BoundingBox[] | ——           | []     |
-| tagList/v-model:tagList   | tag 区域集合,相对于`img`左上角开始定位                                                                                                               | BoundingBox[] | ——           | []     |
-| precision                 | BoundingBox 精度                                                                                                                                     | number        | ——           | 0      |
-| enableDrawCropOutOfImg    | 是否允许 `crop` 画到图片外                                                                                                                           | boolean       | true/false   | true   |
-| enableDrawTagOutOfCrop    | 是否允许 `tag` 画到 `crop` 外                                                                                                                        | boolean       | true/false   | true   |
-| enableDrawTagOutOfImg     | 是否允许 `tag` 画到图片外                                                                                                                            | boolean       | true/false   | true   |
-| enableCropResize          | 是否允许 `crop` 改变大小                                                                                                                             | boolean       | true/false   | true   |
-| enableCropCross           | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交，新画的`crop`会不添加，如果是 resize 操作相交以后，按照下方 `handleResizeCropCross` 属性去处理 | boolean       | true/false   | true   |
-| handleResizeCropCross     | 当`enableCropCross`属性为 false，resize 操作相交后该如何处理进行 resize 操作的`crop`                                                                 | string        | delete/reset | reset  |
-| isShowTip                 | 是否显示底部提示区域                                                                                                                                 | boolean       | true/false   | false  |
-| layerConfig               | 浮层样式                                                                                                                                             | LayerConfig   | ——           | ——     |
-| cropConfig                | `crop` 样式                                                                                                                                          | CropConfig    | ——           | ——     |
-| tagConfig                 | `tag` 样式                                                                                                                                           | TagConfig     | ——           | ——     |
+| 属性                             | 说明                                                                                                                                                 | 类型          | 可选值       | 默认值 |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------ | ------ |
+| src                              | 图片地址, 必选参数                                                                                                                                   | string        | ——           | ——     |
+| mode/v-model:mode                | 模式                                                                                                                                                 | string        | crop/tag     | crop   |
+| cropList/v-model:cropList        | 裁切区域集合，相对于`img`左上角开始定位                                                                                                              | BoundingBox[] | ——           | []     |
+| tagList/v-model:tagList          | tag 区域集合,相对于`img`左上角开始定位                                                                                                               | BoundingBox[] | ——           | []     |
+| precision                        | BoundingBox 精度                                                                                                                                     | number        | ——           | 0      |
+| enableScale                      | 是否允许缩放画布                                                                                                                                     | boolean       | true/false   | true   |
+| enableMove                       | 是否允许移动画布                                                                                                                                     | boolean       | true/false   | true   |
+| enableDraw                       | 是否允许在画布上画 `tag` 和 `crop`                                                                                                                   | boolean       | true/false   | true   |
+| enableInteractiveTagChangeStatus | 是否允许交互改变 `tag` 状态                                                                                                                          | boolean       | true/false   | true   |
+| enableInteractiveCropDelete      | 是否允许交互删除 `crop`                                                                                                                              | boolean       | true/false   | true   |
+| enableDrawCropOutOfImg           | 是否允许 `crop` 画到图片外                                                                                                                           | boolean       | true/false   | true   |
+| enableDrawTagOutOfCrop           | 是否允许 `tag` 画到 `crop` 外                                                                                                                        | boolean       | true/false   | true   |
+| enableDrawTagOutOfImg            | 是否允许 `tag` 画到图片外                                                                                                                            | boolean       | true/false   | true   |
+| enableCropResize                 | 是否允许 `crop` 改变大小                                                                                                                             | boolean       | true/false   | true   |
+| enableCropCross                  | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交，新画的`crop`会不添加，如果是 resize 操作相交以后，按照下方 `handleResizeCropCross` 属性去处理 | boolean       | true/false   | true   |
+| handleResizeCropCross            | 当`enableCropCross`属性为 false，resize 操作相交后该如何处理进行 resize 操作的`crop`                                                                 | string        | delete/reset | reset  |
+| isShowTip                        | 是否显示底部提示区域                                                                                                                                 | boolean       | true/false   | false  |
+| layerConfig                      | 浮层样式                                                                                                                                             | LayerConfig   | ——           | ——     |
+| cropConfig                       | `crop` 样式                                                                                                                                          | CropConfig    | ——           | ——     |
+| tagConfig                        | `tag` 样式                                                                                                                                           | TagConfig     | ——           | ——     |
 
 ## 组件事件
 
