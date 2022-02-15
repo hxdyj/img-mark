@@ -981,10 +981,14 @@ export function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: Boun
 	if (type === 'img') {
 		item.startX = item.startX + cropInfo.startX
 		item.startY = item.startY + cropInfo.startY
+		item.endX = item.endX + cropInfo.startX
+		item.endY = item.endY + cropInfo.startY
 	}
 	if (type === 'crop') {
 		item.startX = item.startX - cropInfo.startX
 		item.startY = item.startY - cropInfo.startY
+		item.endX = item.endX - cropInfo.startX
+		item.endY = item.endY - cropInfo.startY
 	}
 	return item
 }
