@@ -1260,6 +1260,9 @@ defineExpose({
 	.canvas2 {
 		z-index: 2;
 	}
+	.mode-panel {
+		user-select: none;
+	}
 	.status {
 		position: absolute;
 		bottom: 10px;
