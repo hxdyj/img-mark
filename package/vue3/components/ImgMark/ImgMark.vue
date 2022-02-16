@@ -32,9 +32,11 @@ User Options
 				<div class="text">{{ mode === 'crop' ? '裁剪模式' : '标记错误行' }}</div>
 			</div>
 			<div class="tip">
-				<kbd>Ctrl</kbd> +
-				<kbd>B</kbd>
-				<span style="font-size: 14px; margin-left: 10px">切换模式</span>
+				<slot name="tip">
+					<kbd>Ctrl</kbd> +
+					<kbd>B</kbd>
+					<span style="font-size: 14px; margin-left: 10px">切换模式</span>
+				</slot>
 			</div>
 		</div>
 	</div>

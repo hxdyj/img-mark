@@ -12,6 +12,7 @@
 				@resizeStart="resizeStart"
 				@resizeEnd="resizeEnd"
 				@delCrop="delCrop"
+				:isShowTip="true"
 				:enableDraw="false"
 				:enableMove="false"
 				:enableInteractiveTagChangeStatus="false"
@@ -20,7 +21,9 @@
 				:enableDrawCropOutOfImg="false"
 				:enableDrawTagOutOfCrop="false"
 				:enableDrawTagOutOfImg="false"
-			></ImgMark>
+			>
+				<template #tip> 111 </template>
+			</ImgMark>
 		</div>
 		<div class="info-panel">
 			<el-input v-model="src"></el-input>

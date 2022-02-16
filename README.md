@@ -220,6 +220,12 @@ type TagListGroupByCropIndex = {
 | removeTagItems             | 移除 `tag` 项                        | list:BoundingBox[]                        | void                    |
 | getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组 | type: 'startPoint'/'allIn' = 'startPoint' | TagListGroupByCropIndex |
 
+## Slots
+
+| 插槽名 | 说明                 |
+| ------ | -------------------- |
+| tip    | 右下角提示自定义内容 |
+
 ## Lib 方法
 
 | 方法                          | 说明                           | 参数                                                              | 返回类型      |
