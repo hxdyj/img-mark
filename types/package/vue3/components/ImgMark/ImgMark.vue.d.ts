@@ -27,6 +27,7 @@ export declare type ResizeEmitType = {
     box: BoundingBox;
 };
 export declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
+export declare type CropListChangeType = 'add' | 'delete' | 'resize';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -66,7 +67,12 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
-    enableDraw: {
+    enableDrawCrop: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableDrawTag: {
         type: BooleanConstructor;
         required: false;
         default: boolean;
@@ -159,7 +165,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
         isShowTip: boolean;
         enableScale: boolean;
         enableMove: boolean;
-        enableDraw: boolean;
+        enableDrawCrop: boolean;
+        enableDrawTag: boolean;
         enableInteractiveTagChangeStatus: boolean;
         enableCropCross: boolean;
         handleResizeCropCross: 'delete' | 'reset';
@@ -176,7 +183,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
-        (e: 'cropListChange', list: BoundingBox[]): void;
+        (e: 'cropListChange', data: {
+            type: CropListChangeType;
+            list: BoundingBox[];
+        }): void;
         (e: 'update:tagList', list: BoundingBox[]): void;
         (e: 'tagListChange', data: {
             type: TagListChangeType;
@@ -256,10 +266,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onMouseWheel: (e: MouseEvent, privateCall?: boolean | undefined) => void;
     setResizeCrop: (newCropInfo: BoundingBox) => void;
     cleartMousePoints: () => void;
-    triggerCropListChange: () => void;
+    triggerCropListChange: (type: CropListChangeType, changedList: BoundingBox[]) => void;
     triggerTagListChange: (type: TagListChangeType, changedList: BoundingBox[]) => void;
     getTagList: (tagList?: BoundingBox[] | undefined, _cropList?: BoundingBox[] | undefined, initScale?: number | undefined, imageWH?: WH | undefined) => TagItemTmp[];
-    getCropList: () => BoundingBox[];
+    getCropList: (cropList?: BoundingBox[] | undefined) => BoundingBox[];
     onMouseDown: (e: MouseEvent) => void;
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: () => void;
@@ -281,7 +291,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
     isShowTip?: unknown;
     enableScale?: unknown;
     enableMove?: unknown;
-    enableDraw?: unknown;
+    enableDrawCrop?: unknown;
+    enableDrawTag?: unknown;
     enableInteractiveTagChangeStatus?: unknown;
     enableCropCross?: unknown;
     handleResizeCropCross?: unknown;
@@ -302,7 +313,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
     isShowTip: boolean;
     enableScale: boolean;
     enableMove: boolean;
-    enableDraw: boolean;
+    enableDrawCrop: boolean;
+    enableDrawTag: boolean;
     enableInteractiveTagChangeStatus: boolean;
     enableCropCross: boolean;
     handleResizeCropCross: string;
@@ -332,7 +344,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
     isShowTip: boolean;
     enableScale: boolean;
     enableMove: boolean;
-    enableDraw: boolean;
+    enableDrawCrop: boolean;
+    enableDrawTag: boolean;
     enableInteractiveTagChangeStatus: boolean;
     enableCropCross: boolean;
     handleResizeCropCross: string;

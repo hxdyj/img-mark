@@ -13,11 +13,6 @@
 				@resizeEnd="resizeEnd"
 				@delCrop="delCrop"
 				:isShowTip="true"
-				:enableDraw="false"
-				:enableMove="false"
-				:enableInteractiveTagChangeStatus="false"
-				:enableInteractiveCropDelete="false"
-				:enableScale="false"
 				:enableDrawCropOutOfImg="false"
 				:enableDrawTagOutOfCrop="false"
 				:enableDrawTagOutOfImg="false"
@@ -107,8 +102,8 @@ function removeTag(data?: BoundingBox[]) {
 		imgMarkRef.removeTagItems(data)
 	}
 }
-function cropListChange() {
-	console.log(111)
+function cropListChange(data: any) {
+	console.log(data)
 }
 
 function setHoverItem(item: MyBoundingBox) {

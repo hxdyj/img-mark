@@ -189,7 +189,8 @@ type TagListGroupByCropIndex = {
 | precision                        | BoundingBox 精度                                                                                                                                     | number        | ——           | 0      |
 | enableScale                      | 是否允许缩放画布                                                                                                                                     | boolean       | true/false   | true   |
 | enableMove                       | 是否允许移动画布                                                                                                                                     | boolean       | true/false   | true   |
-| enableDraw                       | 是否允许在画布上画 `tag` 和 `crop`                                                                                                                   | boolean       | true/false   | true   |
+| enableDrawCrop                   | 是否允许在画布上画 `crop`                                                                                                                            | boolean       | true/false   | true   |
+| enableDrawTag                    | 是否允许在画布上画 `tag`                                                                                                                             | boolean       | true/false   | true   |
 | enableInteractiveTagChangeStatus | 是否允许交互改变 `tag` 状态                                                                                                                          | boolean       | true/false   | true   |
 | enableInteractiveCropDelete      | 是否允许交互删除 `crop`                                                                                                                              | boolean       | true/false   | true   |
 | enableDrawCropOutOfImg           | 是否允许 `crop` 画到图片外                                                                                                                           | boolean       | true/false   | true   |
@@ -208,7 +209,7 @@ type TagListGroupByCropIndex = {
 | 事件名         | 说明                                        | 参数                                                      |
 | -------------- | ------------------------------------------- | --------------------------------------------------------- |
 | tagListChange  | 当添加或者删除或者改变组件状态 `tag` 项触发 | {type:'add'/'delete'/'statusChange', list:BoundingBox[] } |
-| cropListChange | 当添加或者删除了 `crop` 项触发              | list:BoundingBox[]                                        |
+| cropListChange | 当添加或者删除或者改变 `crop` 大小触发      | {type:'add'/'delete'/'resize', list:BoundingBox[] }       |
 | resizeStart    | `crop` 开始 resize 触发                     | data:ResizeEmitType                                       |
 | resizeEnd      | `crop` 结束 resize 触发                     | data:ResizeEmitType                                       |
 | delCrop        | 删除 `crop` 触发                            | list:BoundingBox[]                                        |

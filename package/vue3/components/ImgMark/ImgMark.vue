@@ -165,7 +165,8 @@ let props = withDefaults(
 		isShowTip?: boolean
 		enableScale?: boolean
 		enableMove?: boolean
-		enableDraw?: boolean
+		enableDrawCrop?: boolean
+		enableDrawTag?: boolean
 		enableInteractiveTagChangeStatus?: boolean
 		enableCropCross?: boolean
 		handleResizeCropCross?: 'delete' | 'reset'
@@ -190,7 +191,8 @@ let props = withDefaults(
 		isShowTip: false,
 		enableMove: true,
 		enableScale: true,
-		enableDraw: true,
+		enableDrawCrop: true,
+		enableDrawTag: true,
 		enableCropCross: false,
 		enableInteractiveTagChangeStatus: true,
 		handleResizeCropCross: 'reset',
@@ -211,9 +213,17 @@ export type ResizeEmitType = {
 	box: BoundingBox
 }
 export type TagListChangeType = 'add' | 'delete' | 'statusChange'
+export type CropListChangeType = 'add' | 'delete' | 'resize'
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
-	(e: 'cropListChange', list: BoundingBox[]): void
+	// (e: 'cropListChange', list: BoundingBox[]): void
+	(
+		e: 'cropListChange',
+		data: {
+			type: CropListChangeType
+			list: BoundingBox[]
+		}
+	): void
 	(e: 'update:tagList', list: BoundingBox[]): void
 	(
 		e: 'tagListChange',
@@ -436,7 +446,7 @@ let hooks = {
 		spaceKeyDown = false
 	},
 	onKeyDownSpace() {
-		if (props.enableDraw) {
+		if ((props.enableDrawCrop && props.mode === 'crop') || (props.enableDrawTag && props.mode === 'tag')) {
 			containerRef.style.cursor = 'crosshair'
 		}
 		if (!status.isMouseDown()) {
@@ -454,10 +464,12 @@ let hooks = {
 	},
 	/* 按着空格移动 */
 	onSpaceMove() {
-		if (props.enableDraw) {
-			if (props.mode === 'crop') {
+		if (props.mode === 'crop') {
+			if (props.enableDrawCrop) {
 				actions.dragCreatOrResizeRect('drawCrop')
-			} else {
+			}
+		} else {
+			if (props.enableDrawTag) {
 				actions.dragCreatOrResizeRect('drawTag')
 			}
 		}
@@ -819,7 +831,7 @@ function setResizeCrop(newCropInfo: BoundingBox) {
 			index: status.resizeCropHovering.index,
 			box: newCropInfo,
 		})
-		triggerCropListChange()
+		triggerCropListChange('resize', getCropList([newCropInfo]))
 	}
 }
 
@@ -857,13 +869,13 @@ function cleartMousePoints() {
 					newCropInfo.scale = 1
 					if (props.enableCropCross) {
 						cropArr.push(newCropInfo)
-						triggerCropListChange()
+						triggerCropListChange('add', getCropList([newCropInfo]))
 					} else {
 						//判断crop是否和其他box相交，相交就不保存
 						let intersectFlag = getBoxIsIntersectWithBoxList(newCropInfo, cropArr)
 						if (!intersectFlag) {
 							cropArr.push(newCropInfo)
-							triggerCropListChange()
+							triggerCropListChange('add', getCropList([newCropInfo]))
 						} else {
 							renderCtx2()
 						}
@@ -895,10 +907,13 @@ function cleartMousePoints() {
 	containerRef.style.cursor = 'auto'
 }
 
-function triggerCropListChange() {
-	let list = getCropList()
+function triggerCropListChange(type: CropListChangeType, changedList: BoundingBox[]) {
+	let list = getCropList(cropArr)
 	emits('update:cropList', list)
-	emits('cropListChange', list)
+	emits('cropListChange', {
+		type,
+		list: changedList,
+	})
 }
 
 function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[]) {
@@ -975,8 +990,9 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 	return resultList.filter(i => i.__isValidity !== false)
 }
 
-function getCropList(): BoundingBox[] {
-	let list = cropArr.map(crop => {
+function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
+	let arr = cropList || cropArr
+	let list = arr.map(crop => {
 		let result: BoundingBox & { _del?: boolean } = {
 			startX: crop.startX,
 			startY: crop.startY,
@@ -1203,7 +1219,7 @@ function removeCropItems(removeList: BoundingBox[]) {
 	cropArr = initBoundingArrScale(newCropArr, scale, props.precision)
 	emits('delCrop', removeCropArr)
 	renderCtx2()
-	triggerCropListChange()
+	triggerCropListChange('delete', getCropList(removeCropArr))
 }
 
 function getTagListGroupByCropIndex(type: 'startPoint' | 'allIn' = 'startPoint'): {
