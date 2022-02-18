@@ -425,7 +425,7 @@ let actions = {
 			hasHoverRectInTagItem,
 			config
 		)
-		if (props.enableCropResize) {
+		if (props.enableCropResize && !spaceKeyDown) {
 			//检测鼠标是否在裁剪框四边上
 			moveDetectCropBorderSetCursor(containerRef, event, props.mode, cropArr, zoomScale, currentPosition, origin, status.isScaleing)
 		}
