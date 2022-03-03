@@ -619,7 +619,9 @@ async function initComponent() {
 	ctx2 = canvas2Ref.getContext('2d')
 
 	if (!ctx || !ctx2) return Promise.reject(`Error: can't find canvas element.`)
+	//TODO
 	canvasWH = amendDpi(getElementWH(ctx.canvas))
+	// canvasWH = getElementWH(ctx.canvas)
 	if (!canvasWH) return Promise.reject(`Error: can't get canvas height and width.`)
 	initCanvasWH(ctx, canvasWH)
 	initCanvasWH(ctx2, canvasWH)
@@ -639,9 +641,11 @@ async function initComponent() {
 		console.log(111, canvasWH, initScaleInfo)
 		if (!cropInfo) {
 			if (initScaleInfo.fit === 'width') {
-				currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
+				currentPosition.x = (canvasWH.width / DPI - imgWH.width * scale) / 2
+				console.log(222, currentPosition, imgWH.width * scale)
 			} else {
-				currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
+				console.log(333, imgWH.width * scale, canvasWH.width)
+				currentPosition.y = (canvasWH.height / DPI - imgWH.height * scale) / 2
 			}
 			cropInfo = {
 				startX: 0,
