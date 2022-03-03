@@ -620,8 +620,6 @@ async function initComponent() {
 
 	if (!ctx || !ctx2) return Promise.reject(`Error: can't find canvas element.`)
 	canvasWH = amendDpi(getElementWH(ctx.canvas))
-	// ctx?.canvas.style.width = (canvasWH?.width||0)+'px'
-	// ctx?.canvas.style.height = (canvasWH?.width||0)+'px'
 	if (!canvasWH) return Promise.reject(`Error: can't get canvas height and width.`)
 	initCanvasWH(ctx, canvasWH)
 	initCanvasWH(ctx2, canvasWH)
@@ -635,16 +633,13 @@ async function initComponent() {
 		// if (debug) console.log('Image WH', imgWH, canvasWH)
 		let initScaleInfo = initScale(canvasWH, img)
 		scale = cropScale = initScaleInfo.scale
-		console.log(initScaleInfo, imgWH, canvasWH)
 		// if (debug) console.log('Scale', scale)
 		// if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
 		//处理没有cropInfo的情况
-
+		console.log(111, canvasWH, initScaleInfo)
 		if (!cropInfo) {
 			if (initScaleInfo.fit === 'width') {
-				// currentPosition.x = 15
-				currentPosition.x = (canvasWH.width / 2 - imgWH.width * scale) / 2
-				console.log('aaa', canvasWH.width - imgWH.width * scale)
+				currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
 			} else {
 				currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
 			}
@@ -654,7 +649,6 @@ async function initComponent() {
 				endX: 0 + imgWH.width,
 				endY: 0 + imgWH.height,
 			}
-			console.log(canvasWH, currentPosition)
 		}
 		//处理有CropInfo的情况，放大裁剪区域至全屏中间
 		else {
