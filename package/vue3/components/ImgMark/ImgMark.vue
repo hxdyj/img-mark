@@ -11,7 +11,7 @@ User Options
 3. Click Tag to Hide Or Show Tag
 
 Bugs
-1. 不使用v-if切换图片源的时候tagList和cropList产生的bug
+
 
  -->
 <template>
@@ -776,6 +776,7 @@ watch(
 watch(
 	() => props.tagList,
 	list => {
+		if (!inited) return
 		tagArr = initBoundingArrScale(list, scale, props.precision)
 		renderCtx2()
 	},
@@ -787,6 +788,7 @@ watch(
 watch(
 	() => props.cropList,
 	list => {
+		if (!inited) return
 		cropArr = initBoundingArrScale(list, scale, props.precision)
 		renderCtx2()
 	}
