@@ -206,13 +206,13 @@ type TagListGroupByCropIndex = {
 
 ## 组件事件
 
-| 事件名         | 说明                                        | 参数                                                      |
-| -------------- | ------------------------------------------- | --------------------------------------------------------- |
-| tagListChange  | 当添加或者删除或者改变组件状态 `tag` 项触发 | {type:'add'/'delete'/'statusChange', list:BoundingBox[] } |
-| cropListChange | 当添加或者删除或者改变 `crop` 大小触发      | {type:'add'/'delete'/'resize', list:BoundingBox[] }       |
-| resizeStart    | `crop` 开始 resize 触发                     | data:ResizeEmitType                                       |
-| resizeEnd      | `crop` 结束 resize 触发                     | data:ResizeEmitType                                       |
-| delCrop        | 删除 `crop` 触发                            | list:BoundingBox[]                                        |
+| 事件名         | 说明                                                                                   | 参数                                                                              |
+| -------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| tagListChange  | 当添加或者删除或者改变组件状态 `tag` 项触发,`parentCrop` 只在 `type` 为 `add` 时候返回 | {type:'add'/'delete'/'statusChange', list:BoundingBox[],parentCrop?:BoundingBox } |
+| cropListChange | 当添加或者删除或者改变 `crop` 大小触发                                                 | {type:'add'/'delete'/'resize', list:BoundingBox[] }                               |
+| resizeStart    | `crop` 开始 resize 触发                                                                | data:ResizeEmitType                                                               |
+| resizeEnd      | `crop` 结束 resize 触发                                                                | data:ResizeEmitType                                                               |
+| delCrop        | 删除 `crop` 触发                                                                       | list:BoundingBox[]                                                                |
 
 ## 组件方法
 

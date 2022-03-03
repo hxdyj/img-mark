@@ -12,6 +12,7 @@
 				@resizeStart="resizeStart"
 				@resizeEnd="resizeEnd"
 				@delCrop="delCrop"
+				@tagListChange="tagsListChange"
 				:isShowTip="true"
 				:enableDrawCropOutOfImg="false"
 				:enableDrawTagOutOfCrop="false"
@@ -104,6 +105,9 @@ function removeTag(data?: BoundingBox[]) {
 }
 function cropListChange(data: any) {
 	console.log(data)
+}
+function tagsListChange(data: any) {
+	console.log('tagsListChange', data)
 }
 
 function setHoverItem(item: MyBoundingBox) {

@@ -9,6 +9,10 @@ User Options
 1. Down Sapce Key and Drag Mouse Move to Draw
 2. Double Click Crop del crop
 3. Click Tag to Hide Or Show Tag
+
+Bugs
+1. 不使用v-if切换图片源的时候tagList和cropList产生的bug
+
  -->
 <template>
 	<div
@@ -43,6 +47,39 @@ User Options
 </template>
 
 <script setup lang="ts">
+export type CropConfig = {
+	lineDash?: number[]
+	strokeStyle?: string
+	lineWidth?: number
+}
+
+export type LayerConfig = {
+	fillStyle?: string
+}
+
+export type TagConfig = {
+	fillStyle?: string
+	textFillStyle?: string
+	hoverStrokeStyle?: string
+	hoverLineWidth?: number
+	hoverLineDash?: number[]
+	highlightStrokeStyle?: string
+	highlightLineWidth?: number
+	highlightLineDash?: number[]
+}
+
+export type Config = {
+	cropConfig: Required<CropConfig>
+	layerConfig: Required<LayerConfig>
+	tagConfig: Required<TagConfig>
+}
+
+export type ResizeEmitType = {
+	index: number
+	box: BoundingBox
+}
+export type TagListChangeType = 'add' | 'delete' | 'statusChange'
+export type CropListChangeType = 'add' | 'delete' | 'resize'
 // console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
 import { cloneDeep, groupBy } from 'lodash'
@@ -130,33 +167,6 @@ function initVar() {
 	status.resizeCropHovering = undefined
 }
 
-export type CropConfig = {
-	lineDash?: number[]
-	strokeStyle?: string
-	lineWidth?: number
-}
-
-export type LayerConfig = {
-	fillStyle?: string
-}
-
-export type TagConfig = {
-	fillStyle?: string
-	textFillStyle?: string
-	hoverStrokeStyle?: string
-	hoverLineWidth?: number
-	hoverLineDash?: number[]
-	highlightStrokeStyle?: string
-	highlightLineWidth?: number
-	highlightLineDash?: number[]
-}
-
-export type Config = {
-	cropConfig: Required<CropConfig>
-	layerConfig: Required<LayerConfig>
-	tagConfig: Required<TagConfig>
-}
-
 let props = withDefaults(
 	defineProps<{
 		cropConfig?: CropConfig
@@ -207,13 +217,11 @@ let props = withDefaults(
 		cropList: () => Array(),
 	}
 )
-
-export type ResizeEmitType = {
-	index: number
-	box: BoundingBox
+type TagListChangeEmitRetunType = {
+	type: TagListChangeType
+	list: BoundingBox[]
+	parentCrop?: BoundingBox
 }
-export type TagListChangeType = 'add' | 'delete' | 'statusChange'
-export type CropListChangeType = 'add' | 'delete' | 'resize'
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
 	// (e: 'cropListChange', list: BoundingBox[]): void
@@ -225,13 +233,7 @@ let emits = defineEmits<{
 		}
 	): void
 	(e: 'update:tagList', list: BoundingBox[]): void
-	(
-		e: 'tagListChange',
-		data: {
-			type: TagListChangeType
-			list: BoundingBox[]
-		}
-	): void
+	(e: 'tagListChange', data: TagListChangeEmitRetunType): void
 	(e: 'update:mode', mode: Mode): void
 	(e: 'resizeStart', data: ResizeEmitType): void
 	(e: 'resizeEnd', data: ResizeEmitType): void
@@ -919,10 +921,20 @@ function triggerCropListChange(type: CropListChangeType, changedList: BoundingBo
 function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[]) {
 	let list = getTagList(tagArr)
 	emits('update:tagList', list)
-	emits('tagListChange', {
+
+	let changeParam: TagListChangeEmitRetunType = {
 		type,
 		list: changedList,
-	})
+	}
+
+	if (type === 'add') {
+		let tag = changedList.filter(i => Reflect.get(i, '__parentCrop'))[0]
+		if (tag) {
+			changeParam.parentCrop = getCropList([Reflect.get(tag, '__parentCrop')])[0]
+			delete tag['__parentCrop']
+		}
+	}
+	emits('tagListChange', changeParam)
 }
 
 type TagItemTmp = BoundingBox & {
@@ -931,6 +943,7 @@ type TagItemTmp = BoundingBox & {
 	__newAdd?: boolean
 	__vertexPosition?: VertexPosition
 	__groupIndex?: number
+	__parentCrop?: BoundingBox
 }
 
 function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScale?: number, imageWH?: WH) {
@@ -961,6 +974,7 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 					newTagInfo.__isValidity = false
 				} else {
 					Object.assign(newTagInfo, intersectPart)
+					newTagInfo.__parentCrop = mousePointCropInfo
 				}
 			}
 		}

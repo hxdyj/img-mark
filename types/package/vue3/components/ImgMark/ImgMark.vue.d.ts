@@ -1,4 +1,3 @@
-import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
 export declare type CropConfig = {
     lineDash?: number[];
     strokeStyle?: string;
@@ -28,6 +27,12 @@ export declare type ResizeEmitType = {
 };
 export declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
 export declare type CropListChangeType = 'add' | 'delete' | 'resize';
+import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
+declare type TagListChangeEmitRetunType = {
+    type: TagListChangeType;
+    list: BoundingBox[];
+    parentCrop?: BoundingBox;
+};
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -35,6 +40,7 @@ declare type TagItemTmp = BoundingBox & {
     __newAdd?: boolean;
     __vertexPosition?: VertexPosition;
     __groupIndex?: number;
+    __parentCrop?: BoundingBox;
 };
 declare const _sfc_main: import("vue").DefineComponent<{
     cropConfig: {
@@ -188,10 +194,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
             list: BoundingBox[];
         }): void;
         (e: 'update:tagList', list: BoundingBox[]): void;
-        (e: 'tagListChange', data: {
-            type: TagListChangeType;
-            list: BoundingBox[];
-        }): void;
+        (e: 'tagListChange', data: TagListChangeEmitRetunType): void;
         (e: 'update:mode', mode: Mode): void;
         (e: 'resizeStart', data: ResizeEmitType): void;
         (e: 'resizeEnd', data: ResizeEmitType): void;
