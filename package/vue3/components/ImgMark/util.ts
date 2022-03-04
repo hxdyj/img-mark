@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash'
 import { Config } from './ImgMark.vue'
+import device from 'current-device'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
 export const debug = false
@@ -528,8 +529,9 @@ export function getTwoPointsOffsetInfo(
 	offsetInfo: Offset
 } {
 	let position = transfromTwoPoints2Rect(startPoint, endPoint)
-	let offsetX = ((endPoint.x - startPoint.x) / zoomScale) * DPI
-	let offsetY = ((endPoint.y - startPoint.y) / zoomScale) * DPI
+	//手机端已经在开始初始化过DPI了
+	let offsetX = (endPoint.x - startPoint.x) / zoomScale
+	let offsetY = (endPoint.y - startPoint.y) / zoomScale
 	let isStartMove = false
 	const MIN_MOVE = 5
 	if (position[2] > MIN_MOVE || position[3] > MIN_MOVE) {
@@ -594,8 +596,8 @@ export type LayerTouchEvent = (MouseEvent | TouchEvent) & {
 
 export function fixPoint(point: Point, zoomScale, origin: Point): Point {
 	return {
-		x: (point.x / zoomScale) * DPI + origin.x,
-		y: (point.y / zoomScale) * DPI + origin.y,
+		x: point.x / zoomScale + origin.x,
+		y: point.y / zoomScale + origin.y,
 	}
 }
 
@@ -675,7 +677,7 @@ export type ResizeItem = {
 
 export function getCropFourBorderRect(cropInfo: BoundingBox, currentPosition: Point, index: number) {
 	let positions = transfromBoxToRect(cropInfo, cropInfo.scale, currentPosition)
-	const BorderWidth = 6
+	const BorderWidth = device.mobile() ? DPI * 6 : 6
 	let HalfBorder = BorderWidth / 2
 	let list: ResizeItem[] = [
 		{

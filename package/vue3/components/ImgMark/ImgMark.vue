@@ -53,6 +53,8 @@ export type CropConfig = {
 	lineWidth?: number
 }
 
+export type MobileOperation = 'draw' | 'move'
+
 export type LayerConfig = {
 	fillStyle?: string
 }
@@ -83,7 +85,7 @@ export type CropListChangeType = 'add' | 'delete' | 'resize'
 // console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
 import device from 'current-device'
-import { cloneDeep, groupBy } from 'lodash'
+import { cloneDeep, groupBy, clone } from 'lodash'
 import {
 	BoundingBox,
 	ResizeItem,
@@ -158,13 +160,13 @@ let mouseQuickDoubleTapTime: {
 		up: undefined,
 	},
 }
-
-let zoomIntensity = 0.1
+const __zoomIntensity = device.mobile() ? (0.1 / DPI) * 1.5 : 0.1
+let zoomIntensity = __zoomIntensity
 let hasHoverRectInTagItem = false
 
 function initVar() {
 	hasHoverRectInTagItem = false
-	zoomIntensity = 0.1
+	zoomIntensity = __zoomIntensity
 	status.resizeCropHovering = undefined
 }
 
@@ -192,6 +194,7 @@ let props = withDefaults(
 		cropList?: BoundingBox[]
 		tagList?: BoundingBox[]
 		mode?: Mode
+		mobileOperation?: MobileOperation
 		src: string
 		precision?: number
 	}>(),
@@ -213,6 +216,7 @@ let props = withDefaults(
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
 		mode: 'crop',
+		mobileOperation: 'move',
 		precision: 0,
 		tagList: () => Array(),
 		cropList: () => Array(),
@@ -514,7 +518,6 @@ let hooks = {
 		if (isReDraw) {
 			renderCtx2()
 			triggerTagListChange('statusChange', getTagList(redrawList))
-			// emits('tagsStatusChange', getTagList(redrawList))
 		}
 	},
 	onWheel(zoom: number, mouse: Point, privateCall?: boolean) {
@@ -619,9 +622,7 @@ async function initComponent() {
 	ctx2 = canvas2Ref.getContext('2d')
 
 	if (!ctx || !ctx2) return Promise.reject(`Error: can't find canvas element.`)
-	//TODO
 	canvasWH = amendDpi(getElementWH(ctx.canvas))
-	// canvasWH = getElementWH(ctx.canvas)
 	if (!canvasWH) return Promise.reject(`Error: can't get canvas height and width.`)
 	initCanvasWH(ctx, canvasWH)
 	initCanvasWH(ctx2, canvasWH)
@@ -632,20 +633,18 @@ async function initComponent() {
 			width: img.width,
 			height: img.height,
 		}
+		console.log('WH', canvasWH, imgWH)
 		// if (debug) console.log('Image WH', imgWH, canvasWH)
 		let initScaleInfo = initScale(canvasWH, img)
 		scale = cropScale = initScaleInfo.scale
 		// if (debug) console.log('Scale', scale)
 		// if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
 		//处理没有cropInfo的情况
-		console.log(111, canvasWH, initScaleInfo)
 		if (!cropInfo) {
 			if (initScaleInfo.fit === 'width') {
-				currentPosition.x = (canvasWH.width / DPI - imgWH.width * scale) / 2
-				console.log(222, currentPosition, imgWH.width * scale)
+				currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
 			} else {
-				console.log(333, imgWH.width * scale, canvasWH.width)
-				currentPosition.y = (canvasWH.height / DPI - imgWH.height * scale) / 2
+				currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
 			}
 			cropInfo = {
 				startX: 0,
@@ -817,9 +816,9 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	if (status.isDrawRecting || status.isMoving) return
 	//有startMousePoint的时候也不能缩放
 	// if ((startMousePoint.x !== undefined || endMousePoint.x !== undefined) && !event.onTouchMove) return
-
-	let mousex = privateCall ? 0 : (event.clientX - containerInfo.left) * DPI
-	let mousey = privateCall ? 0 : (event.clientY - containerInfo.top) * DPI
+	let dpi = event.onTouchMove ? 1 : DPI
+	let mousex = privateCall ? 0 : (event.clientX - containerInfo.left) * dpi
+	let mousey = privateCall ? 0 : (event.clientY - containerInfo.top) * dpi
 	let wheel = event.deltaY < 0 ? 1 : -1
 	let zoom = privateCall ? event.__zoom : Math.exp(wheel * zoomIntensity)
 
@@ -1060,15 +1059,21 @@ function onMouseDown(e: MouseEvent) {
 		mouseQuickDoubleTapTime.prev.down = time
 	}
 
-	let event = e as LayerTouchEvent
-
+	let event = {
+		layerX: Reflect.get(e, 'layerX'),
+		layerY: Reflect.get(e, 'layerY'),
+	} as LayerTouchEvent
+	event = amendDpi(event, ['layerX', 'layerY'])
 	startMousePoint = {
 		x: event.layerX,
 		y: event.layerY,
 	}
+
+	console.log('startMousePoint', startMousePoint)
 	//检测是否点在了crop的border或者vertex上边
 	if (props.mode === 'crop' && !spaceKeyDown && props.enableCropResize) {
 		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropArr, zoomScale, currentPosition, origin)
+		console.log(111, detectResult)
 		if (detectResult.hasIn) {
 			status.resizeCropHovering = findOneBorderOrVertex(detectResult.list)
 			emits('resizeStart', {
@@ -1081,7 +1086,11 @@ function onMouseDown(e: MouseEvent) {
 
 function onMouseMove(e: MouseEvent) {
 	if (!inited) return
-	let event = e as LayerTouchEvent
+	let event = {
+		layerX: Reflect.get(e, 'layerX'),
+		layerY: Reflect.get(e, 'layerY'),
+	} as LayerTouchEvent
+	event = amendDpi(event, ['layerX', 'layerY'])
 	mouseUpTime = new Date().getTime()
 	hooks.onMouseOverMove(event)
 }
@@ -1131,7 +1140,9 @@ function onClick(event) {
 function onTouchStart(event: TouchEvent) {
 	mouseDownTime = new Date().getTime()
 	// console.log('onTouchStart', event.touches)
-	let touchList = amendMobileTouchEventDpi(event)
+	let touchList = event.touches
+	// let touchList = amendMobileTouchEventDpi(event)
+	console.log('onTouchStart', touchList)
 	if (event.touches.length === 1) {
 		onMouseDown({
 			layerX: touchList[0].clientX,
@@ -1139,21 +1150,24 @@ function onTouchStart(event: TouchEvent) {
 		} as unknown as MouseEvent)
 	}
 	if (event.touches.length == 2) {
-		let { width, height } = getTwoFingerTouchListDistence(touchList)
+		let amendTouchList = amendMobileTouchEventDpi(event)
+		let { width, height } = getTwoFingerTouchListDistence(amendTouchList)
+		console.log('onTouchStart width, height', width, height)
 		let hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
 		// console.log('TouchStart', event.touches, width, height, hypotenuse)
 		hypotenuse = hypotenuse
 		twoFingerCenterPoint = {
-			x: (touchList[0].clientX + touchList[1].clientX) / 2,
-			y: (touchList[0].clientY + touchList[1].clientY) / 2,
+			x: (amendTouchList[0].clientX + amendTouchList[1].clientX) / 2,
+			y: (amendTouchList[0].clientY + amendTouchList[1].clientY) / 2,
 		}
+		console.log('twoFingerCenterPoint', twoFingerCenterPoint)
 	}
 }
 
 async function onTouchMove(event: TouchEvent) {
-	// console.log('onTouchMove', event.touches)
 	mouseUpTime = new Date().getTime()
-	let touchList = amendMobileTouchEventDpi(event)
+	let touchList = event.touches
+	// let touchList = amendMobileTouchEventDpi(event)
 	if (event.touches.length === 1) {
 		onMouseMove({
 			layerX: touchList[0].clientX,
@@ -1161,7 +1175,8 @@ async function onTouchMove(event: TouchEvent) {
 		} as unknown as MouseEvent)
 	}
 	if (event.touches.length == 2) {
-		let { width, height } = getTwoFingerTouchListDistence(touchList)
+		let amendTouchList = amendMobileTouchEventDpi(event)
+		let { width, height } = getTwoFingerTouchListDistence(amendTouchList)
 		let _hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
 		let distance = _hypotenuse - hypotenuse // 双指距离变化
 		let zoom = -distance
