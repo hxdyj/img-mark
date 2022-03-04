@@ -128,12 +128,13 @@ export function getVariableType(value: unknown) {
 	return valueObjectString.slice(8, valueObjectString.length - 1) as ObjectToString
 }
 
-export function amendDpi<T>(val: T, propers: Array<keyof T> = ['width', 'height'] as Array<keyof T>): T | (T & WH) {
+export function amendDpi<T>(val: T, propers: Array<keyof T> = ['width', 'height'] as Array<keyof T>, reverse: boolean = false): T | (T & WH) {
 	try {
 		let valType = getVariableType(val)
-		if (valType === 'Number') return ((val as unknown as number) * DPI) as unknown as T
+		let dpi = reverse ? 1 / DPI : DPI
+		if (valType === 'Number') return ((val as unknown as number) * dpi) as unknown as T
 		propers.forEach(properName => {
-			val[properName as any] *= DPI
+			val[properName as any] *= dpi
 		})
 	} catch (error) {
 		console.error('ERROR', val, getVariableType(val), error)
@@ -472,7 +473,12 @@ export function moveDrawCropRect(
 	config: Config
 ) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
+		//TODO
 		let position = fixMoveRectPosition(transfromTwoPoints2Rect(startPoint, endPoint), zoomScale, origin)
+		position[2] = amendDpi(position[2], undefined, true)
+		position[3] = amendDpi(position[3], undefined, true)
+		// let position = fixMoveRectPosition(transfromTwoPoints2Rect(amendDpi(startPoint, ['x', 'y'], true), amendDpi(endPoint, ['x', 'y'], true)), zoomScale, origin)
+		console.log('movePOSITION', position)
 		if (position[2] > 5 || position[3] > 5) {
 			drawCropList(ctx, cropList, currentPosition, config)
 			drawCropRect(ctx, ...position, config, true)
@@ -510,6 +516,8 @@ export function moveDrawTagRect(
 ) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
 		let position = fixMoveRectPosition(transfromTwoPoints2Rect(startPoint, endPoint), zoomScale, origin)
+		position[2] = amendDpi(position[2], undefined, true)
+		position[3] = amendDpi(position[3], undefined, true)
 		if (position[2] > 5 || position[3] > 5) {
 			// if (debug) console.log('DRAW Tag', position)
 			drawTagList(ctx, tagArr, currentPosition, config)

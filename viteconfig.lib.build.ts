@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { uglify } from 'rollup-plugin-uglify'
+import strip from '@rollup/plugin-strip'
 
 export default defineConfig({
 	build: {
@@ -30,6 +31,7 @@ export default defineConfig({
 		vue({
 			reactivityTransform: true,
 		}),
+		strip(),
 		dts({
 			outputDir: 'types',
 			exclude: ['vue.d.ts'],

@@ -36,7 +36,7 @@ declare type ScaleReturn = {
 export declare function initScale(canvasWH: WH, imgWH: HTMLImageElement): ScaleReturn;
 declare type ObjectToString = 'Number' | 'String' | 'Symbol' | 'Object' | 'Function' | 'Null';
 export declare function getVariableType(value: unknown): ObjectToString;
-export declare function amendDpi<T>(val: T, propers?: Array<keyof T>): T | (T & WH);
+export declare function amendDpi<T>(val: T, propers?: Array<keyof T>, reverse?: boolean): T | (T & WH);
 export declare function amendMobileTouchEventDpi(touchEvent: TouchEvent): ({
     clientX: number;
     clientY: number;

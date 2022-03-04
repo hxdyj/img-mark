@@ -4,6 +4,7 @@
 			<ImgMark
 				ref="imgMarkRef"
 				:src="src"
+				v-model:mobileOperation="mobileOperation"
 				v-model:mode="mode"
 				v-model:tagList="tagList"
 				v-model:cropList="cropList"
@@ -24,6 +25,8 @@
 		<div class="info-panel">
 			<el-input v-model="src"></el-input>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
+			<el-button type="primary" size="small" style="margin-top: 40px" @click="changeMode()">changeMode</el-button>
+			<el-button type="primary" size="small" style="margin-top: 40px" @click="changeMobileOperation()">mobileOperation</el-button>
 			<el-alert
 				v-for="item in tagList"
 				@close="removeTag([item])"
@@ -45,6 +48,22 @@ import { ImgMark, Mode, BoundingBox, ResizeEmitType } from 'img-mark'
 import { uid } from 'uid'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('crop')
+let mobileOperation = $ref('move')
+
+function changeMode() {
+	if (mode === 'tag') {
+		mode = 'crop'
+	} else {
+		mode = 'tag'
+	}
+}
+function changeMobileOperation() {
+	if (mobileOperation === 'draw') {
+		mobileOperation = 'move'
+	} else {
+		mobileOperation = 'draw'
+	}
+}
 let cropList = $ref<BoundingBox[]>([
 	{
 		startX: 0,

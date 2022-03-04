@@ -240,6 +240,7 @@ let emits = defineEmits<{
 	(e: 'update:tagList', list: BoundingBox[]): void
 	(e: 'tagListChange', data: TagListChangeEmitRetunType): void
 	(e: 'update:mode', mode: Mode): void
+	(e: 'update:mobileOperation', mode: MobileOperation): void
 	(e: 'resizeStart', data: ResizeEmitType): void
 	(e: 'resizeEnd', data: ResizeEmitType): void
 	(e: 'delCrop', list: BoundingBox[]): void
@@ -462,12 +463,15 @@ let hooks = {
 	},
 	onMouseOverMove(event: LayerTouchEvent) {
 		//当没有鼠标按下的时候
-		if (!status.isMouseDown()) {
-			actions.hoverRect(event)
-			return
+		if (device.mobile()) {
+			this.onHoldMouseLeftBtnMove(event)
+		} else {
+			if (!status.isMouseDown() && !device.mobile()) {
+				actions.hoverRect(event)
+				return
+			}
+			this.onHoldMouseLeftBtnMove(event)
 		}
-
-		this.onHoldMouseLeftBtnMove(event)
 	},
 	/* 按着空格移动 */
 	onSpaceMove() {
@@ -557,11 +561,13 @@ function onKeyUpListener(e) {
 	}
 }
 function addListenerKeyUpDown() {
+	if (device.mobile()) return
 	document.addEventListener('keydown', onKeyDownListener)
 	document.addEventListener('keyup', onKeyUpListener)
 }
 
 function removeListenerKeyUpDown() {
+	if (device.mobile()) return
 	document.removeEventListener('keydown', onKeyDownListener)
 	document.removeEventListener('keyup', onKeyUpListener)
 }
@@ -618,6 +624,7 @@ async function initComponent() {
 		y: containerRectInfo.y,
 	}
 	addListenerKeyUpDown()
+	initMobileOperation()
 	ctx = canvasRef.getContext('2d')
 	ctx2 = canvas2Ref.getContext('2d')
 
@@ -633,7 +640,7 @@ async function initComponent() {
 			width: img.width,
 			height: img.height,
 		}
-		console.log('WH', canvasWH, imgWH)
+		// console.log('WH', canvasWH, imgWH)
 		// if (debug) console.log('Image WH', imgWH, canvasWH)
 		let initScaleInfo = initScale(canvasWH, img)
 		scale = cropScale = initScaleInfo.scale
@@ -749,6 +756,17 @@ async function resizeRender() {
 	inited = true
 }
 
+function initMobileOperation() {
+	if (!device.mobile()) return
+	if (props.mobileOperation === 'draw') {
+		hooks.onKeyDownSpace()
+	}
+
+	if (props.mobileOperation === 'move') {
+		hooks.onKeyUpSpace()
+	}
+}
+
 function onWindowResize() {
 	hooks.resize()
 }
@@ -776,6 +794,14 @@ watch(
 	src => {
 		if (!src) return
 		hooks.init()
+	}
+)
+
+watch(
+	() => props.mobileOperation,
+	mobileOperation => {
+		if (!inited) return
+		initMobileOperation()
 	}
 )
 
@@ -1069,11 +1095,9 @@ function onMouseDown(e: MouseEvent) {
 		y: event.layerY,
 	}
 
-	console.log('startMousePoint', startMousePoint)
 	//检测是否点在了crop的border或者vertex上边
 	if (props.mode === 'crop' && !spaceKeyDown && props.enableCropResize) {
 		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropArr, zoomScale, currentPosition, origin)
-		console.log(111, detectResult)
 		if (detectResult.hasIn) {
 			status.resizeCropHovering = findOneBorderOrVertex(detectResult.list)
 			emits('resizeStart', {
@@ -1113,8 +1137,15 @@ function onMouseOut() {
 	cleartMousePoints()
 }
 
-function onClick(event) {
+function onClick(e) {
 	if (!inited) return
+
+	let event = {
+		layerX: Reflect.get(e, 'layerX'),
+		layerY: Reflect.get(e, 'layerY'),
+	} as LayerTouchEvent
+
+	event = amendDpi(event, ['layerX', 'layerY'])
 	let touchPoint = getTouchPoint(event, zoomScale, origin, 'click')
 	let clickInterval = mouseUpTime && mouseDownTime ? mouseUpTime - mouseDownTime : 0
 	mouseDownTime = undefined
@@ -1139,28 +1170,23 @@ function onClick(event) {
 
 function onTouchStart(event: TouchEvent) {
 	mouseDownTime = new Date().getTime()
-	// console.log('onTouchStart', event.touches)
 	let touchList = event.touches
-	// let touchList = amendMobileTouchEventDpi(event)
-	console.log('onTouchStart', touchList)
 	if (event.touches.length === 1) {
-		onMouseDown({
+		let fakeEvent = {
 			layerX: touchList[0].clientX,
 			layerY: touchList[0].clientY,
-		} as unknown as MouseEvent)
+		} as unknown as MouseEvent
+		onMouseDown(fakeEvent)
 	}
 	if (event.touches.length == 2) {
 		let amendTouchList = amendMobileTouchEventDpi(event)
 		let { width, height } = getTwoFingerTouchListDistence(amendTouchList)
-		console.log('onTouchStart width, height', width, height)
 		let hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
-		// console.log('TouchStart', event.touches, width, height, hypotenuse)
 		hypotenuse = hypotenuse
 		twoFingerCenterPoint = {
 			x: (amendTouchList[0].clientX + amendTouchList[1].clientX) / 2,
 			y: (amendTouchList[0].clientY + amendTouchList[1].clientY) / 2,
 		}
-		console.log('twoFingerCenterPoint', twoFingerCenterPoint)
 	}
 }
 
@@ -1180,7 +1206,6 @@ async function onTouchMove(event: TouchEvent) {
 		let _hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
 		let distance = _hypotenuse - hypotenuse // 双指距离变化
 		let zoom = -distance
-		// console.log('Touch Zoom', zoom, hypotenuse, this.hypotenuse)
 		hypotenuse = _hypotenuse
 		onMouseWheel({
 			onTouchMove: true,

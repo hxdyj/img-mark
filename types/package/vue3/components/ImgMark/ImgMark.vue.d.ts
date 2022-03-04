@@ -3,6 +3,7 @@ export declare type CropConfig = {
     strokeStyle?: string;
     lineWidth?: number;
 };
+export declare type MobileOperation = 'draw' | 'move';
 export declare type LayerConfig = {
     fillStyle?: string;
 };
@@ -138,6 +139,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: string;
     };
+    mobileOperation: {
+        type: StringConstructor;
+        required: false;
+        default: string;
+    };
     src: {
         type: StringConstructor;
         required: true;
@@ -161,6 +167,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
             up: number | undefined;
         };
     };
+    __zoomIntensity: number;
     zoomIntensity: number;
     hasHoverRectInTagItem: boolean;
     initVar: () => void;
@@ -184,6 +191,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         cropList: BoundingBox[];
         tagList: BoundingBox[];
         mode: Mode;
+        mobileOperation: MobileOperation;
         src: string;
         precision: number;
     };
@@ -196,6 +204,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'update:tagList', list: BoundingBox[]): void;
         (e: 'tagListChange', data: TagListChangeEmitRetunType): void;
         (e: 'update:mode', mode: Mode): void;
+        (e: 'update:mobileOperation', mode: MobileOperation): void;
         (e: 'resizeStart', data: ResizeEmitType): void;
         (e: 'resizeEnd', data: ResizeEmitType): void;
         (e: 'delCrop', list: BoundingBox[]): void;
@@ -265,6 +274,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     initResizeVar: () => void;
     renderCtx2: () => void;
     resizeRender: () => Promise<undefined>;
+    initMobileOperation: () => void;
     onWindowResize: () => void;
     onMouseWheel: (e: MouseEvent, privateCall?: boolean | undefined) => void;
     setResizeCrop: (newCropInfo: BoundingBox) => void;
@@ -277,7 +287,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: () => void;
     onMouseOut: () => void;
-    onClick: (event: any) => void;
+    onClick: (e: any) => void;
     onTouchStart: (event: TouchEvent) => void;
     onTouchMove: (event: TouchEvent) => Promise<void>;
     onTouchEnd: (event: any) => void;
@@ -287,56 +297,123 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagListGroupByCropIndex: (type?: 'startPoint' | 'allIn') => {
         [index: number]: BoundingBox[];
     };
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "resizeStart" | "resizeEnd" | "delCrop")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "resizeStart" | "resizeEnd" | "delCrop", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
-    cropConfig?: unknown;
-    layerConfig?: unknown;
-    tagConfig?: unknown;
-    isShowTip?: unknown;
-    enableScale?: unknown;
-    enableMove?: unknown;
-    enableDrawCrop?: unknown;
-    enableDrawTag?: unknown;
-    enableInteractiveTagChangeStatus?: unknown;
-    enableCropCross?: unknown;
-    handleResizeCropCross?: unknown;
-    enableInteractiveCropDelete?: unknown;
-    enableCropResize?: unknown;
-    enableDrawCropOutOfImg?: unknown;
-    enableDrawTagOutOfCrop?: unknown;
-    enableDrawTagOutOfImg?: unknown;
-    cropList?: unknown;
-    tagList?: unknown;
-    mode?: unknown;
-    src?: unknown;
-    precision?: unknown;
-} & {
-    cropConfig: Record<string, any>;
-    layerConfig: Record<string, any>;
-    tagConfig: Record<string, any>;
-    isShowTip: boolean;
-    enableScale: boolean;
-    enableMove: boolean;
-    enableDrawCrop: boolean;
-    enableDrawTag: boolean;
-    enableInteractiveTagChangeStatus: boolean;
-    enableCropCross: boolean;
-    handleResizeCropCross: string;
-    enableInteractiveCropDelete: boolean;
-    enableCropResize: boolean;
-    enableDrawCropOutOfImg: boolean;
-    enableDrawTagOutOfCrop: boolean;
-    enableDrawTagOutOfImg: boolean;
-    cropList: unknown[];
-    tagList: unknown[];
-    mode: any;
-    src: string;
-    precision: number;
-} & {}> & {
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    cropConfig: {
+        type: ObjectConstructor;
+        required: false;
+        default: () => Required<CropConfig>;
+    };
+    layerConfig: {
+        type: ObjectConstructor;
+        required: false;
+        default: () => Required<LayerConfig>;
+    };
+    tagConfig: {
+        type: ObjectConstructor;
+        required: false;
+        default: () => Required<TagConfig>;
+    };
+    isShowTip: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableScale: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableMove: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableDrawCrop: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableDrawTag: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableInteractiveTagChangeStatus: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableCropCross: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    handleResizeCropCross: {
+        type: StringConstructor;
+        required: false;
+        default: string;
+    };
+    enableInteractiveCropDelete: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableCropResize: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableDrawCropOutOfImg: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableDrawTagOutOfCrop: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    enableDrawTagOutOfImg: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    cropList: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
+    tagList: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
+    mode: {
+        type: null;
+        required: false;
+        default: string;
+    };
+    mobileOperation: {
+        type: StringConstructor;
+        required: false;
+        default: string;
+    };
+    src: {
+        type: StringConstructor;
+        required: true;
+    };
+    precision: {
+        type: NumberConstructor;
+        required: false;
+        default: number;
+    };
+}>> & {
     "onUpdate:cropList"?: ((...args: any[]) => any) | undefined;
     onCropListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:tagList"?: ((...args: any[]) => any) | undefined;
     onTagListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:mode"?: ((...args: any[]) => any) | undefined;
+    "onUpdate:mobileOperation"?: ((...args: any[]) => any) | undefined;
     onResizeStart?: ((...args: any[]) => any) | undefined;
     onResizeEnd?: ((...args: any[]) => any) | undefined;
     onDelCrop?: ((...args: any[]) => any) | undefined;
@@ -360,6 +437,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     cropList: unknown[];
     tagList: unknown[];
     mode: any;
+    mobileOperation: string;
     precision: number;
 }>;
 export default _sfc_main;
