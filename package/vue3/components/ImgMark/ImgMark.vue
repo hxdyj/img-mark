@@ -2,8 +2,6 @@
 Known issues
 1. 组件的爷爷节点flex布局，且组件的父节点flex-shrink不为0，当被resize时候，鼠标hover样式位置不准
 
-TODO
-1. 移动端适配
 
 User Options
 1. Down Sapce Key and Drag Mouse Move to Draw
