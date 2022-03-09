@@ -13,6 +13,9 @@
 				@resizeEnd="resizeEnd"
 				@delCrop="delCrop"
 				@tagListChange="tagsListChange"
+				:tagConfig="{
+					showText: false,
+				}"
 				:isShowTip="true"
 				:enableDrawCropOutOfImg="false"
 				:enableDrawTagOutOfCrop="false"

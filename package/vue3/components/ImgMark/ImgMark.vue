@@ -58,6 +58,7 @@ export type LayerConfig = {
 }
 
 export type TagConfig = {
+	showText?: boolean
 	fillStyle?: string
 	textFillStyle?: string
 	hoverStrokeStyle?: string

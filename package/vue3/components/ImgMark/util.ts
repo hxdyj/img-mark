@@ -7,6 +7,7 @@ export const debug = false
 
 export const DEFAULT_CONFIG: Config = {
 	tagConfig: {
+		showText: true,
 		fillStyle: 'rgba(242, 88, 85, 0.5)',
 		textFillStyle: 'rgba(255, 255, 255, 0.6)',
 		hoverStrokeStyle: '#F25856',
@@ -374,7 +375,7 @@ export function drawTagRect(
 	if (isShow && (!touchPoint || touchPoint.type !== 'move')) {
 		ctx.fillStyle = config.tagConfig.fillStyle
 		ctx.fillRect(left, top, width, height)
-		if (index) {
+		if (index && config.tagConfig.showText) {
 			let fontsize = parseFloat(ctx.font.split(' ')[0])
 			ctx.fillStyle = config.tagConfig.textFillStyle
 			ctx.fillText(tagLabel || index + '', left + 4, top + height / 2 + fontsize / 2)

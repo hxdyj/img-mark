@@ -157,6 +157,7 @@ type LayerConfig = {
 }
 
 type TagConfig = {
+	showText?: boolean //是否展示tag index
 	fillStyle?: string
 	textFillStyle?: string
 	hoverStrokeStyle?: string

@@ -8,6 +8,7 @@ export declare type LayerConfig = {
     fillStyle?: string;
 };
 export declare type TagConfig = {
+    showText?: boolean;
     fillStyle?: string;
     textFillStyle?: string;
     hoverStrokeStyle?: string;
