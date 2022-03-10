@@ -140,6 +140,8 @@ let spaceKeyDown = false
 let mouseDownTime: number | undefined = undefined
 let mouseUpTime: number | undefined = undefined
 
+let clickedCrop: BoundingBox | null = null
+
 let mouseQuickDoubleTapTime: {
 	last: {
 		down: number | undefined
@@ -164,6 +166,7 @@ let zoomIntensity = __zoomIntensity
 let hasHoverRectInTagItem = false
 
 function initVar() {
+	clickedCrop = null
 	hasHoverRectInTagItem = false
 	zoomIntensity = __zoomIntensity
 	status.resizeCropHovering = undefined
@@ -350,7 +353,7 @@ let actions = {
 
 		if (type == 'resizeCrop') {
 			if (props.enableCropResize && status.resizeCropHovering) {
-				let clickedCrop = cropArr[status.resizeCropHovering.index || 0]
+				clickedCrop = cropArr[status.resizeCropHovering.index || 0]
 				if (!status.resizeCropHovering || !clickedCrop) return
 
 				tmpCropPositionInfo = moveResizeCrop(
@@ -708,6 +711,7 @@ async function initComponent() {
 }
 
 function initResizeVar() {
+	clickedCrop = null
 	inited = false
 	canvasWH = cloneDeep(defaultWH)
 	startMousePoint = cloneDeep(defaultPoint)
@@ -824,6 +828,7 @@ watch(
 		renderCtx2()
 	}
 )
+
 function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	let event = e as unknown as LayerTouchEvent &
 		MouseEvent & {
@@ -879,7 +884,11 @@ function cleartMousePoints() {
 	if (status.isMouseUpDownPoints()) {
 		if (props.mode === 'crop') {
 			if (tmpCropPositionInfo) {
-				let newCropInfo = transfromRect2Box(tmpCropPositionInfo, currentPosition, scale)
+				let newCropInfo = {
+					...clickedCrop,
+					...transfromRect2Box(tmpCropPositionInfo, currentPosition, scale),
+				}
+				clickedCrop = null
 				if (status.resizeCropHovering) {
 					if (!props.enableCropCross) {
 						let intersectFlag = getBoxIsIntersectWithBoxList(
@@ -984,7 +993,7 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 	let cropList = _cropList || cropArr
 	let resultList: TagItemTmp[] = []
 	list.forEach(tag => {
-		let newTagInfo: TagItemTmp = cloneDeep(tag)
+		let newTagInfo: TagItemTmp = tag
 		let _scale = tag.scale === 1 ? initScale || scale : 1
 		Object.assign(newTagInfo, {
 			startX: tag.startX / _scale,
@@ -1012,6 +1021,8 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 			}
 		}
 		delete newTagInfo.__newAdd
+		Reflect.deleteProperty(newTagInfo, '__parentCrop')
+		Reflect.deleteProperty(newTagInfo, '__vertexPosition')
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
 			let whObj = imageWH || imgWH
 			const imgRect = {
@@ -1040,14 +1051,23 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
 	let arr = cropList || cropArr
 	let list = arr.map(crop => {
-		let result: BoundingBox & { _del?: boolean } = {
-			...crop,
+		let result = crop as BoundingBox & { _del?: boolean }
+
+		Object.assign(result, {
 			startX: crop.startX,
 			startY: crop.startY,
 			endX: crop.endX,
 			endY: crop.endY,
 			_del: false,
-		}
+		})
+		// let result: BoundingBox & { _del?: boolean } = {
+		// 	...crop,
+		// startX: crop.startX,
+		// 			startY: crop.startY,
+		// 			endX: crop.endX,
+		// 			endY: crop.endY,
+		// 			_del: false,
+		// }
 
 		if (!props.enableDrawCropOutOfImg) {
 			let whObj = imgWH
@@ -1074,6 +1094,7 @@ function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
 		if (result.scale === 1) {
 			delete result.scale
 		}
+		Reflect.deleteProperty(result, '__vertexPosition')
 		let fixBox = fixBoxInfo(result)
 
 		return transformBoxPrecision(fixBox.info, props.precision) as BoundingBox & { _del?: boolean }

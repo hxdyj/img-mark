@@ -46,6 +46,7 @@
 <script setup lang="ts">
 import { ImgMark, Mode, BoundingBox, ResizeEmitType } from 'img-mark'
 import { uid } from 'uid'
+import { nextTick } from 'vue'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('crop')
 let cropList = $ref<
@@ -121,6 +122,11 @@ function cropListChange(data: any) {
 	console.log(111, data)
 }
 function tagsListChange(data: any) {
+	if (data.type === 'add') {
+		removeTag([tagList[0]])
+		let obj = tagList.find(item => !item.__uid)
+		obj!.__uid = '333333'
+	}
 	console.log('tagsListChange', data)
 }
 

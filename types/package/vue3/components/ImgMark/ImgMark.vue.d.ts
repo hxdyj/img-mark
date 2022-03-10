@@ -158,6 +158,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     spaceKeyDown: boolean;
     mouseDownTime: undefined;
     mouseUpTime: undefined;
+    clickedCrop: null;
     mouseQuickDoubleTapTime: {
         last: {
             down: number | undefined;
