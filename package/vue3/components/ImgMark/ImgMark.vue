@@ -1041,6 +1041,7 @@ function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
 	let arr = cropList || cropArr
 	let list = arr.map(crop => {
 		let result: BoundingBox & { _del?: boolean } = {
+			...crop,
 			startX: crop.startX,
 			startY: crop.startY,
 			endX: crop.endX,
@@ -1061,11 +1062,17 @@ function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
 				result._del = true
 			} else {
 				if (isBoxValidity(intersectPart)) {
-					result = intersectPart
+					result = {
+						...crop,
+						...intersectPart,
+					}
 				} else {
 					result._del = true
 				}
 			}
+		}
+		if (result.scale === 1) {
+			delete result.scale
 		}
 		let fixBox = fixBoxInfo(result)
 

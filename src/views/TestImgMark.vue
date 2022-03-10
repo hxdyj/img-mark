@@ -48,14 +48,22 @@ import { ImgMark, Mode, BoundingBox, ResizeEmitType } from 'img-mark'
 import { uid } from 'uid'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('crop')
-let cropList = $ref<BoundingBox[]>([
+let cropList = $ref<
+	Array<
+		BoundingBox & {
+			__uid: string
+		}
+	>
+>([
 	{
+		__uid: '1',
 		startX: 0,
 		startY: 0,
 		endX: 1774,
 		endY: 100,
 	},
 	{
+		__uid: '2',
 		startX: 200,
 		startY: 200,
 		endX: 1000,
@@ -63,10 +71,12 @@ let cropList = $ref<BoundingBox[]>([
 	},
 ])
 type MyBoundingBox = BoundingBox & {
+	__uid: string
 	type: number
 }
 let tagList = $ref<MyBoundingBox[]>([
 	{
+		__uid: '1',
 		startX: 50,
 		startY: 0,
 		endX: 100,
@@ -76,6 +86,7 @@ let tagList = $ref<MyBoundingBox[]>([
 		labelText: 'haha',
 	},
 	{
+		__uid: '2',
 		startX: 0,
 		startY: 0,
 		endX: 1774,
@@ -107,7 +118,7 @@ function removeTag(data?: BoundingBox[]) {
 	}
 }
 function cropListChange(data: any) {
-	console.log(data)
+	console.log(111, data)
 }
 function tagsListChange(data: any) {
 	console.log('tagsListChange', data)

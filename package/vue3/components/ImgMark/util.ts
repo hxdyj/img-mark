@@ -479,7 +479,6 @@ export function moveDrawCropRect(
 		position[2] = amendDpi(position[2], undefined, true)
 		position[3] = amendDpi(position[3], undefined, true)
 		// let position = fixMoveRectPosition(transfromTwoPoints2Rect(amendDpi(startPoint, ['x', 'y'], true), amendDpi(endPoint, ['x', 'y'], true)), zoomScale, origin)
-		console.log('movePOSITION', position)
 		if (position[2] > 5 || position[3] > 5) {
 			drawCropList(ctx, cropList, currentPosition, config)
 			drawCropRect(ctx, ...position, config, true)
