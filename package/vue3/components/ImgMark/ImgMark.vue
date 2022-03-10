@@ -961,14 +961,13 @@ function triggerCropListChange(type: CropListChangeType, changedList: BoundingBo
 }
 
 function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[]) {
-	let list = getTagList(tagArr)
-	emits('update:tagList', list)
-
+	// let list1 = getTagList(tagArr)
+	// console.log(222, changedList[changedList.length - 1] === list1[list1.length - 1])
+	// debugger
 	let changeParam: TagListChangeEmitRetunType = {
 		type,
 		list: changedList,
 	}
-
 	if (type === 'add') {
 		let tag = changedList.filter(i => Reflect.get(i, '__parentCrop'))[0]
 		if (tag) {
@@ -977,6 +976,9 @@ function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[
 		}
 	}
 	emits('tagListChange', changeParam)
+
+	let list = getTagList(tagArr)
+	emits('update:tagList', list)
 }
 
 type TagItemTmp = BoundingBox & {
@@ -1021,7 +1023,6 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 			}
 		}
 		delete newTagInfo.__newAdd
-		Reflect.deleteProperty(newTagInfo, '__parentCrop')
 		Reflect.deleteProperty(newTagInfo, '__vertexPosition')
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
 			let whObj = imageWH || imgWH
@@ -1058,7 +1059,6 @@ function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
 			startY: crop.startY,
 			endX: crop.endX,
 			endY: crop.endY,
-			_del: false,
 		})
 		// let result: BoundingBox & { _del?: boolean } = {
 		// 	...crop,

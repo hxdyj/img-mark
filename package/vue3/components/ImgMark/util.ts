@@ -270,7 +270,9 @@ type FixBoxInfoReturn = {
 startX endX  负数相反不对的部分给修正
 */
 export function fixBoxInfo(boundingBox: BoundingBox): FixBoxInfoReturn {
-	let newInfo = cloneDeep(boundingBox)
+	// let newInfo = cloneDeep(boundingBox)
+	//TODO
+	let newInfo = boundingBox
 	let { startX, startY, endX, endY } = newInfo
 	let width = Math.abs(startX - endX)
 	let height = Math.abs(startY - endY)

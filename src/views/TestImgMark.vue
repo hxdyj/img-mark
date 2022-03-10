@@ -123,9 +123,8 @@ function cropListChange(data: any) {
 }
 function tagsListChange(data: any) {
 	if (data.type === 'add') {
+		data.list[0].__uid = '333333'
 		removeTag([tagList[0]])
-		let obj = tagList.find(item => !item.__uid)
-		obj!.__uid = '333333'
 	}
 	console.log('tagsListChange', data)
 }

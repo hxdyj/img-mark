@@ -2920,7 +2920,7 @@ function transfromTwoPoints2Rect(t, e) {
   return [Math.min(t.x, e.x), Math.min(t.y, e.y), n, r];
 }
 function fixBoxInfo(t) {
-  let e = lodash.exports.cloneDeep(t);
+  let e = t;
   var { startX: t, startY: n, endX: r, endY: o } = e, i = Math.abs(t - r), a = Math.abs(n - o), t = Math.min(t, r), n = Math.min(n, o);
   return e.startX = t, e.startY = n, e.endX = t + i, e.endY = n + a, { info: e, position: [t, n, i, a] };
 }
@@ -3100,7 +3100,7 @@ var ImgMark_vue_vue_type_style_index_0_scoped_true_lang = "", _export_sfc = (t, 
     n[r] = o;
   return n;
 };
-const _withScopeId = (t) => (pushScopeId("data-v-7904a006"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousedown", "onClick", "onMouseup", "onMousemove", "onMouseout", "onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop"], setup(n, { expose: t, emit: o }) {
+const _withScopeId = (t) => (pushScopeId("data-v-6a73d949"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousedown", "onClick", "onMouseup", "onMousemove", "onMouseout", "onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop"], setup(n, { expose: t, emit: o }) {
   const u = n;
   let r = false, i = void 0, a = void 0, c = null, f = { last: { down: void 0, up: void 0 }, prev: { down: void 0, up: void 0 } };
   const e = device.mobile() ? 0.1 / DPI * 1.5 : 0.1;
@@ -3234,14 +3234,14 @@ const _withScopeId = (t) => (pushScopeId("data-v-7904a006"), t = t(), popScopeId
     o("update:cropList", n2), o("cropListChange", { type: t2, list: e2 });
   }
   function Q(t2, e2) {
-    var n2 = X(D);
-    o("update:tagList", n2);
-    let r2 = { type: t2, list: e2 };
+    let n2 = { type: t2, list: e2 };
     if (t2 === "add") {
       let t3 = e2.filter((t4) => Reflect.get(t4, "__parentCrop"))[0];
-      t3 && (r2.parentCrop = j([Reflect.get(t3, "__parentCrop")])[0], delete t3.__parentCrop);
+      t3 && (n2.parentCrop = j([Reflect.get(t3, "__parentCrop")])[0], delete t3.__parentCrop);
     }
-    o("tagListChange", r2);
+    o("tagListChange", n2);
+    t2 = X(D);
+    o("update:tagList", t2);
   }
   function X(t2, e2, r2, o2) {
     let n2 = t2 || D, i2 = e2 || O, a2 = [];
@@ -3255,7 +3255,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-7904a006"), t = t(), popScopeId
         var n3 = getTwoBoxIntersectPart(e3, t3);
         n3 && isBoxValidity(n3) ? (Object.assign(e3, n3), e3.__parentCrop = t3) : e3.__isValidity = false;
       }
-      delete e3.__newAdd, Reflect.deleteProperty(e3, "__parentCrop"), Reflect.deleteProperty(e3, "__vertexPosition"), u.enableDrawTagOutOfCrop && !u.enableDrawTagOutOfImg && (t3 = { startX: 0, startY: 0, endX: (n3 = o2 || g).width, endY: n3.height }, (n3 = getTwoBoxIntersectPart(e3, t3)) && isBoxValidity(n3) ? Object.assign(e3, n3) : e3.__isValidity = false);
+      delete e3.__newAdd, Reflect.deleteProperty(e3, "__vertexPosition"), u.enableDrawTagOutOfCrop && !u.enableDrawTagOutOfImg && (t3 = { startX: 0, startY: 0, endX: (n3 = o2 || g).width, endY: n3.height }, (n3 = getTwoBoxIntersectPart(e3, t3)) && isBoxValidity(n3) ? Object.assign(e3, n3) : e3.__isValidity = false);
       t3 = fixBoxInfo(e3);
       a2.push(transformBoxPrecision(t3.info, u.precision));
     }), a2.filter((t3) => t3.__isValidity !== false);
@@ -3263,7 +3263,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-7904a006"), t = t(), popScopeId
   function j(t2) {
     let e2 = t2 || O, n2 = e2.map((t3) => {
       let e3 = t3;
-      Object.assign(e3, { startX: t3.startX, startY: t3.startY, endX: t3.endX, endY: t3.endY, _del: false }), u.enableDrawCropOutOfImg || (n3 = { startX: 0, startY: 0, endX: (n3 = g).width, endY: n3.height }, (n3 = getTwoBoxIntersectPart(e3, n3)) && isBoxValidity(n3) ? e3 = __spreadValues(__spreadValues({}, t3), n3) : e3._del = true), e3.scale === 1 && delete e3.scale, Reflect.deleteProperty(e3, "__vertexPosition");
+      Object.assign(e3, { startX: t3.startX, startY: t3.startY, endX: t3.endX, endY: t3.endY }), u.enableDrawCropOutOfImg || (n3 = { startX: 0, startY: 0, endX: (n3 = g).width, endY: n3.height }, (n3 = getTwoBoxIntersectPart(e3, n3)) && isBoxValidity(n3) ? e3 = __spreadValues(__spreadValues({}, t3), n3) : e3._del = true), e3.scale === 1 && delete e3.scale, Reflect.deleteProperty(e3, "__vertexPosition");
       var n3, t3 = fixBoxInfo(e3);
       return transformBoxPrecision(t3.info, u.precision);
     });
@@ -3347,5 +3347,5 @@ const _withScopeId = (t) => (pushScopeId("data-v-7904a006"), t = t(), popScopeId
     }), lodash.exports.groupBy(t2, "__groupIndex");
   } }), (t2, e2) => (openBlock(), createElementBlock("div", { class: "comp-ocr-img", ref_key: "containerRef", ref: S, onMousedown: withModifiers(tt, ["stop"]), onClick: withModifiers(ot, ["stop"]), onMouseup: withModifiers(nt, ["stop"]), onMousemove: withModifiers(et, ["stop"]), onMouseout: withModifiers(rt, ["stop"]), onMousewheel: withModifiers(G, ["stop"]), onTouchmove: withModifiers(at, ["stop", "prevent"]), onTouchstart: withModifiers(it, ["stop"]), onTouchend: withModifiers(ut, ["stop"]) }, [createElementVNode("canvas", { class: "canvas", ref_key: "canvasRef", ref: F }, null, 512), createElementVNode("canvas", { class: "canvas2", ref_key: "canvas2Ref", ref: V }, null, 512), unref(u).isShowTip ? (openBlock(), createElementBlock("div", _hoisted_2, [createElementVNode("div", _hoisted_3, [createElementVNode("div", { class: normalizeClass(["circle", { crop: n.mode === "crop", tag: n.mode === "tag" }]) }, null, 2), createElementVNode("div", _hoisted_4, toDisplayString(n.mode === "crop" ? "\u88C1\u526A\u6A21\u5F0F" : "\u6807\u8BB0\u9519\u8BEF\u884C"), 1)]), createElementVNode("div", _hoisted_5, [renderSlot(t2.$slots, "tip", {}, () => [_hoisted_6, _hoisted_7, _hoisted_8, _hoisted_9], true)])])) : createCommentVNode("", true)], 40, _hoisted_1));
 } });
-var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-7904a006"]]);
+var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-6a73d949"]]);
 export { ImgMark, boxIsAllInOtherBox, transformTagBoxRelativeTo, transformTagListBoxRelativeTo };
