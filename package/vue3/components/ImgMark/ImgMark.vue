@@ -672,18 +672,25 @@ async function initComponent() {
 
 			// if (debug) console.log('RATE', widthRate, heightRate)
 			// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
-			let boxStretchScale = cropBoxInfo[2] >= cropBoxInfo[3] ? widthRate : heightRate // 长边尽量展示出来
+			/* tips
+			box
+			innerBox
+
+			boxAspectRatio<innerBoxAspectRatio  width fix
+			boxAspectRatio>innerBoxAspectRatio  height fix
+			*/
+			let boxStretchScale = canvasWH.width / canvasWH.height > cropBoxInfo[2] / cropBoxInfo[3] ? heightRate : widthRate // 长边尽量展示出来
 			let canvasZoom = boxStretchScale
 
 			let cropX = cropBoxInfo[0] + cropBoxInfo[2]
 			let cropY = cropBoxInfo[1] + cropBoxInfo[3]
 
 			if (boxStretchScale === widthRate) {
-				currentPosition.x = canvasWH.width / canvasZoom - cropX - ((canvasWH.width / canvasZoom) * whiteRate) / 2
-				currentPosition.y = (canvasWH.height / canvasZoom - cropBoxInfo[3]) / 2 - cropBoxInfo[1]
+				currentPosition.x = (canvasWH.width - cropX * canvasZoom - (canvasWH.width * whiteRate) / 2) / canvasZoom
+				currentPosition.y = ((canvasWH.height - cropBoxInfo[3] * canvasZoom) / 2 - cropBoxInfo[1] * canvasZoom) / canvasZoom
 			} else {
-				currentPosition.x = (canvasWH.width / canvasZoom - cropBoxInfo[2]) / 2 - cropBoxInfo[0]
-				currentPosition.y = canvasWH.height / canvasZoom - cropY - ((canvasWH.height / canvasZoom) * whiteRate) / 2
+				currentPosition.x = ((canvasWH.width - cropBoxInfo[2] * canvasZoom) / 2 - cropBoxInfo[0] * canvasZoom) / canvasZoom
+				currentPosition.y = (canvasWH.height - cropY * canvasZoom - (canvasWH.height * whiteRate) / 2) / canvasZoom
 			}
 
 			onMouseWheel(

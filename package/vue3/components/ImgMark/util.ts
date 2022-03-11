@@ -270,8 +270,6 @@ type FixBoxInfoReturn = {
 startX endX  负数相反不对的部分给修正
 */
 export function fixBoxInfo(boundingBox: BoundingBox): FixBoxInfoReturn {
-	// let newInfo = cloneDeep(boundingBox)
-	//TODO
 	let newInfo = boundingBox
 	let { startX, startY, endX, endY } = newInfo
 	let width = Math.abs(startX - endX)
@@ -476,11 +474,9 @@ export function moveDrawCropRect(
 	config: Config
 ) {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
-		//TODO
 		let position = fixMoveRectPosition(transfromTwoPoints2Rect(startPoint, endPoint), zoomScale, origin)
 		position[2] = amendDpi(position[2], undefined, true)
 		position[3] = amendDpi(position[3], undefined, true)
-		// let position = fixMoveRectPosition(transfromTwoPoints2Rect(amendDpi(startPoint, ['x', 'y'], true), amendDpi(endPoint, ['x', 'y'], true)), zoomScale, origin)
 		if (position[2] > 5 || position[3] > 5) {
 			drawCropList(ctx, cropList, currentPosition, config)
 			drawCropRect(ctx, ...position, config, true)
