@@ -14,7 +14,7 @@
 				@delCrop="delCrop"
 				@tagListChange="tagsListChange"
 				:tagConfig="{
-					showText: false,
+					fontSize: 50,
 				}"
 				:isShowTip="true"
 				:enableDrawCropOutOfImg="false"

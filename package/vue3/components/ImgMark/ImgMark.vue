@@ -58,6 +58,7 @@ export type LayerConfig = {
 }
 
 export type TagConfig = {
+	fontSize?: number //px单位，默认20
 	showText?: boolean
 	fillStyle?: string
 	textFillStyle?: string
@@ -400,7 +401,7 @@ let actions = {
 		zoomScale *= zoom
 		//动态设置字体大小
 		// ctx2.font = `${8 * zoomScale}px serif`
-		ctx2.font = `20px serif`
+		// ctx2.font = `20px serif`
 		clearCanvas(ctx)
 		clearCanvas(ctx2)
 		drawImage(ctx, img, currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)

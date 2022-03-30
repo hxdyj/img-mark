@@ -8,6 +8,7 @@ export declare type LayerConfig = {
     fillStyle?: string;
 };
 export declare type TagConfig = {
+    fontSize?: number;
     showText?: boolean;
     fillStyle?: string;
     textFillStyle?: string;

@@ -157,6 +157,7 @@ type LayerConfig = {
 }
 
 type TagConfig = {
+	fontSize?: number //px单位，默认20
 	showText?: boolean //是否展示tag index
 	fillStyle?: string
 	textFillStyle?: string

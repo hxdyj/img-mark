@@ -120,7 +120,7 @@ Object.prototype.hasOwnProperty.call(window, "onorientationchange") && (orientat
 var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : {}, lodash = { exports: {} };
 !function(O, L) {
   !function() {
-    var Wi, Ui = "Expected a function", ya = "__lodash_hash_undefined__", wa = "__lodash_placeholder__", ma = 16, Fi = 32, Vi = 64, Ni = 128, xa = 256, Hi = 1 / 0, $i = 9007199254740991, ba = NaN, qi = 4294967295, Ca = [["ary", Ni], ["bind", 1], ["bindKey", 2], ["curry", 8], ["curryRight", ma], ["flip", 512], ["partial", Fi], ["partialRight", Vi], ["rearg", xa]], Gi = "[object Arguments]", Ia = "[object Array]", Ki = "[object Boolean]", Zi = "[object Date]", Ta = "[object Error]", Ba = "[object Function]", Ra = "[object GeneratorFunction]", Ji = "[object Map]", Qi = "[object Number]", ta = "[object Object]", Da = "[object Promise]", Oa = "[object RegExp]", ea = "[object Set]", La = "[object String]", Sa = "[object Symbol]", ka = "[object WeakMap]", Ya = "[object ArrayBuffer]", na = "[object DataView]", Ea = "[object Float32Array]", Aa = "[object Float64Array]", Xa = "[object Int8Array]", ja = "[object Int16Array]", za = "[object Int32Array]", Ma = "[object Uint8Array]", Pa = "[object Uint8ClampedArray]", Wa = "[object Uint16Array]", Ua = "[object Uint32Array]", Fa = /\b__p \+= '';/g, Va = /\b(__p \+=) '' \+/g, Na = /(__e\(.*?\)|\b__t\)) \+\n'';/g, Ha = /&(?:amp|lt|gt|quot|#39);/g, $a = /[&<>"']/g, qa = RegExp(Ha.source), Ga = RegExp($a.source), Ka = /<%-([\s\S]+?)%>/g, Za = /<%([\s\S]+?)%>/g, Ja = /<%=([\s\S]+?)%>/g, Qa = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, tu = /^\w*$/, eu = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, nu = /[\\^$.*+?()[\]{}|]/g, ru = RegExp(nu.source), ou = /^\s+/, i = /\s/, iu = /\{(?:\n\/\* \[wrapped with .+\] \*\/)?\n?/, au = /\{\n\/\* \[wrapped with (.+)\] \*/, uu = /,? & /, cu = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g, fu = /[()=,{}\[\]\/\s]/, su = /\\(\\)?/g, lu = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g, du = /\w*$/, pu = /^[-+]0x[0-9a-f]+$/i, hu = /^0b[01]+$/i, vu = /^\[object .+?Constructor\]$/, gu = /^0o[0-7]+$/i, _u = /^(?:0|[1-9]\d*)$/, yu = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g, wu = /($^)/, mu = /['\n\r\u2028\u2029\\]/g, a = "\\ud800-\\udfff", u = "\\u0300-\\u036f\\ufe20-\\ufe2f\\u20d0-\\u20ff", c = "\\u2700-\\u27bf", t = "a-z\\xdf-\\xf6\\xf8-\\xff", e = "A-Z\\xc0-\\xd6\\xd8-\\xde", f = "\\ufe0e\\ufe0f", s = "\\xac\\xb1\\xd7\\xf7\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf\\u2000-\\u206f \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000", l = "['\u2019]", n = "[" + a + "]", d = "[" + s + "]", p = "[" + u + "]", h = "[" + c + "]", v = "[" + t + "]", s = "[^" + a + s + "\\d+" + c + t + e + "]", c = "\\ud83c[\\udffb-\\udfff]", t = "[^" + a + "]", g = "(?:\\ud83c[\\udde6-\\uddff]){2}", r = "[\\ud800-\\udbff][\\udc00-\\udfff]", e = "[" + e + "]", _ = "\\u200d", y = "(?:" + v + "|" + s + ")", s = "(?:" + e + "|" + s + ")", w = "(?:['\u2019](?:d|ll|m|re|s|t|ve))?", m = "(?:['\u2019](?:D|LL|M|RE|S|T|VE))?", x = "(?:" + p + "|" + c + ")?", b = "[" + f + "]?", b = b + x + ("(?:" + _ + "(?:" + [t, g, r].join("|") + ")" + b + x + ")*"), x = "(?:" + [h, g, r].join("|") + ")" + b, h = "(?:" + [t + p + "?", p, g, r, n].join("|") + ")", xu = RegExp(l, "g"), bu = RegExp(p, "g"), C = RegExp(c + "(?=" + c + ")|" + h + b, "g"), Cu = RegExp([e + "?" + v + "+" + w + "(?=" + [d, e, "$"].join("|") + ")", s + "+" + m + "(?=" + [d, e + y, "$"].join("|") + ")", e + "?" + y + "+" + w, e + "+" + m, "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])", "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])", "\\d+", x].join("|"), "g"), I = RegExp("[" + _ + a + u + f + "]"), Iu = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/, Tu = ["Array", "Buffer", "DataView", "Date", "Error", "Float32Array", "Float64Array", "Function", "Int8Array", "Int16Array", "Int32Array", "Map", "Math", "Object", "Promise", "RegExp", "Set", "String", "Symbol", "TypeError", "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array", "WeakMap", "_", "clearTimeout", "isFinite", "parseInt", "setTimeout"], Bu = -1, ra = {}, oa = (ra[Ea] = ra[Aa] = ra[Xa] = ra[ja] = ra[za] = ra[Ma] = ra[Pa] = ra[Wa] = ra[Ua] = true, ra[Gi] = ra[Ia] = ra[Ya] = ra[Ki] = ra[na] = ra[Zi] = ra[Ta] = ra[Ba] = ra[Ji] = ra[Qi] = ra[ta] = ra[Oa] = ra[ea] = ra[La] = ra[ka] = false, {}), T = (oa[Gi] = oa[Ia] = oa[Ya] = oa[na] = oa[Ki] = oa[Zi] = oa[Ea] = oa[Aa] = oa[Xa] = oa[ja] = oa[za] = oa[Ji] = oa[Qi] = oa[ta] = oa[Oa] = oa[ea] = oa[La] = oa[Sa] = oa[Ma] = oa[Pa] = oa[Wa] = oa[Ua] = true, oa[Ta] = oa[Ba] = oa[ka] = false, { "\\": "\\", "'": "'", "\n": "n", "\r": "r", "\u2028": "u2028", "\u2029": "u2029" }), Ru = parseFloat, Du = parseInt, t = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal, g = typeof self == "object" && self && self.Object === Object && self, ia = t || g || Function("return this")(), r = L && !L.nodeType && L, o = r && O && !O.nodeType && O, Ou = o && o.exports === r, B = Ou && t.process, n = function() {
+    var Wi, Ui = "Expected a function", ya = "__lodash_hash_undefined__", wa = "__lodash_placeholder__", ma = 16, Fi = 32, Vi = 64, Ni = 128, xa = 256, Hi = 1 / 0, $i = 9007199254740991, ba = NaN, qi = 4294967295, Ca = [["ary", Ni], ["bind", 1], ["bindKey", 2], ["curry", 8], ["curryRight", ma], ["flip", 512], ["partial", Fi], ["partialRight", Vi], ["rearg", xa]], Gi = "[object Arguments]", Ia = "[object Array]", Ki = "[object Boolean]", Zi = "[object Date]", Ta = "[object Error]", Ba = "[object Function]", Ra = "[object GeneratorFunction]", Ji = "[object Map]", Qi = "[object Number]", ta = "[object Object]", Da = "[object Promise]", Oa = "[object RegExp]", ea = "[object Set]", La = "[object String]", Sa = "[object Symbol]", ka = "[object WeakMap]", Ya = "[object ArrayBuffer]", na = "[object DataView]", Ea = "[object Float32Array]", Aa = "[object Float64Array]", Xa = "[object Int8Array]", za = "[object Int16Array]", ja = "[object Int32Array]", Ma = "[object Uint8Array]", Pa = "[object Uint8ClampedArray]", Wa = "[object Uint16Array]", Ua = "[object Uint32Array]", Fa = /\b__p \+= '';/g, Va = /\b(__p \+=) '' \+/g, Na = /(__e\(.*?\)|\b__t\)) \+\n'';/g, Ha = /&(?:amp|lt|gt|quot|#39);/g, $a = /[&<>"']/g, qa = RegExp(Ha.source), Ga = RegExp($a.source), Ka = /<%-([\s\S]+?)%>/g, Za = /<%([\s\S]+?)%>/g, Ja = /<%=([\s\S]+?)%>/g, Qa = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, tu = /^\w*$/, eu = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, nu = /[\\^$.*+?()[\]{}|]/g, ru = RegExp(nu.source), ou = /^\s+/, i = /\s/, iu = /\{(?:\n\/\* \[wrapped with .+\] \*\/)?\n?/, au = /\{\n\/\* \[wrapped with (.+)\] \*/, uu = /,? & /, cu = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g, fu = /[()=,{}\[\]\/\s]/, su = /\\(\\)?/g, lu = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g, du = /\w*$/, pu = /^[-+]0x[0-9a-f]+$/i, hu = /^0b[01]+$/i, vu = /^\[object .+?Constructor\]$/, gu = /^0o[0-7]+$/i, _u = /^(?:0|[1-9]\d*)$/, yu = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g, wu = /($^)/, mu = /['\n\r\u2028\u2029\\]/g, a = "\\ud800-\\udfff", u = "\\u0300-\\u036f\\ufe20-\\ufe2f\\u20d0-\\u20ff", c = "\\u2700-\\u27bf", t = "a-z\\xdf-\\xf6\\xf8-\\xff", e = "A-Z\\xc0-\\xd6\\xd8-\\xde", f = "\\ufe0e\\ufe0f", s = "\\xac\\xb1\\xd7\\xf7\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf\\u2000-\\u206f \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000", l = "['\u2019]", n = "[" + a + "]", d = "[" + s + "]", p = "[" + u + "]", h = "[" + c + "]", v = "[" + t + "]", s = "[^" + a + s + "\\d+" + c + t + e + "]", c = "\\ud83c[\\udffb-\\udfff]", t = "[^" + a + "]", g = "(?:\\ud83c[\\udde6-\\uddff]){2}", r = "[\\ud800-\\udbff][\\udc00-\\udfff]", e = "[" + e + "]", _ = "\\u200d", y = "(?:" + v + "|" + s + ")", s = "(?:" + e + "|" + s + ")", w = "(?:['\u2019](?:d|ll|m|re|s|t|ve))?", m = "(?:['\u2019](?:D|LL|M|RE|S|T|VE))?", x = "(?:" + p + "|" + c + ")?", b = "[" + f + "]?", b = b + x + ("(?:" + _ + "(?:" + [t, g, r].join("|") + ")" + b + x + ")*"), x = "(?:" + [h, g, r].join("|") + ")" + b, h = "(?:" + [t + p + "?", p, g, r, n].join("|") + ")", xu = RegExp(l, "g"), bu = RegExp(p, "g"), C = RegExp(c + "(?=" + c + ")|" + h + b, "g"), Cu = RegExp([e + "?" + v + "+" + w + "(?=" + [d, e, "$"].join("|") + ")", s + "+" + m + "(?=" + [d, e + y, "$"].join("|") + ")", e + "?" + y + "+" + w, e + "+" + m, "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])", "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])", "\\d+", x].join("|"), "g"), I = RegExp("[" + _ + a + u + f + "]"), Iu = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/, Tu = ["Array", "Buffer", "DataView", "Date", "Error", "Float32Array", "Float64Array", "Function", "Int8Array", "Int16Array", "Int32Array", "Map", "Math", "Object", "Promise", "RegExp", "Set", "String", "Symbol", "TypeError", "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array", "WeakMap", "_", "clearTimeout", "isFinite", "parseInt", "setTimeout"], Bu = -1, ra = {}, oa = (ra[Ea] = ra[Aa] = ra[Xa] = ra[za] = ra[ja] = ra[Ma] = ra[Pa] = ra[Wa] = ra[Ua] = true, ra[Gi] = ra[Ia] = ra[Ya] = ra[Ki] = ra[na] = ra[Zi] = ra[Ta] = ra[Ba] = ra[Ji] = ra[Qi] = ra[ta] = ra[Oa] = ra[ea] = ra[La] = ra[ka] = false, {}), T = (oa[Gi] = oa[Ia] = oa[Ya] = oa[na] = oa[Ki] = oa[Zi] = oa[Ea] = oa[Aa] = oa[Xa] = oa[za] = oa[ja] = oa[Ji] = oa[Qi] = oa[ta] = oa[Oa] = oa[ea] = oa[La] = oa[Sa] = oa[Ma] = oa[Pa] = oa[Wa] = oa[Ua] = true, oa[Ta] = oa[Ba] = oa[ka] = false, { "\\": "\\", "'": "'", "\n": "n", "\r": "r", "\u2028": "u2028", "\u2029": "u2029" }), Ru = parseFloat, Du = parseInt, t = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal, g = typeof self == "object" && self && self.Object === Object && self, ia = t || g || Function("return this")(), r = L && !L.nodeType && L, o = r && O && !O.nodeType && O, Ou = o && o.exports === r, B = Ou && t.process, n = function() {
       try {
         var t2 = o && o.require && o.require("util").types;
         return t2 ? t2 : B && B.binding && B.binding("util");
@@ -152,12 +152,12 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         ;
       return t2;
     }
-    function ju(t2, e2) {
+    function zu(t2, e2) {
       for (var n2 = t2 == null ? 0 : t2.length; n2-- && e2(t2[n2], n2, t2) !== false; )
         ;
       return t2;
     }
-    function zu(t2, e2) {
+    function ju(t2, e2) {
       for (var n2 = -1, r2 = t2 == null ? 0 : t2.length; ++n2 < r2; )
         if (!e2(t2[n2], n2, t2))
           return false;
@@ -365,13 +365,13 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           return {};
         if (rt)
           return rt(t3);
-        jt.prototype = t3;
-        t3 = new jt();
-        return jt.prototype = Wi, t3;
+        zt.prototype = t3;
+        t3 = new zt();
+        return zt.prototype = Wi, t3;
       };
-      function jt() {
-      }
       function zt() {
+      }
+      function jt() {
       }
       function g2(t3, e3) {
         this.__wrapped__ = t3, this.__actions__ = [], this.__chain__ = !!e3, this.__index__ = 0, this.__values__ = Wi;
@@ -405,7 +405,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         for (this.__data__ = new Wt(); ++e3 < n3; )
           this.add(t3[e3]);
       }
-      function j(t3) {
+      function z(t3) {
         t3 = this.__data__ = new Pt(t3);
         this.size = t3.size;
       }
@@ -417,7 +417,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       }
       function Vt(t3) {
         var e3 = t3.length;
-        return e3 ? t3[ze(0, e3 - 1)] : Wi;
+        return e3 ? t3[je(0, e3 - 1)] : Wi;
       }
       function Nt(t3, e3) {
         return wr(I2(t3), te(e3, 0, t3.length));
@@ -472,7 +472,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           }(n3), !u3)
             return I2(n3, a3);
         } else {
-          var l3 = z(n3), d3 = l3 == Ba || l3 == Ra;
+          var l3 = j(n3), d3 = l3 == Ba || l3 == Ra;
           if (mo(n3))
             return sn(n3, u3);
           if (l3 == ta || l3 == Gi || d3 && !e3) {
@@ -497,8 +497,8 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
                 case Ea:
                 case Aa:
                 case Xa:
-                case ja:
                 case za:
+                case ja:
                 case Ma:
                 case Pa:
                 case Wa:
@@ -524,7 +524,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
             }(n3, l3, u3);
           }
         }
-        var p3 = (i3 = i3 || new j()).get(n3);
+        var p3 = (i3 = i3 || new z()).get(n3);
         if (p3)
           return p3;
         i3.set(n3, a3), Oo(n3) ? n3.forEach(function(t4) {
@@ -573,7 +573,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           }
         return c3;
       }
-      h2.templateSettings = { escape: Ka, evaluate: Za, interpolate: Ja, variable: "", imports: { _: h2 } }, (h2.prototype = zt.prototype).constructor = h2, (g2.prototype = Xt(zt.prototype)).constructor = g2, (_2.prototype = Xt(zt.prototype)).constructor = _2, Mt.prototype.clear = function() {
+      h2.templateSettings = { escape: Ka, evaluate: Za, interpolate: Ja, variable: "", imports: { _: h2 } }, (h2.prototype = jt.prototype).constructor = h2, (g2.prototype = Xt(jt.prototype)).constructor = g2, (_2.prototype = Xt(jt.prototype)).constructor = _2, Mt.prototype.clear = function() {
         this.__data__ = Bt ? Bt(null) : {}, this.size = 0;
       }, Mt.prototype.delete = function(t3) {
         return t3 = this.has(t3) && delete this.__data__[t3], this.size -= t3 ? 1 : 0, t3;
@@ -614,16 +614,16 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return this.__data__.set(t3, ya), this;
       }, Ut.prototype.has = function(t3) {
         return this.__data__.has(t3);
-      }, j.prototype.clear = function() {
+      }, z.prototype.clear = function() {
         this.__data__ = new Pt(), this.size = 0;
-      }, j.prototype.delete = function(t3) {
+      }, z.prototype.delete = function(t3) {
         var e3 = this.__data__, t3 = e3.delete(t3);
         return this.size = e3.size, t3;
-      }, j.prototype.get = function(t3) {
+      }, z.prototype.get = function(t3) {
         return this.__data__.get(t3);
-      }, j.prototype.has = function(t3) {
+      }, z.prototype.has = function(t3) {
         return this.__data__.has(t3);
-      }, j.prototype.set = function(t3, e3) {
+      }, z.prototype.set = function(t3, e3) {
         var n3 = this.__data__;
         if (n3 instanceof Pt) {
           var r3 = n3.__data__;
@@ -741,14 +741,14 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
             return true;
           if (t3 == null || e3 == null || !W(t3) && !W(e3))
             return t3 != t3 && e3 != e3;
-          var i3 = be, a3 = P(t3), u3 = P(e3), c3 = a3 ? Ia : z(t3), u3 = u3 ? Ia : z(e3), f3 = (c3 = c3 == Gi ? ta : c3) == ta, s3 = (u3 = u3 == Gi ? ta : u3) == ta, u3;
+          var i3 = be, a3 = P(t3), u3 = P(e3), c3 = a3 ? Ia : j(t3), u3 = u3 ? Ia : j(e3), f3 = (c3 = c3 == Gi ? ta : c3) == ta, s3 = (u3 = u3 == Gi ? ta : u3) == ta, u3;
           if ((u3 = c3 == u3) && mo(t3)) {
             if (!mo(e3))
               return false;
             f3 = !(a3 = true);
           }
           if (u3 && !f3) {
-            o3 = o3 || new j();
+            o3 = o3 || new z();
             if (a3 || So(t3))
               return Fn(t3, e3, n3, r3, i3, o3);
             else {
@@ -798,10 +798,10 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           if (!(1 & n3)) {
             a3 = f3 && X.call(t3, "__wrapped__"), c3 = s3 && X.call(e3, "__wrapped__");
             if (a3 || c3)
-              return f3 = a3 ? t3.value() : t3, s3 = c3 ? e3.value() : e3, o3 = o3 || new j(), i3(f3, s3, n3, r3, o3);
+              return f3 = a3 ? t3.value() : t3, s3 = c3 ? e3.value() : e3, o3 = o3 || new z(), i3(f3, s3, n3, r3, o3);
           }
           if (u3) {
-            o3 = o3 || new j();
+            o3 = o3 || new z();
             var m3 = t3, x3 = e3, b3 = n3, C3 = r3, I3 = i3, T3 = o3, B3 = 1 & b3, R3 = Nn(m3), D3 = R3.length, a3 = Nn(x3).length;
             if (D3 != a3 && !B3)
               return false;
@@ -842,7 +842,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
             if (f3 === Wi && !(c3 in t3))
               return false;
           } else {
-            var l3, d3 = new j();
+            var l3, d3 = new z();
             if (!((l3 = r3 ? r3(f3, s3, c3, t3, e3, d3) : l3) === Wi ? be(s3, f3, 3, r3, d3) : l3))
               return false;
           }
@@ -901,7 +901,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       function ke(v3, g3, _3, y3, w3) {
         v3 !== g3 && fe(g3, function(t3, e3) {
           var n3, r3, o3, i3, a3, u3, c3, f3, s3, l3, d3, p3, h3;
-          w3 = w3 || new j(), T2(t3) ? (r3 = g3, i3 = _3, a3 = ke, u3 = y3, c3 = w3, d3 = pr(n3 = v3, o3 = e3), p3 = pr(r3, o3), (h3 = c3.get(p3)) ? $t(n3, o3, h3) : (h3 = u3 ? u3(d3, p3, o3 + "", n3, r3, c3) : Wi, (r3 = h3 === Wi) && (f3 = P(p3), s3 = !f3 && mo(p3), l3 = !f3 && !s3 && So(p3), h3 = p3, f3 || s3 || l3 ? h3 = P(d3) ? d3 : x2(d3) ? I2(d3) : s3 ? sn(p3, !(r3 = false)) : l3 ? dn(p3, !(r3 = false)) : [] : Ro(p3) || yo(p3) ? yo(h3 = d3) ? h3 = jo(d3) : T2(d3) && !bo(d3) || (h3 = nr(p3)) : r3 = false), r3 && (c3.set(p3, h3), a3(h3, p3, i3, u3, c3), c3.delete(p3)), $t(n3, o3, h3))) : (f3 = y3 ? y3(pr(v3, e3), t3, e3 + "", v3, g3, w3) : Wi, $t(v3, e3, f3 = f3 === Wi ? t3 : f3));
+          w3 = w3 || new z(), T2(t3) ? (r3 = g3, i3 = _3, a3 = ke, u3 = y3, c3 = w3, d3 = pr(n3 = v3, o3 = e3), p3 = pr(r3, o3), (h3 = c3.get(p3)) ? $t(n3, o3, h3) : (h3 = u3 ? u3(d3, p3, o3 + "", n3, r3, c3) : Wi, (r3 = h3 === Wi) && (f3 = P(p3), s3 = !f3 && mo(p3), l3 = !f3 && !s3 && So(p3), h3 = p3, f3 || s3 || l3 ? h3 = P(d3) ? d3 : x2(d3) ? I2(d3) : s3 ? sn(p3, !(r3 = false)) : l3 ? dn(p3, !(r3 = false)) : [] : Ro(p3) || yo(p3) ? yo(h3 = d3) ? h3 = zo(d3) : T2(d3) && !bo(d3) || (h3 = nr(p3)) : r3 = false), r3 && (c3.set(p3, h3), a3(h3, p3, i3, u3, c3), c3.delete(p3)), $t(n3, o3, h3))) : (f3 = y3 ? y3(pr(v3, e3), t3, e3 + "", v3, g3, w3) : Wi, $t(v3, e3, f3 = f3 === Wi ? t3 : f3));
         }, L2);
       }
       function Ye(t3, e3) {
@@ -951,13 +951,13 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
             u3 !== t3 && it.call(u3, c3, 1), it.call(t3, c3, 1);
         return t3;
       }
-      function je(t3, e3) {
+      function ze(t3, e3) {
         for (var n3 = t3 ? e3.length : 0, r3 = n3 - 1; n3--; ) {
           var o3, i3 = e3[n3];
           n3 != r3 && i3 === o3 || (or(o3 = i3) ? it.call(t3, i3, 1) : Ze(t3, i3));
         }
       }
-      function ze(t3, e3) {
+      function je(t3, e3) {
         return t3 + ht(xt() * (e3 - t3 + 1));
       }
       function Me(t3, e3) {
@@ -1054,7 +1054,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         if (n3)
           a3 = false, o3 = Pu;
         else if (200 <= i3) {
-          var f3 = e3 ? null : jn(t3);
+          var f3 = e3 ? null : zn(t3);
           if (f3)
             return fc(f3);
           a3 = false, o3 = ec, c3 = new Ut();
@@ -1382,12 +1382,12 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           return t4 = D2(t4), (e3 = e3 == null ? 0 : C2(R2(e3), 292)) && gt(t4) ? (n3 = (p2(t4) + "e").split("e"), +((n3 = (p2(r3(n3[0] + "e" + (+n3[1] + e3))) + "e").split("e"))[0] + "e" + (+n3[1] - e3))) : r3(t4);
         };
       }
-      var jn = Tt && 1 / fc(new Tt([, -0]))[1] == Hi ? function(t3) {
+      var zn = Tt && 1 / fc(new Tt([, -0]))[1] == Hi ? function(t3) {
         return new Tt(t3);
       } : Ii;
-      function zn(i3) {
+      function jn(i3) {
         return function(t3) {
-          var e3, n3, r3, o3 = z(t3);
+          var e3, n3, r3, o3 = j(t3);
           return o3 == Ji ? uc(t3) : o3 == ea ? (o3 = t3, e3 = -1, n3 = Array(o3.size), o3.forEach(function(t4) {
             n3[++e3] = [t4, t4];
           }), n3) : fa(i3(r3 = t3), function(t4) {
@@ -1509,7 +1509,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         for (var e3 = []; t3; )
           sa(e3, Qn(t3)), t3 = nt(t3);
         return e3;
-      } : Si, z = n2;
+      } : Si, j = n2;
       function er(t3, e3, n3) {
         for (var r3 = -1, o3 = (e3 = an(e3, t3)).length, i3 = false; ++r3 < o3; ) {
           var a3 = br(e3[r3]);
@@ -1548,7 +1548,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           return e3 && t3 === e3[0];
         }
       }
-      (i2 && z(new i2(new ArrayBuffer(1))) != na || Ct && z(new Ct()) != Ji || It && z(It.resolve()) != Da || Tt && z(new Tt()) != ea || t2 && z(new t2()) != ka) && (z = function(t3) {
+      (i2 && j(new i2(new ArrayBuffer(1))) != na || Ct && j(new Ct()) != Ji || It && j(It.resolve()) != Da || Tt && j(new Tt()) != ea || t2 && j(new t2()) != ka) && (j = function(t3) {
         var e3 = n2(t3), t3 = e3 == ta ? t3.constructor : Wi, t3 = t3 ? Cr(t3) : "";
         if (t3)
           switch (t3) {
@@ -1625,7 +1625,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       function wr(t3, e3) {
         var n3 = -1, r3 = t3.length, o3 = r3 - 1;
         for (e3 = e3 === Wi ? r3 : e3; ++n3 < e3; ) {
-          var i3 = ze(n3, o3), a3 = t3[i3];
+          var i3 = je(n3, o3), a3 = t3[i3];
           t3[i3] = t3[n3], t3[n3] = a3;
         }
         return t3.length = e3, t3;
@@ -1713,7 +1713,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       }
       var Lr = Vn(function(t3, e3) {
         var n3 = t3 == null ? 0 : t3.length, r3 = Qt(t3, e3);
-        return je(t3, fa(e3, function(t4) {
+        return ze(t3, fa(e3, function(t4) {
           return or(t4, n3) ? +t4 : t4;
         }).sort(pn)), r3;
       });
@@ -1747,9 +1747,9 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           return aa(e3, Wi, t4);
         });
       }
-      var jr = a2(function(t3, e3) {
+      var zr = a2(function(t3, e3) {
         return x2(t3) ? re(t3, e3) : [];
-      }), zr = a2(function(t3) {
+      }), jr = a2(function(t3) {
         return en(ca(t3, x2));
       }), Mr = a2(function(t3) {
         var e3 = r2(t3);
@@ -1786,7 +1786,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return (P(t3) ? ua : oe)(t3, l2(e3, 3));
       }
       function Kr(t3, e3) {
-        return (P(t3) ? ju : ie)(t3, l2(e3, 3));
+        return (P(t3) ? zu : ie)(t3, l2(e3, 3));
       }
       var Zr = _n(function(t3, e3, n3) {
         X.call(t3, n3) ? t3[n3].push(e3) : Jt(t3, n3, [e3]);
@@ -1966,7 +1966,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return t3 != null && typeof t3 == "object";
       }
       var To = ku ? da(ku) : function(t3) {
-        return W(t3) && z(t3) == Ji;
+        return W(t3) && j(t3) == Ji;
       };
       function Bo(t3) {
         return typeof t3 == "number" || W(t3) && n2(t3) == Qi;
@@ -1984,7 +1984,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return W(t3) && n2(t3) == Oa;
       };
       var Oo = Eu ? da(Eu) : function(t3) {
-        return W(t3) && z(t3) == ea;
+        return W(t3) && j(t3) == ea;
       };
       function Lo(t3) {
         return typeof t3 == "string" || !P(t3) && W(t3) && n2(t3) == La;
@@ -2008,7 +2008,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
             r3.push(e3.value);
           return r3;
         }
-        var o3 = z(t3);
+        var o3 = j(t3);
         return (o3 == Ji ? uc : o3 == ea ? fc : ri)(t3);
       }
       function Ao(t3) {
@@ -2032,13 +2032,13 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         var e3 = hu.test(t3);
         return e3 || gu.test(t3) ? Du(t3.slice(2), e3 ? 2 : 8) : pu.test(t3) ? ba : +t3;
       }
-      function jo(t3) {
+      function zo(t3) {
         return gn(t3, L2(t3));
       }
       function p2(t3) {
         return t3 == null ? "" : f2(t3);
       }
-      var zo = yn(function(t3, e3) {
+      var jo = yn(function(t3, e3) {
         if (cr(e3) || s2(e3))
           gn(e3, O2(e3), t3);
         else
@@ -2111,7 +2111,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           return n3(t4, e4[0]);
         });
       }
-      var ei = zn(O2), ni = zn(L2);
+      var ei = jn(O2), ni = jn(L2);
       function ri(t3) {
         return t3 == null ? [] : tc(t3, O2(t3));
       }
@@ -2185,7 +2185,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       }
       function Ii() {
       }
-      var Ti = Ln(fa), Bi = Ln(zu), Ri = Ln(Fu);
+      var Ti = Ln(fa), Bi = Ln(ju), Ri = Ln(Fu);
       function Di(t3) {
         return ir(t3) ? Gu(br(t3)) : (e3 = t3, function(t4) {
           return he(t4, e3);
@@ -2204,7 +2204,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       }, 0), Ei = Xn("ceil"), Ai = On(function(t3, e3) {
         return t3 / e3;
       }, 1), Xi = Xn("floor");
-      var ji, zi = On(function(t3, e3) {
+      var zi, ji = On(function(t3, e3) {
         return t3 * e3;
       }, 1), Mi = Xn("round"), Pi = On(function(t3, e3) {
         return t3 - e3;
@@ -2216,7 +2216,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           if (--t3 < 1)
             return e3.apply(this, arguments);
         };
-      }, h2.ary = oo, h2.assign = zo, h2.assignIn = Mo, h2.assignInWith = Po, h2.assignWith = Wo, h2.at = Uo, h2.before = io, h2.bind = ao, h2.bindAll = gi, h2.bindKey = uo, h2.castArray = function() {
+      }, h2.ary = oo, h2.assign = jo, h2.assignIn = Mo, h2.assignInWith = Po, h2.assignWith = Wo, h2.at = Uo, h2.before = io, h2.bind = ao, h2.bindAll = gi, h2.bindKey = uo, h2.castArray = function() {
         if (!arguments.length)
           return [];
         var t3 = arguments[0];
@@ -2355,7 +2355,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           var a3 = t3[r3];
           e3(a3, r3, t3) && (n3.push(a3), o3.push(r3));
         }
-        return je(t3, o3), n3;
+        return ze(t3, o3), n3;
       }, h2.rest = function(t3, e3) {
         if (typeof t3 != "function")
           throw new y2(Ui);
@@ -2405,7 +2405,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return T2(n3) && (r3 = "leading" in n3 ? !!n3.leading : r3, o3 = "trailing" in n3 ? !!n3.trailing : o3), co(t3, e3, { leading: r3, maxWait: e3, trailing: o3 });
       }, h2.thru = Vr, h2.toArray = Eo, h2.toPairs = ei, h2.toPairsIn = ni, h2.toPath = function(t3) {
         return P(t3) ? fa(t3, br) : B2(t3) ? [t3] : I2(xr(p2(t3)));
-      }, h2.toPlainObject = jo, h2.transform = function(t3, r3, o3) {
+      }, h2.toPlainObject = zo, h2.transform = function(t3, r3, o3) {
         var e3, n3 = P(t3), i3 = n3 || mo(t3) || So(t3);
         return r3 = l2(r3, 4), o3 == null && (e3 = t3 && t3.constructor, o3 = i3 ? n3 ? new e3() : [] : T2(t3) && bo(e3) ? Xt(nt(t3)) : {}), (i3 ? ua : le)(t3, function(t4, e4, n4) {
           return r3(o3, t4, e4, n4);
@@ -2426,9 +2426,9 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return r3 = typeof r3 == "function" ? r3 : Wi, t3 == null ? t3 : Je(t3, e3, on(n3), r3);
       }, h2.values = ri, h2.valuesIn = function(t3) {
         return t3 == null ? [] : tc(t3, L2(t3));
-      }, h2.without = jr, h2.words = hi, h2.wrap = function(t3, e3) {
+      }, h2.without = zr, h2.words = hi, h2.wrap = function(t3, e3) {
         return po(on(e3), t3);
-      }, h2.xor = zr, h2.xorBy = Mr, h2.xorWith = Pr, h2.zip = Wr, h2.zipObject = function(t3, e3) {
+      }, h2.xor = jr, h2.xorBy = Mr, h2.xorWith = Pr, h2.zip = Wr, h2.zipObject = function(t3, e3) {
         return nn(t3 || [], e3 || [], qt);
       }, h2.zipObjectDeep = function(t3, e3) {
         return nn(t3 || [], e3 || [], Ue);
@@ -2455,7 +2455,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       }, h2.escapeRegExp = function(t3) {
         return (t3 = p2(t3)) && ru.test(t3) ? t3.replace(nu, "\\$&") : t3;
       }, h2.every = function(t3, e3, n3) {
-        return (P(t3) ? zu : ae)(t3, l2(e3 = n3 && d2(t3, e3, n3) ? Wi : e3, 3));
+        return (P(t3) ? ju : ae)(t3, l2(e3 = n3 && d2(t3, e3, n3) ? Wi : e3, 3));
       }, h2.find = $r, h2.findIndex = Tr, h2.findKey = function(t3, e3) {
         return Vu(t3, l2(e3, 3), le);
       }, h2.findLast = qr, h2.findLastIndex = Br, h2.findLastKey = function(t3, e3) {
@@ -2486,7 +2486,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           return true;
         if (s2(t3) && (P(t3) || typeof t3 == "string" || typeof t3.splice == "function" || mo(t3) || So(t3) || yo(t3)))
           return !t3.length;
-        var e3, n3 = z(t3);
+        var e3, n3 = j(t3);
         if (n3 == Ji || n3 == ea)
           return !t3.size;
         if (cr(t3))
@@ -2521,7 +2521,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       }, h2.isSet = Oo, h2.isString = Lo, h2.isSymbol = B2, h2.isTypedArray = So, h2.isUndefined = function(t3) {
         return t3 === Wi;
       }, h2.isWeakMap = function(t3) {
-        return W(t3) && z(t3) == ka;
+        return W(t3) && j(t3) == ka;
       }, h2.isWeakSet = function(t3) {
         return W(t3) && n2(t3) == "[object WeakSet]";
       }, h2.join = function(t3, e3) {
@@ -2555,7 +2555,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return "";
       }, h2.stubTrue = function() {
         return true;
-      }, h2.multiply = zi, h2.nth = function(t3, e3) {
+      }, h2.multiply = ji, h2.nth = function(t3, e3) {
         return t3 && t3.length ? Ye(t3, R2(e3)) : Wi;
       }, h2.noConflict = function() {
         return ia._ === this && (ia._ = J), this;
@@ -2575,7 +2575,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         return e3 = n3 || e3 == null ? 0 : e3 && +e3, mt(p2(t3).replace(ou, ""), e3 || 0);
       }, h2.random = function(t3, e3, n3) {
         var r3;
-        return n3 && typeof n3 != "boolean" && d2(t3, e3, n3) && (e3 = n3 = Wi), n3 === Wi && (typeof e3 == "boolean" ? (n3 = e3, e3 = Wi) : typeof t3 == "boolean" && (n3 = t3, t3 = Wi)), t3 === Wi && e3 === Wi ? (t3 = 0, e3 = 1) : (t3 = Ao(t3), e3 === Wi ? (e3 = t3, t3 = 0) : e3 = Ao(e3)), e3 < t3 && (r3 = t3, t3 = e3, e3 = r3), n3 || t3 % 1 || e3 % 1 ? (r3 = xt(), C2(t3 + r3 * (e3 - t3 + Ru("1e-" + ((r3 + "").length - 1))), e3)) : ze(t3, e3);
+        return n3 && typeof n3 != "boolean" && d2(t3, e3, n3) && (e3 = n3 = Wi), n3 === Wi && (typeof e3 == "boolean" ? (n3 = e3, e3 = Wi) : typeof t3 == "boolean" && (n3 = t3, t3 = Wi)), t3 === Wi && e3 === Wi ? (t3 = 0, e3 = 1) : (t3 = Ao(t3), e3 === Wi ? (e3 = t3, t3 = 0) : e3 = Ao(e3)), e3 < t3 && (r3 = t3, t3 = e3, e3 = r3), n3 || t3 % 1 || e3 % 1 ? (r3 = xt(), C2(t3 + r3 * (e3 - t3 + Ru("1e-" + ((r3 + "").length - 1))), e3)) : je(t3, e3);
       }, h2.reduce = function(t3, e3, n3) {
         var r3 = P(t3) ? Wu : Ku, o3 = arguments.length < 3;
         return r3(t3, l2(e3, 4), n3, o3, oe);
@@ -2601,7 +2601,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
           return 0;
         if (s2(t3))
           return Lo(t3) ? va(t3) : t3.length;
-        var e3 = z(t3);
+        var e3 = j(t3);
         return e3 == Ji || e3 == ea ? t3.size : Be(t3).length;
       }, h2.snakeCase = si, h2.some = function(t3, e3, n3) {
         return (P(t3) ? Fu : Ne)(t3, l2(e3 = n3 && d2(t3, e3, n3) ? Wi : e3, 3));
@@ -2692,9 +2692,9 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
       }, h2.uniqueId = function(t3) {
         var e3 = ++q;
         return p2(t3) + e3;
-      }, h2.upperCase = di, h2.upperFirst = pi, h2.each = Gr, h2.eachRight = Kr, h2.first = Dr, Ci(h2, (ji = {}, le(h2, function(t3, e3) {
-        X.call(h2.prototype, e3) || (ji[e3] = t3);
-      }), ji), { chain: false }), h2.VERSION = "4.17.21", ua(["bind", "bindKey", "curry", "curryRight", "partial", "partialRight"], function(t3) {
+      }, h2.upperCase = di, h2.upperFirst = pi, h2.each = Gr, h2.eachRight = Kr, h2.first = Dr, Ci(h2, (zi = {}, le(h2, function(t3, e3) {
+        X.call(h2.prototype, e3) || (zi[e3] = t3);
+      }), zi), { chain: false }), h2.VERSION = "4.17.21", ua(["bind", "bindKey", "curry", "curryRight", "partial", "partialRight"], function(t3) {
         h2[t3].placeholder = h2;
       }), ua(["drop", "take"], function(n3, r3) {
         _2.prototype[n3] = function(t3) {
@@ -2814,7 +2814,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
         var t3 = this.__index__ >= this.__values__.length;
         return { done: t3, value: t3 ? Wi : this.__values__[this.__index__++] };
       }, h2.prototype.plant = function(t3) {
-        for (var e3, n3 = this; n3 instanceof zt; )
+        for (var e3, n3 = this; n3 instanceof jt; )
           var r3 = Ir(n3), o3 = (r3.__index__ = 0, r3.__values__ = Wi, e3 ? o3.__wrapped__ = r3 : e3 = r3, r3), n3 = n3.__wrapped__;
         return o3.__wrapped__ = t3, e3;
       }, h2.prototype.reverse = function() {
@@ -2829,7 +2829,7 @@ var commonjsGlobal = typeof globalThis != "undefined" ? globalThis : typeof wind
     o ? ((o.exports = _a)._ = _a, r._ = _a) : ia._ = _a;
   }.call(commonjsGlobal);
 }(lodash, lodash.exports);
-const CancasSafeArea = 1e5, DPI = window.devicePixelRatio || 1, DEFAULT_CONFIG = { tagConfig: { showText: true, fillStyle: "rgba(242, 88, 85, 0.5)", textFillStyle: "rgba(255, 255, 255, 0.6)", hoverStrokeStyle: "#F25856", hoverLineWidth: 1, hoverLineDash: [5], highlightStrokeStyle: "yellow", highlightLineWidth: 2, highlightLineDash: [5] }, layerConfig: { fillStyle: "rgba(0, 0, 0, 0.6)" }, cropConfig: { lineDash: [], strokeStyle: "rgba(255, 255, 255, 1)", lineWidth: 2 } }, defaultWH = { width: 0, height: 0 }, defaultPoint = { x: void 0, y: void 0 };
+const CancasSafeArea = 1e5, DPI = window.devicePixelRatio || 1, DEFAULT_CONFIG = { tagConfig: { fontSize: 20, showText: true, fillStyle: "rgba(242, 88, 85, 0.5)", textFillStyle: "rgba(255, 255, 255, 0.6)", hoverStrokeStyle: "#F25856", hoverLineWidth: 1, hoverLineDash: [5], highlightStrokeStyle: "yellow", highlightLineWidth: 2, highlightLineDash: [5] }, layerConfig: { fillStyle: "rgba(0, 0, 0, 0.6)" }, cropConfig: { lineDash: [], strokeStyle: "rgba(255, 255, 255, 1)", lineWidth: 2 } }, defaultWH = { width: 0, height: 0 }, defaultPoint = { x: void 0, y: void 0 };
 function clearCanvas(t) {
   t.clearRect(-CancasSafeArea / 2, -CancasSafeArea / 2, CancasSafeArea, CancasSafeArea);
 }
@@ -2942,7 +2942,7 @@ function isBoxValidity(t) {
   return 5 <= t[2] && 5 <= t[3];
 }
 function drawTagRect(t, e, n, r, o, i, a, u, c, f, s) {
-  if (u || c) {
+  if (t.font = i.tagConfig.fontSize + "px sans-serif", u || c) {
     var l;
     !c || u && u.type === "move" || (t.fillStyle = i.tagConfig.fillStyle, t.fillRect(e, n, r, o), a && i.tagConfig.showText && (l = parseFloat(t.font.split(" ")[0]), t.fillStyle = i.tagConfig.textFillStyle, t.fillText(s || a + "", e + 4, n + o / 2 + l / 2))), f && (t.strokeStyle = i.tagConfig.highlightStrokeStyle, t.lineWidth = i.tagConfig.highlightLineWidth, t.setLineDash(i.tagConfig.highlightLineDash), t.strokeRect(e, n, r, o));
     if (u && pointIsInRect(u, [e, n, r, o])) {
@@ -3100,13 +3100,13 @@ var ImgMark_vue_vue_type_style_index_0_scoped_true_lang = "", _export_sfc = (t, 
     n[r] = o;
   return n;
 };
-const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousedown", "onClick", "onMouseup", "onMousemove", "onMouseout", "onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop"], setup(n, { expose: t, emit: o }) {
+const _withScopeId = (t) => (pushScopeId("data-v-2cc14b6d"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousedown", "onClick", "onMouseup", "onMousemove", "onMouseout", "onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop"], setup(n, { expose: t, emit: o }) {
   const u = n;
   let r = false, i = void 0, a = void 0, c = null, f = { last: { down: void 0, up: void 0 }, prev: { down: void 0, up: void 0 } };
   const e = device.mobile() ? 0.1 / DPI * 1.5 : 0.1;
-  let z = e, s = false;
+  let j = e, s = false;
   function M() {
-    c = null, s = false, z = e, k.resizeCropHovering = void 0;
+    c = null, s = false, j = e, k.resizeCropHovering = void 0;
   }
   let l = false, d = null, p = null, h, v = lodash.exports.cloneDeep(defaultWH), g = lodash.exports.cloneDeep(defaultWH), _ = lodash.exports.cloneDeep(defaultPoint), y = lodash.exports.cloneDeep(defaultPoint), P = { x: 0, y: 0 }, W = 0, w = { x: 0, y: 0 }, m = { x: 0, y: 0 }, x = 1, b, C, U = 1, I, T = 1, B, R, D = [], O = [], L = computed(() => {
     var t2 = lodash.exports.cloneDeep(DEFAULT_CONFIG);
@@ -3124,7 +3124,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId
   }, scale(t2, e2) {
     if (!h || !d || !p)
       throw new Error("can't find canvas ctx or img");
-    k.isScaleing = true, d.translate(m.x, m.y), p.translate(m.x, m.y), m = { x: m.x - (e2.x / (T * t2) - e2.x / T), y: m.y - (e2.y / (T * t2) - e2.y / T) }, d.scale(t2, t2), p.scale(t2, t2), d.translate(-m.x, -m.y), p.translate(-m.x, -m.y), T *= t2, p.font = "20px serif", clearCanvas(d), clearCanvas(p), drawImage(d, h, w.x, w.y, g.width * x, g.height * x), A(), s = false, k.isScaleing = false;
+    k.isScaleing = true, d.translate(m.x, m.y), p.translate(m.x, m.y), m = { x: m.x - (e2.x / (T * t2) - e2.x / T), y: m.y - (e2.y / (T * t2) - e2.y / T) }, d.scale(t2, t2), p.scale(t2, t2), d.translate(-m.x, -m.y), p.translate(-m.x, -m.y), T *= t2, clearCanvas(d), clearCanvas(p), drawImage(d, h, w.x, w.y, g.width * x, g.height * x), A(), s = false, k.isScaleing = false;
   }, move() {
     var t2;
     u.enableMove && d && p && h && !k.isScaleing && (k.isMoving = true, (t2 = moveCanvas(d, p, h, g, x, w, _, y, O, T, D, L.value)) && (C = lodash.exports.cloneDeep(w)) && (C.x += t2.offsetX, C.y += t2.offsetY));
@@ -3207,10 +3207,10 @@ const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId
     if (!I)
       throw new Error("can't find  containerInfo.");
     var r2, o2;
-    (l || n2.__zoom) && (n2.preventDefault(), k.isDrawRecting || k.isMoving || (t2 = n2.onTouchMove ? 1 : DPI, r2 = e2 ? 0 : (n2.clientX - I.left) * t2, t2 = e2 ? 0 : (n2.clientY - I.top) * t2, o2 = n2.deltaY < 0 ? 1 : -1, o2 = e2 ? n2.__zoom : Math.exp(o2 * z), T * o2 < 0.2 || E.onWheel(o2, { x: r2, y: t2 }, e2)));
+    (l || n2.__zoom) && (n2.preventDefault(), k.isDrawRecting || k.isMoving || (t2 = n2.onTouchMove ? 1 : DPI, r2 = e2 ? 0 : (n2.clientX - I.left) * t2, t2 = e2 ? 0 : (n2.clientY - I.top) * t2, o2 = n2.deltaY < 0 ? 1 : -1, o2 = e2 ? n2.__zoom : Math.exp(o2 * j), T * o2 < 0.2 || E.onWheel(o2, { x: r2, y: t2 }, e2)));
   }
   function K(t2) {
-    k.resizeCropHovering && (O[k.resizeCropHovering.index] = t2, o("resizeEnd", { index: k.resizeCropHovering.index, box: t2 }), J("resize", j([t2])));
+    k.resizeCropHovering && (O[k.resizeCropHovering.index] = t2, o("resizeEnd", { index: k.resizeCropHovering.index, box: t2 }), J("resize", z([t2])));
   }
   function Z() {
     if (l) {
@@ -3222,7 +3222,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId
             c = null, k.resizeCropHovering ? !u.enableCropCross && getBoxIsIntersectWithBoxList(t3, O.filter((t4, e3) => {
               var _a;
               return e3 !== ((_a = k.resizeCropHovering) == null ? void 0 : _a.index);
-            })) ? (u.handleResizeCropCross === "reset" && A(), u.handleResizeCropCross === "delete" && ct([O[k.resizeCropHovering.index]])) : K(t3) : (t3.scale = 1, !u.enableCropCross && getBoxIsIntersectWithBoxList(t3, O) ? A() : (O.push(t3), J("add", j([t3])))), B = void 0;
+            })) ? (u.handleResizeCropCross === "reset" && A(), u.handleResizeCropCross === "delete" && ct([O[k.resizeCropHovering.index]])) : K(t3) : (t3.scale = 1, !u.enableCropCross && getBoxIsIntersectWithBoxList(t3, O) ? A() : (O.push(t3), J("add", z([t3])))), B = void 0;
           }
         } else
           R && (t2 = getVertexPositionByTwoPoints(_, y), e2 = transfromRect2Box(R, w), Object.assign(e2, { scale: 1, isShow: true, __newAdd: true, __vertexPosition: t2 }), D.push(e2), Q("add", X([e2])), R = void 0);
@@ -3230,14 +3230,14 @@ const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId
     }
   }
   function J(t2, e2) {
-    var n2 = j(O);
+    var n2 = z(O);
     o("update:cropList", n2), o("cropListChange", { type: t2, list: e2 });
   }
   function Q(t2, e2) {
     let n2 = { type: t2, list: e2 };
     if (t2 === "add") {
       let t3 = e2.filter((t4) => Reflect.get(t4, "__parentCrop"))[0];
-      t3 && (n2.parentCrop = j([Reflect.get(t3, "__parentCrop")])[0], delete t3.__parentCrop);
+      t3 && (n2.parentCrop = z([Reflect.get(t3, "__parentCrop")])[0], delete t3.__parentCrop);
     }
     o("tagListChange", n2);
     t2 = X(D);
@@ -3260,7 +3260,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId
       a2.push(transformBoxPrecision(t3.info, u.precision));
     }), a2.filter((t3) => t3.__isValidity !== false);
   }
-  function j(t2) {
+  function z(t2) {
     let e2 = t2 || O, n2 = e2.map((t3) => {
       let e3 = t3;
       Object.assign(e3, { startX: t3.startX, startY: t3.startY, endX: t3.endX, endY: t3.endY }), u.enableDrawCropOutOfImg || (n3 = { startX: 0, startY: 0, endX: (n3 = g).width, endY: n3.height }, (n3 = getTwoBoxIntersectPart(e3, n3)) && isBoxValidity(n3) ? e3 = __spreadValues(__spreadValues({}, t3), n3) : e3._del = true), e3.scale === 1 && delete e3.scale, Reflect.deleteProperty(e3, "__vertexPosition");
@@ -3304,13 +3304,13 @@ const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId
   }
   function ct(r2) {
     if (r2.length !== 0) {
-      let t2 = [], n2 = [], e2 = j();
+      let t2 = [], n2 = [], e2 = z();
       e2.forEach((e3) => {
         (r2.find((t3) => {
           t3 = fixBoxInfo(t3).info;
           return t3.startX === e3.startX && t3.endX === e3.endX && t3.startY === e3.startY && t3.endY === e3.endY;
         }) ? n2 : t2).push(e3);
-      }), O = initBoundingArrScale(t2, x, u.precision), o("delCrop", n2), A(), J("delete", j(n2));
+      }), O = initBoundingArrScale(t2, x, u.precision), o("delCrop", n2), A(), J("delete", z(n2));
     }
   }
   return onBeforeUnmount(() => {
@@ -3340,12 +3340,12 @@ const _withScopeId = (t) => (pushScopeId("data-v-fa89f258"), t = t(), popScopeId
     }
     D = initBoundingArrScale(r2, x, u.precision), A(), Q("delete", o2);
   }, getTagListGroupByCropIndex: function(n2 = "startPoint") {
-    let t2 = X(), r2 = j();
+    let t2 = X(), r2 = z();
     return t2.forEach((t3) => {
       var e2;
       n2 === "startPoint" && (e2 = pointIsInBoxList({ x: t3.startX, y: t3.startY }, r2), t3.__groupIndex = e2.indexList[0]), n2 === "allIn" && (e2 = boxAllInBoxList(t3, r2), t3.__groupIndex = e2.indexList[0]);
     }), lodash.exports.groupBy(t2, "__groupIndex");
   } }), (t2, e2) => (openBlock(), createElementBlock("div", { class: "comp-ocr-img", ref_key: "containerRef", ref: S, onMousedown: withModifiers(tt, ["stop"]), onClick: withModifiers(ot, ["stop"]), onMouseup: withModifiers(nt, ["stop"]), onMousemove: withModifiers(et, ["stop"]), onMouseout: withModifiers(rt, ["stop"]), onMousewheel: withModifiers(G, ["stop"]), onTouchmove: withModifiers(at, ["stop", "prevent"]), onTouchstart: withModifiers(it, ["stop"]), onTouchend: withModifiers(ut, ["stop"]) }, [createElementVNode("canvas", { class: "canvas", ref_key: "canvasRef", ref: F }, null, 512), createElementVNode("canvas", { class: "canvas2", ref_key: "canvas2Ref", ref: V }, null, 512), unref(u).isShowTip ? (openBlock(), createElementBlock("div", _hoisted_2, [createElementVNode("div", _hoisted_3, [createElementVNode("div", { class: normalizeClass(["circle", { crop: n.mode === "crop", tag: n.mode === "tag" }]) }, null, 2), createElementVNode("div", _hoisted_4, toDisplayString(n.mode === "crop" ? "\u88C1\u526A\u6A21\u5F0F" : "\u6807\u8BB0\u9519\u8BEF\u884C"), 1)]), createElementVNode("div", _hoisted_5, [renderSlot(t2.$slots, "tip", {}, () => [_hoisted_6, _hoisted_7, _hoisted_8, _hoisted_9], true)])])) : createCommentVNode("", true)], 40, _hoisted_1));
 } });
-var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-fa89f258"]]);
+var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-2cc14b6d"]]);
 export { ImgMark, boxIsAllInOtherBox, transformTagBoxRelativeTo, transformTagListBoxRelativeTo };

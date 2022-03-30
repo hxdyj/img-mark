@@ -7,6 +7,7 @@ export const debug = false
 
 export const DEFAULT_CONFIG: Config = {
 	tagConfig: {
+		fontSize: 20,
 		showText: true,
 		fillStyle: 'rgba(242, 88, 85, 0.5)',
 		textFillStyle: 'rgba(255, 255, 255, 0.6)',
@@ -371,6 +372,9 @@ export function drawTagRect(
 	  }
 	| undefined {
 	// if (debug) console.log(`DRAW ITEM${index}`, touchPoint, [left, top, width, height], isShow)
+
+	ctx.font = `${config.tagConfig.fontSize}px sans-serif`
+
 	if (!touchPoint && !isShow) return
 	if (isShow && (!touchPoint || touchPoint.type !== 'move')) {
 		ctx.fillStyle = config.tagConfig.fillStyle
