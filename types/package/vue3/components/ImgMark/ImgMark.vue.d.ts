@@ -126,6 +126,16 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    isImgCrop: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    isCropSingle: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     cropList: {
         type: ArrayConstructor;
         required: false;
@@ -191,6 +201,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
         enableDrawCropOutOfImg: boolean;
         enableDrawTagOutOfCrop: boolean;
         enableDrawTagOutOfImg: boolean;
+        isImgCrop: boolean;
+        isCropSingle: boolean;
         cropList: BoundingBox[];
         tagList: BoundingBox[];
         mode: Mode;
@@ -211,6 +223,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'resizeStart', data: ResizeEmitType): void;
         (e: 'resizeEnd', data: ResizeEmitType): void;
         (e: 'delCrop', list: BoundingBox[]): void;
+        (e: 'drawCropStart'): void;
+        (e: 'drawTagStart'): void;
     };
     inited: boolean;
     ctx: null;
@@ -300,7 +314,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagListGroupByCropIndex: (type?: 'startPoint' | 'allIn') => {
         [index: number]: BoundingBox[];
     };
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
         type: ObjectConstructor;
         required: false;
@@ -381,6 +395,16 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    isImgCrop: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    isCropSingle: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     cropList: {
         type: ArrayConstructor;
         required: false;
@@ -420,6 +444,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onResizeStart?: ((...args: any[]) => any) | undefined;
     onResizeEnd?: ((...args: any[]) => any) | undefined;
     onDelCrop?: ((...args: any[]) => any) | undefined;
+    onDrawCropStart?: ((...args: any[]) => any) | undefined;
+    onDrawTagStart?: ((...args: any[]) => any) | undefined;
 }, {
     cropConfig: Record<string, any>;
     layerConfig: Record<string, any>;
@@ -437,6 +463,8 @@ declare const _sfc_main: import("vue").DefineComponent<{
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
     enableDrawTagOutOfImg: boolean;
+    isImgCrop: boolean;
+    isCropSingle: boolean;
     cropList: unknown[];
     tagList: unknown[];
     mode: any;

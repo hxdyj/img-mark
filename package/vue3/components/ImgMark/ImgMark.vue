@@ -194,6 +194,10 @@ let props = withDefaults(
 		enableDrawTagOutOfCrop?: boolean
 		//是否允许Tag画到img外
 		enableDrawTagOutOfImg?: boolean
+		//是否在无crop的时候以全图为crop
+		isImgCrop?: boolean
+		//是否crop为数量维持一个，新画crop的时候会自动清空之前的
+		isCropSingle?: boolean
 		cropList?: BoundingBox[]
 		tagList?: BoundingBox[]
 		mode?: Mode
@@ -218,6 +222,8 @@ let props = withDefaults(
 		enableDrawCropOutOfImg: true,
 		enableDrawTagOutOfCrop: true,
 		enableDrawTagOutOfImg: true,
+		isCropSingle: false,
+		isImgCrop: false,
 		mode: 'crop',
 		mobileOperation: 'move',
 		precision: 0,
@@ -247,6 +253,8 @@ let emits = defineEmits<{
 	(e: 'resizeStart', data: ResizeEmitType): void
 	(e: 'resizeEnd', data: ResizeEmitType): void
 	(e: 'delCrop', list: BoundingBox[]): void
+	(e: 'drawCropStart'): void
+	(e: 'drawTagStart'): void
 }>()
 
 type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>
@@ -333,6 +341,7 @@ let status = {
 	isMouseDown: () => (startMousePoint.x === undefined ? false : true),
 	isMouseUpDownPoints: () => startMousePoint.x !== undefined && endMousePoint.x !== undefined,
 }
+
 /* 抽象动作相关 */
 let actions = {
 	//画方块一半被打断
@@ -341,13 +350,24 @@ let actions = {
 	},
 	dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resizeCrop') {
 		if (!ctx2) return
-		status.isDrawRecting = true
 		if (type == 'drawCrop') {
+			if (props.isCropSingle && !status.isDrawRecting) {
+				cropArr = []
+			}
+			if (!status.isDrawRecting) {
+				emits('drawCropStart')
+			}
+			status.isDrawRecting = true
+
 			tmpCropPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, cropArr, currentPosition, config)
 			drawTagList(ctx2, tagArr, currentPosition, config)
 		}
 
 		if (type == 'drawTag') {
+			if (!status.isDrawRecting) {
+				emits('drawTagStart')
+			}
+			status.isDrawRecting = true
 			drawCropList(ctx2, cropArr, currentPosition, config)
 			tmpTagPositionInfo = moveDrawTagRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, tagArr, currentPosition, config)
 		}
@@ -356,6 +376,8 @@ let actions = {
 			if (props.enableCropResize && status.resizeCropHovering) {
 				clickedCrop = cropArr[status.resizeCropHovering.index || 0]
 				if (!status.resizeCropHovering || !clickedCrop) return
+
+				status.isDrawRecting = true
 
 				tmpCropPositionInfo = moveResizeCrop(
 					ctx2,
@@ -661,6 +683,11 @@ async function initComponent() {
 				startY: 0,
 				endX: 0 + imgWH.width,
 				endY: 0 + imgWH.height,
+			}
+
+			if (props.isImgCrop) {
+				cropArr = [cropInfo]
+				triggerCropListChange('add', cropArr)
 			}
 		}
 		//处理有CropInfo的情况，放大裁剪区域至全屏中间

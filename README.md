@@ -203,6 +203,8 @@ type TagListGroupByCropIndex = {
 | enableCropCross                         | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交，新画的`crop`会不添加，如果是 resize 操作相交以后，按照下方 `handleResizeCropCross` 属性去处理 | boolean       | true/false   | true   |
 | handleResizeCropCross                   | 当`enableCropCross`属性为 false，resize 操作相交后该如何处理进行 resize 操作的`crop`                                                                 | string        | delete/reset | reset  |
 | isShowTip                               | 是否显示底部提示区域                                                                                                                                 | boolean       | true/false   | false  |
+| isCropSingle                            | 是否单个 `crop` , 在添加 `crop` 的时候自动删除旧的 `crop`                                                                                            | boolean       | true/false   | false  |
+| isImgCrop                               | 是否在 `cropList` 为空时默认以图片大小为裁切区域                                                                                                     | boolean       | true/false   | false  |
 | layerConfig                             | 浮层样式                                                                                                                                             | LayerConfig   | ——           | ——     |
 | cropConfig                              | `crop` 样式                                                                                                                                          | CropConfig    | ——           | ——     |
 | tagConfig                               | `tag` 样式                                                                                                                                           | TagConfig     | ——           | ——     |
@@ -216,6 +218,8 @@ type TagListGroupByCropIndex = {
 | resizeStart    | `crop` 开始 resize 触发                                                                | data:ResizeEmitType                                                               |
 | resizeEnd      | `crop` 结束 resize 触发                                                                | data:ResizeEmitType                                                               |
 | delCrop        | 删除 `crop` 触发                                                                       | list:BoundingBox[]                                                                |
+| drawCropStart  | 添加 `crop` 之前触发                                                                   | ——                                                                                |
+| drawTagStart   | 添加 `tag` 之前触发                                                                    | ——                                                                                |
 
 ## 组件方法
 

@@ -374,7 +374,6 @@ export function drawTagRect(
 	// if (debug) console.log(`DRAW ITEM${index}`, touchPoint, [left, top, width, height], isShow)
 
 	ctx.font = `${config.tagConfig.fontSize}px sans-serif`
-
 	if (!touchPoint && !isShow) return
 	if (isShow && (!touchPoint || touchPoint.type !== 'move')) {
 		ctx.fillStyle = config.tagConfig.fillStyle
