@@ -16,12 +16,12 @@ Bugs
 	<div
 		class="comp-ocr-img"
 		ref="containerRef"
-		@mousedown.stop="onMouseDown"
+		@mousedown="onMouseDown"
 		@mouseenter="getContainerInfo"
-		@click.stop="onClick"
-		@mouseup.stop="onMouseUp"
-		@mousemove.stop="onMouseMove"
-		@mouseout.stop="onMouseOut"
+		@click="onClick"
+		@mouseup="onMouseUp"
+		@mousemove="onMouseMove"
+		@mouseout="onMouseOut"
 		@mousewheel.stop="onMouseWheel"
 		@touchmove.stop.prevent="onTouchMove"
 		@touchstart.stop="onTouchStart"
@@ -81,6 +81,18 @@ export type ResizeEmitType = {
 	index: number
 	box: BoundingBox
 }
+
+export type TagListChangeEmitRetunType = {
+	type: TagListChangeType
+	list: BoundingBox[]
+	parentCrop?: BoundingBox
+}
+
+export type MouseOverInfoEmitType = {
+	canvas: Point | null
+	img: Point | null
+}
+
 export type TagListChangeType = 'add' | 'delete' | 'statusChange'
 export type CropListChangeType = 'add' | 'delete' | 'resize'
 // console.log('Init Component.')
@@ -231,16 +243,6 @@ let props = withDefaults(
 		cropList: () => Array(),
 	}
 )
-type TagListChangeEmitRetunType = {
-	type: TagListChangeType
-	list: BoundingBox[]
-	parentCrop?: BoundingBox
-}
-
-type MouseOverInfoEmitType = {
-	canvas: Point | null
-	img: Point | null
-}
 
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void

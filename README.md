@@ -169,6 +169,11 @@ type TagConfig = {
 	highlightLineDash?: number[]
 }
 
+type Point = {
+	x: number
+	y: number
+}
+
 type ResizeEmitType = {
 	index: number
 	box: BoundingBox

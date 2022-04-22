@@ -28,18 +28,18 @@ export declare type ResizeEmitType = {
     index: number;
     box: BoundingBox;
 };
-export declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
-export declare type CropListChangeType = 'add' | 'delete' | 'resize';
-import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
-declare type TagListChangeEmitRetunType = {
+export declare type TagListChangeEmitRetunType = {
     type: TagListChangeType;
     list: BoundingBox[];
     parentCrop?: BoundingBox;
 };
-declare type MouseOverInfoEmitType = {
+export declare type MouseOverInfoEmitType = {
     canvas: Point | null;
     img: Point | null;
 };
+export declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
+export declare type CropListChangeType = 'add' | 'delete' | 'resize';
+import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
