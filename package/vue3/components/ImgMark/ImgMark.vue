@@ -17,6 +17,7 @@ Bugs
 		class="comp-ocr-img"
 		ref="containerRef"
 		@mousedown.stop="onMouseDown"
+		@mouseenter="getContainerInfo"
 		@click.stop="onClick"
 		@mouseup.stop="onMouseUp"
 		@mousemove.stop="onMouseMove"
@@ -85,7 +86,7 @@ export type CropListChangeType = 'add' | 'delete' | 'resize'
 // console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
 import device from 'current-device'
-import { cloneDeep, groupBy, clone } from 'lodash'
+import { cloneDeep, groupBy, throttle } from 'lodash'
 import {
 	BoundingBox,
 	ResizeItem,
@@ -135,7 +136,6 @@ import {
 	boxAllInBoxList,
 	transformBoxPrecision,
 } from './util'
-
 let spaceKeyDown = false
 
 let mouseDownTime: number | undefined = undefined
@@ -236,9 +236,14 @@ type TagListChangeEmitRetunType = {
 	list: BoundingBox[]
 	parentCrop?: BoundingBox
 }
+
+type MouseOverInfoEmitType = {
+	canvas: Point | null
+	img: Point | null
+}
+
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
-	// (e: 'cropListChange', list: BoundingBox[]): void
 	(
 		e: 'cropListChange',
 		data: {
@@ -255,6 +260,7 @@ let emits = defineEmits<{
 	(e: 'delCrop', list: BoundingBox[]): void
 	(e: 'drawCropStart'): void
 	(e: 'drawTagStart'): void
+	(e: 'mouseOverInfo', info: MouseOverInfoEmitType): void
 }>()
 
 type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>
@@ -627,16 +633,7 @@ function initCropInfo() {
 	}
 }
 
-async function initComponent() {
-	//处理文件变量
-	initVar()
-	//初始化Vue data变量
-	initDataVar()
-	await nextTick()
-	//初始化prop到data
-	initCropInfo()
-	tagArr = cloneDeep(props.tagList)
-	cropArr = cloneDeep(props.cropList)
+function getContainerInfo() {
 	let containerRectInfo = containerRef.getBoundingClientRect()
 	containerInfo = {
 		top: containerRectInfo.top,
@@ -648,6 +645,19 @@ async function initComponent() {
 		x: containerRectInfo.x,
 		y: containerRectInfo.y,
 	}
+}
+
+async function initComponent() {
+	//处理文件变量
+	initVar()
+	//初始化Vue data变量
+	initDataVar()
+	await nextTick()
+	//初始化prop到data
+	initCropInfo()
+	tagArr = cloneDeep(props.tagList)
+	cropArr = cloneDeep(props.cropList)
+	getContainerInfo()
 	addListenerKeyUpDown()
 	initMobileOperation()
 	ctx = canvasRef.getContext('2d')
@@ -763,17 +773,7 @@ function renderCtx2() {
 async function resizeRender() {
 	initResizeVar()
 	await nextTick()
-	let containerRectInfo = containerRef.getBoundingClientRect()
-	containerInfo = {
-		top: containerRectInfo.top,
-		right: containerRectInfo.right,
-		bottom: containerRectInfo.bottom,
-		left: containerRectInfo.left,
-		width: containerRectInfo.width,
-		height: containerRectInfo.height,
-		x: containerRectInfo.x,
-		y: containerRectInfo.y,
-	}
+	getContainerInfo()
 
 	if (!ctx || !ctx2 || !img) {
 		console.error(`ctx or ctx2 or img can't find on resize.`)
@@ -945,7 +945,7 @@ function cleartMousePoints() {
 						setResizeCrop(newCropInfo)
 					}
 				} else {
-					newCropInfo.scale = 1
+					newCropInfo = initBoundingArrScale([newCropInfo], scale, props.precision)[0]
 					if (props.enableCropCross) {
 						cropArr.push(newCropInfo)
 						triggerCropListChange('add', getCropList([newCropInfo]))
@@ -965,9 +965,9 @@ function cleartMousePoints() {
 		} else {
 			if (tmpTagPositionInfo) {
 				let vertexPosition = getVertexPositionByTwoPoints(startMousePoint, endMousePoint)
-				let tagInfo = transfromRect2Box(tmpTagPositionInfo, currentPosition)
+				let tagInfo = transfromRect2Box(tmpTagPositionInfo, currentPosition, scale)
+				tagInfo = initBoundingArrScale([tagInfo], scale, props.precision)[0]
 				Object.assign(tagInfo, {
-					scale: 1,
 					isShow: true,
 					__newAdd: true,
 					__vertexPosition: vertexPosition,
@@ -1025,22 +1025,12 @@ type TagItemTmp = BoundingBox & {
 	__parentCrop?: BoundingBox
 }
 
-function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScale?: number, imageWH?: WH) {
+function getTagList(tagList?: BoundingBox[]) {
 	let list = tagList || tagArr
-	let cropList = _cropList || cropArr
+	let cropList = cropArr
 	let resultList: TagItemTmp[] = []
 	list.forEach(tag => {
 		let newTagInfo: TagItemTmp = tag
-		let _scale = tag.scale === 1 ? initScale || scale : 1
-		Object.assign(newTagInfo, {
-			startX: tag.startX / _scale,
-			startY: tag.startY / _scale,
-			endX: tag.endX / _scale,
-			endY: tag.endY / _scale,
-		})
-		if (newTagInfo.scale === 1) {
-			delete newTagInfo.scale
-		}
 		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd && newTagInfo.__vertexPosition) {
 			let tagStartXYinCropList = pointIsInBoxList(getPointByBoxAndVertexPosition(newTagInfo, newTagInfo.__vertexPosition), cropList)
 			let mousePointCropInfo = tagStartXYinCropList.boxList[0]
@@ -1060,7 +1050,7 @@ function getTagList(tagList?: BoundingBox[], _cropList?: BoundingBox[], initScal
 		delete newTagInfo.__newAdd
 		Reflect.deleteProperty(newTagInfo, '__vertexPosition')
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
-			let whObj = imageWH || imgWH
+			let whObj = imgWH
 			const imgRect = {
 				startX: 0,
 				startY: 0,
@@ -1089,21 +1079,6 @@ function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
 	let list = arr.map(crop => {
 		let result = crop as BoundingBox & { _del?: boolean }
 
-		Object.assign(result, {
-			startX: crop.startX,
-			startY: crop.startY,
-			endX: crop.endX,
-			endY: crop.endY,
-		})
-		// let result: BoundingBox & { _del?: boolean } = {
-		// 	...crop,
-		// startX: crop.startX,
-		// 			startY: crop.startY,
-		// 			endX: crop.endX,
-		// 			endY: crop.endY,
-		// 			_del: false,
-		// }
-
 		if (!props.enableDrawCropOutOfImg) {
 			let whObj = imgWH
 			const imgRect = {
@@ -1125,9 +1100,6 @@ function getCropList(cropList?: BoundingBox[]): BoundingBox[] {
 					result._del = true
 				}
 			}
-		}
-		if (result.scale === 1) {
-			delete result.scale
 		}
 		Reflect.deleteProperty(result, '__vertexPosition')
 		let fixBox = fixBoxInfo(result)
@@ -1169,6 +1141,30 @@ function onMouseDown(e: MouseEvent) {
 		}
 	}
 }
+let triggerMouseOverInfo = throttle(
+	function (event?: LayerTouchEvent) {
+		if (event) {
+			let canvasPosition = getTouchPoint(event, zoomScale, origin, 'over')
+			let imgPosition = cloneDeep(canvasPosition)
+			imgPosition.x -= currentPosition.x
+			imgPosition.y -= currentPosition.y
+			emits('mouseOverInfo', {
+				canvas: canvasPosition,
+				img: imgPosition,
+			})
+		} else {
+			emits('mouseOverInfo', {
+				canvas: null,
+				img: null,
+			})
+		}
+	},
+	100,
+	{
+		leading: false,
+		trailing: true,
+	}
+)
 
 function onMouseMove(e: MouseEvent) {
 	if (!inited) return
@@ -1179,6 +1175,7 @@ function onMouseMove(e: MouseEvent) {
 	event = amendDpi(event, ['layerX', 'layerY'])
 	mouseUpTime = new Date().getTime()
 	hooks.onMouseOverMove(event)
+	triggerMouseOverInfo(event)
 }
 
 function onMouseUp() {
@@ -1197,6 +1194,7 @@ function onMouseOut() {
 	if (!inited) return
 	containerRef.style.cursor = 'auto'
 	cleartMousePoints()
+	triggerMouseOverInfo()
 }
 
 function onClick(e) {

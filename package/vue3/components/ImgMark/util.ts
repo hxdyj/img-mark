@@ -349,7 +349,7 @@ export function isBoxValidity(box: BoundingBox) {
 	return false
 }
 
-type TouchType = 'move' | 'click'
+type TouchType = 'move' | 'click' | 'over'
 export type TypePoint = Point & {
 	type: TouchType
 }
@@ -918,9 +918,7 @@ export function transfromRect2Box(rect: Rect, currentPosition: Point, scale = 1)
 
 export function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number) {
 	return tagArr.map(tag => {
-		if (tag.scale !== 1) {
-			tag.scale = scale
-		}
+		tag.scale = scale
 		return fixBoxInfo(transformBoxPrecision(tag, precision)).info
 	})
 }

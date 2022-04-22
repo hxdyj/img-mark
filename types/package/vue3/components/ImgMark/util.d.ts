@@ -73,7 +73,7 @@ export declare function fixBoxInfo(boundingBox: BoundingBox): FixBoxInfoReturn;
 export declare function getTwoBoxIntersectPart(box1: BoundingBox, box2: BoundingBox): BoundingBox | undefined;
 export declare function transfromBoxToRect(position: BoundingBox, scale?: number, currentPosition?: Point): Rect;
 export declare function isBoxValidity(box: BoundingBox): boolean;
-declare type TouchType = 'move' | 'click';
+declare type TouchType = 'move' | 'click' | 'over';
 export declare type TypePoint = Point & {
     type: TouchType;
 };

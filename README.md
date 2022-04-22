@@ -178,6 +178,11 @@ type TagListGroupByCropIndex = {
 	[key: number]: BoundingBox[]
 	undefined: BoundingBox[]
 }
+
+type MouseOverInfoEmitType = {
+	canvas: Point | null
+	img: Point | null
+}
 ```
 
 ## 组件属性
@@ -220,6 +225,7 @@ type TagListGroupByCropIndex = {
 | delCrop        | 删除 `crop` 触发                                                                       | list:BoundingBox[]                                                                |
 | drawCropStart  | 添加 `crop` 之前触发                                                                   | ——                                                                                |
 | drawTagStart   | 添加 `tag` 之前触发                                                                    | ——                                                                                |
+| mouseOverInfo  | 鼠标在组件上移动或者移除时候触发                                                       | info:MouseOverInfoEmitType                                                        |
 
 ## 组件方法
 

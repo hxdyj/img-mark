@@ -36,6 +36,10 @@ declare type TagListChangeEmitRetunType = {
     list: BoundingBox[];
     parentCrop?: BoundingBox;
 };
+declare type MouseOverInfoEmitType = {
+    canvas: Point | null;
+    img: Point | null;
+};
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -225,6 +229,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'delCrop', list: BoundingBox[]): void;
         (e: 'drawCropStart'): void;
         (e: 'drawTagStart'): void;
+        (e: 'mouseOverInfo', info: MouseOverInfoEmitType): void;
     };
     inited: boolean;
     ctx: null;
@@ -287,6 +292,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     addListenerKeyUpDown: () => void;
     removeListenerKeyUpDown: () => void;
     initCropInfo: () => void;
+    getContainerInfo: () => void;
     initComponent: () => Promise<boolean>;
     initResizeVar: () => void;
     renderCtx2: () => void;
@@ -298,9 +304,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
     cleartMousePoints: () => void;
     triggerCropListChange: (type: CropListChangeType, changedList: BoundingBox[]) => void;
     triggerTagListChange: (type: TagListChangeType, changedList: BoundingBox[]) => void;
-    getTagList: (tagList?: BoundingBox[] | undefined, _cropList?: BoundingBox[] | undefined, initScale?: number | undefined, imageWH?: WH | undefined) => TagItemTmp[];
+    getTagList: (tagList?: BoundingBox[] | undefined) => TagItemTmp[];
     getCropList: (cropList?: BoundingBox[] | undefined) => BoundingBox[];
     onMouseDown: (e: MouseEvent) => void;
+    triggerMouseOverInfo: any;
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: () => void;
     onMouseOut: () => void;
@@ -314,7 +321,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagListGroupByCropIndex: (type?: 'startPoint' | 'allIn') => {
         [index: number]: BoundingBox[];
     };
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
         type: ObjectConstructor;
         required: false;
@@ -446,6 +453,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onDelCrop?: ((...args: any[]) => any) | undefined;
     onDrawCropStart?: ((...args: any[]) => any) | undefined;
     onDrawTagStart?: ((...args: any[]) => any) | undefined;
+    onMouseOverInfo?: ((...args: any[]) => any) | undefined;
 }, {
     cropConfig: Record<string, any>;
     layerConfig: Record<string, any>;
