@@ -1150,6 +1150,8 @@ let triggerMouseOverInfo = throttle(
 			let imgPosition = cloneDeep(canvasPosition)
 			imgPosition.x -= currentPosition.x
 			imgPosition.y -= currentPosition.y
+			imgPosition.x /= scale
+			imgPosition.y /= scale
 			emits('mouseOverInfo', {
 				canvas: canvasPosition,
 				img: imgPosition,
