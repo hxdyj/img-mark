@@ -1243,13 +1243,16 @@ function onTouchStart(event: TouchEvent) {
 		onMouseDown(fakeEvent)
 	}
 	if (event.touches.length == 2) {
+		if (!containerInfo) {
+			throw new Error(`can't find  containerInfo.`)
+		}
 		let amendTouchList = amendMobileTouchEventDpi(event)
 		let { width, height } = getTwoFingerTouchListDistence(amendTouchList)
 		let hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
 		hypotenuse = hypotenuse
 		twoFingerCenterPoint = {
-			x: (amendTouchList[0].clientX + amendTouchList[1].clientX) / 2,
-			y: (amendTouchList[0].clientY + amendTouchList[1].clientY) / 2,
+			x: (amendTouchList[0].clientX + amendTouchList[1].clientX) / 2 - containerInfo.left,
+			y: (amendTouchList[0].clientY + amendTouchList[1].clientY) / 2 - containerInfo.top,
 		}
 	}
 }
@@ -1265,6 +1268,9 @@ async function onTouchMove(event: TouchEvent) {
 		} as unknown as MouseEvent)
 	}
 	if (event.touches.length == 2) {
+		if (!containerInfo) {
+			throw new Error(`can't find  containerInfo.`)
+		}
 		let amendTouchList = amendMobileTouchEventDpi(event)
 		let { width, height } = getTwoFingerTouchListDistence(amendTouchList)
 		let _hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
@@ -1277,8 +1283,8 @@ async function onTouchMove(event: TouchEvent) {
 			preventDefault() {
 				console.log('none')
 			},
-			clientX: twoFingerCenterPoint.x,
-			clientY: twoFingerCenterPoint.y,
+			clientX: twoFingerCenterPoint.x - containerInfo.left,
+			clientY: twoFingerCenterPoint.y - containerInfo.top,
 		} as unknown as MouseEvent)
 	}
 }
