@@ -1283,8 +1283,8 @@ async function onTouchMove(event: TouchEvent) {
 			preventDefault() {
 				console.log('none')
 			},
-			clientX: twoFingerCenterPoint.x - containerInfo.left,
-			clientY: twoFingerCenterPoint.y - containerInfo.top,
+			clientX: twoFingerCenterPoint.x,
+			clientY: twoFingerCenterPoint.y,
 		} as unknown as MouseEvent)
 	}
 }
