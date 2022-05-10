@@ -3100,138 +3100,138 @@ var ImgMark_vue_vue_type_style_index_0_scoped_true_lang = "", _export_sfc = (t, 
     n[r] = o;
   return n;
 };
-const _withScopeId = (t) => (pushScopeId("data-v-34957acf"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, isImgCrop: { type: Boolean, default: false }, isCropSingle: { type: Boolean, default: false }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop", "drawCropStart", "drawTagStart", "mouseOverInfo"], setup(n, { expose: t, emit: o }) {
+const _withScopeId = (t) => (pushScopeId("data-v-607285b8"), t = t(), popScopeId(), t), _hoisted_1 = ["onMousewheel", "onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, isImgCrop: { type: Boolean, default: false }, isCropSingle: { type: Boolean, default: false }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop", "drawCropStart", "drawTagStart", "mouseOverInfo"], setup(n, { expose: t, emit: o }) {
   const a = n;
   let r = false, i = void 0, u = void 0, c = null, f = { last: { down: void 0, up: void 0 }, prev: { down: void 0, up: void 0 } };
   const e = device.mobile() ? 0.1 / DPI * 1.5 : 0.1;
-  let j = e, l = false;
-  function P() {
-    c = null, l = false, j = e, k.resizeCropHovering = void 0;
+  let j = e, P = false;
+  function M() {
+    c = null, P = false, j = e, L.resizeCropHovering = void 0;
   }
-  let s = false, d = null, p = null, h, v = lodash.exports.cloneDeep(defaultWH), g = lodash.exports.cloneDeep(defaultWH), _ = lodash.exports.cloneDeep(defaultPoint), y = lodash.exports.cloneDeep(defaultPoint), M = { x: 0, y: 0 }, W = 0, w = { x: 0, y: 0 }, m = { x: 0, y: 0 }, x = 1, b, C, U = 1, I, T = 1, B, R, D = [], S = [], O = computed(() => {
+  let l = false, s = null, d = null, p, h = lodash.exports.cloneDeep(defaultWH), v = lodash.exports.cloneDeep(defaultWH), g = lodash.exports.cloneDeep(defaultPoint), _ = lodash.exports.cloneDeep(defaultPoint), W = { x: 0, y: 0 }, U = 0, y = { x: 0, y: 0 }, w = { x: 0, y: 0 }, m = 1, x, b, F = 1, C, I = 1, T, B, R = [], D = [], S = computed(() => {
     var t2 = lodash.exports.cloneDeep(DEFAULT_CONFIG);
     return Object.assign(t2.cropConfig, a.cropConfig), Object.assign(t2.tagConfig, a.tagConfig), Object.assign(t2.layerConfig, a.layerConfig), t2;
   });
-  let L = ref(), F = ref(), V = ref(), k = { isScaleing: false, isDrawRecting: false, isMoving: false, resizeCropHovering: void 0, isMouseDown: () => _.x !== void 0, isMouseUpDownPoints: () => _.x !== void 0 && y.x !== void 0 }, E = { dragCreatRectInterrupt() {
+  let O = ref(), V = ref(), N = ref(), L = { isScaleing: false, isDrawRecting: false, isMoving: false, resizeCropHovering: void 0, isMouseDown: () => g.x !== void 0, isMouseUpDownPoints: () => g.x !== void 0 && _.x !== void 0 }, k = { dragCreatRectInterrupt() {
     Q();
   }, dragCreatOrResizeRect(t2) {
-    p && (t2 == "drawCrop" && (a.isCropSingle && !k.isDrawRecting && (S = []), k.isDrawRecting || o("drawCropStart"), k.isDrawRecting = true, B = moveDrawCropRect(p, _, y, T, m, S, w, O.value), drawTagList(p, D, w, O.value)), t2 == "drawTag" && (k.isDrawRecting || o("drawTagStart"), k.isDrawRecting = true, drawCropList(p, S, w, O.value), R = moveDrawTagRect(p, _, y, T, m, D, w, O.value)), t2 == "resizeCrop" && (a.enableCropResize && k.resizeCropHovering ? (c = S[k.resizeCropHovering.index || 0], k.resizeCropHovering && c && (k.isDrawRecting = true, B = moveResizeCrop(p, _, y, c, c.scale || 1, T, w, D, k.resizeCropHovering, S.filter((t3, e2) => {
+    d && (t2 == "drawCrop" && (a.isCropSingle && !L.isDrawRecting && (D = []), L.isDrawRecting || o("drawCropStart"), L.isDrawRecting = true, T = moveDrawCropRect(d, g, _, I, w, D, y, S.value), drawTagList(d, R, y, S.value)), t2 == "drawTag" && (L.isDrawRecting || o("drawTagStart"), L.isDrawRecting = true, drawCropList(d, D, y, S.value), B = moveDrawTagRect(d, g, _, I, w, R, y, S.value)), t2 == "resizeCrop" && (a.enableCropResize && L.resizeCropHovering ? (c = D[L.resizeCropHovering.index || 0], L.resizeCropHovering && c && (L.isDrawRecting = true, T = moveResizeCrop(d, g, _, c, c.scale || 1, I, y, R, L.resizeCropHovering, D.filter((t3, e2) => {
       var _a;
-      return e2 !== ((_a = k.resizeCropHovering) == null ? void 0 : _a.index);
-    }), O.value))) : E.move()));
+      return e2 !== ((_a = L.resizeCropHovering) == null ? void 0 : _a.index);
+    }), S.value))) : k.move()));
   }, changeMode() {
     a.mode === "tag" ? o("update:mode", "crop") : o("update:mode", "tag");
   }, scale(t2, e2) {
-    if (!h || !d || !p)
+    if (!p || !s || !d)
       throw new Error("can't find canvas ctx or img");
-    k.isScaleing = true, d.translate(m.x, m.y), p.translate(m.x, m.y), m = { x: m.x - (e2.x / (T * t2) - e2.x / T), y: m.y - (e2.y / (T * t2) - e2.y / T) }, d.scale(t2, t2), p.scale(t2, t2), d.translate(-m.x, -m.y), p.translate(-m.x, -m.y), T *= t2, clearCanvas(d), clearCanvas(p), drawImage(d, h, w.x, w.y, g.width * x, g.height * x), Y(), l = false, k.isScaleing = false;
+    L.isScaleing = true, s.translate(w.x, w.y), d.translate(w.x, w.y), w = { x: w.x - (e2.x / (I * t2) - e2.x / I), y: w.y - (e2.y / (I * t2) - e2.y / I) }, s.scale(t2, t2), d.scale(t2, t2), s.translate(-w.x, -w.y), d.translate(-w.x, -w.y), I *= t2, clearCanvas(s), clearCanvas(d), drawImage(s, p, y.x, y.y, v.width * m, v.height * m), Y(), P = false, L.isScaleing = false;
   }, move() {
     var t2;
-    a.enableMove && d && p && h && !k.isScaleing && (k.isMoving = true, (t2 = moveCanvas(d, p, h, g, x, w, _, y, S, T, D, O.value)) && (C = lodash.exports.cloneDeep(w)) && (C.x += t2.offsetX, C.y += t2.offsetY));
+    a.enableMove && s && d && p && !L.isScaleing && (L.isMoving = true, (t2 = moveCanvas(s, d, p, v, m, y, g, _, D, I, R, S.value)) && (b = lodash.exports.cloneDeep(y)) && (b.x += t2.offsetX, b.y += t2.offsetY));
   }, hoverRect(t2) {
-    p && (l = moveDrawUnshowTagDashRect(p, a.mode, D, T, w, m, t2, S, k.isScaleing, l, O.value), a.enableCropResize && !r && moveDetectCropBorderSetCursor(L.value, t2, a.mode, S, T, w, m, k.isScaleing));
-  } }, A = { onKeyUpCtrlB() {
-    E.changeMode();
+    d && (P = moveDrawUnshowTagDashRect(d, a.mode, R, I, y, w, t2, D, L.isScaleing, P, S.value), a.enableCropResize && !r && moveDetectCropBorderSetCursor(O.value, t2, a.mode, D, I, y, w, L.isScaleing));
+  } }, E = { onKeyUpCtrlB() {
+    k.changeMode();
   }, onKeyUpSpace() {
-    k.isMoving || k.resizeCropHovering || E.dragCreatRectInterrupt(), r = false;
+    L.isMoving || L.resizeCropHovering || k.dragCreatRectInterrupt(), r = false;
   }, onKeyDownSpace() {
-    (a.enableDrawCrop && a.mode === "crop" || a.enableDrawTag && a.mode === "tag") && (L.value.style.cursor = "crosshair"), k.isMouseDown() || (r = true);
+    (a.enableDrawCrop && a.mode === "crop" || a.enableDrawTag && a.mode === "tag") && (O.value.style.cursor = "crosshair"), L.isMouseDown() || (r = true);
   }, onMouseOverMove(t2) {
-    device.mobile() || k.isMouseDown() || device.mobile() ? this.onHoldMouseLeftBtnMove(t2) : E.hoverRect(t2);
+    device.mobile() || L.isMouseDown() || device.mobile() ? this.onHoldMouseLeftBtnMove(t2) : k.hoverRect(t2);
   }, onSpaceMove() {
-    a.mode === "crop" ? a.enableDrawCrop && E.dragCreatOrResizeRect("drawCrop") : a.enableDrawTag && E.dragCreatOrResizeRect("drawTag");
+    a.mode === "crop" ? a.enableDrawCrop && k.dragCreatOrResizeRect("drawCrop") : a.enableDrawTag && k.dragCreatOrResizeRect("drawTag");
   }, onHoldMouseLeftBtnMove(t2) {
-    y = { x: t2.layerX, y: t2.layerY }, r ? this.onSpaceMove() : (a.mode === "tag" && E.move(), a.mode === "crop" && (k.resizeCropHovering ? E.dragCreatOrResizeRect("resizeCrop") : E.move()));
+    _ = { x: t2.layerX, y: t2.layerY }, r ? this.onSpaceMove() : (a.mode === "tag" && k.move(), a.mode === "crop" && (L.resizeCropHovering ? k.dragCreatOrResizeRect("resizeCrop") : k.move()));
   }, onDoubleClick(t2) {
-    a.mode === "crop" && a.enableInteractiveCropDelete && st(pointIsInBoxList(t2, S, x, w).boxList);
+    a.mode === "crop" && a.enableInteractiveCropDelete && st(pointIsInBoxList(t2, D, m, y).boxList);
   }, onCick(t2) {
     var e2;
-    a.mode === "tag" && p && a.enableInteractiveTagChangeStatus && (drawCropList(p, S, w, O.value), { isReDraw: t2, redrawList: e2 } = drawTagList(p, D, w, O.value, void 0, t2), t2 && (Y(), et("statusChange", z(e2))));
+    a.mode === "tag" && d && a.enableInteractiveTagChangeStatus && (drawCropList(d, D, y, S.value), { isReDraw: t2, redrawList: e2 } = drawTagList(d, R, y, S.value, void 0, t2), t2 && (Y(), et("statusChange", z(e2))));
   }, onWheel(t2, e2, n2) {
-    (a.enableScale || n2) && E.scale(t2, e2);
+    (a.enableScale || n2) && k.scale(t2, e2);
   }, init() {
     !async function() {
-      if (P(), s = false, d = null, p = null, h = void 0, v = lodash.exports.cloneDeep(defaultWH), g = lodash.exports.cloneDeep(defaultWH), _ = lodash.exports.cloneDeep(defaultPoint), y = lodash.exports.cloneDeep(defaultPoint), w = { x: 0, y: 0 }, m = { x: 0, y: 0 }, x = 1, b = void 0, C = void 0, U = 1, I = void 0, T = 1, B = void 0, R = void 0, D = [], S = [], await nextTick(), 1 < a.cropList.length) {
+      if (M(), l = false, s = null, d = null, p = void 0, h = lodash.exports.cloneDeep(defaultWH), v = lodash.exports.cloneDeep(defaultWH), g = lodash.exports.cloneDeep(defaultPoint), _ = lodash.exports.cloneDeep(defaultPoint), y = { x: 0, y: 0 }, w = { x: 0, y: 0 }, m = 1, x = void 0, b = void 0, F = 1, C = void 0, I = 1, T = void 0, B = void 0, R = [], D = [], await nextTick(), 1 < a.cropList.length) {
         let e2 = { startX: 1 / 0, startY: 1 / 0, endX: -1 / 0, endY: -1 / 0 };
         a.cropList.forEach((t2) => {
           t2 = fixBoxInfo(t2);
           t2.info.startX < e2.startX && (e2.startX = t2.info.startX), t2.info.startY < e2.startY && (e2.startY = t2.info.startY), t2.info.endX > e2.endX && (e2.endX = t2.info.endX), t2.info.endY > e2.endY && (e2.endY = t2.info.endY);
-        }), b = e2;
+        }), x = e2;
       }
-      return a.cropList.length == 1 && (b = a.cropList[0]), D = lodash.exports.cloneDeep(a.tagList), S = lodash.exports.cloneDeep(a.cropList), $(), device.mobile() || (document.addEventListener("keydown", N), document.addEventListener("keyup", H)), G(), d = F.value.getContext("2d"), p = V.value.getContext("2d"), d && p ? (v = amendDpi(getElementWH(d.canvas))) ? (initCanvasWH(d, v), initCanvasWH(p, v), loadImage(a.src).then((t2) => {
-        if (!v || !d || !p)
+      return a.cropList.length == 1 && (x = a.cropList[0]), R = lodash.exports.cloneDeep(a.tagList), D = lodash.exports.cloneDeep(a.cropList), A(), device.mobile() || (document.addEventListener("keydown", H), document.addEventListener("keyup", $)), G(), s = V.value.getContext("2d"), d = N.value.getContext("2d"), s && d ? (h = amendDpi(getElementWH(s.canvas))) ? (initCanvasWH(s, h), initCanvasWH(d, h), loadImage(a.src).then((t2) => {
+        if (!h || !s || !d)
           return Promise.reject("canvasWH or canvas var not has valid values.");
-        h = t2, g = { width: h.width, height: h.height };
-        var e2, n2, r2, o2, i2, t2 = initScale(v, h);
-        return x = U = t2.scale, b ? (e2 = transfromBoxToRect(b, U, w), n2 = (v.width - 0.05 * v.width) / e2[2], r2 = (v.height - 0.05 * v.height) / e2[3], r2 = v.width / v.height > e2[2] / e2[3] ? r2 : n2, o2 = e2[0] + e2[2], i2 = e2[1] + e2[3], (r2 = r2) == n2 ? (w.x = (v.width - o2 * r2 - 0.05 * v.width / 2) / r2, w.y = ((v.height - e2[3] * r2) / 2 - e2[1] * r2) / r2) : (w.x = ((v.width - e2[2] * r2) / 2 - e2[0] * r2) / r2, w.y = (v.height - i2 * r2 - 0.05 * v.height / 2) / r2), Z({ deltaY: 1, clientX: 0, clientY: 0, preventDefault() {
-        }, __zoom: r2 }, true)) : (t2.fit === "width" ? w.x = (v.width - g.width * x) / 2 : w.y = (v.height - g.height * x) / 2, b = { startX: 0, startY: 0, endX: 0 + g.width, endY: 0 + g.height }, a.isImgCrop && tt("add", S = [b])), drawImage(d, h, w.x, w.y, h.width * x, h.height * x), S = initBoundingArrScale(S, x, a.precision), D = initBoundingArrScale(D, x, a.precision), Y(), true;
+        p = t2, v = { width: p.width, height: p.height };
+        var e2, n2, r2, o2, i2, t2 = initScale(h, p);
+        return m = F = t2.scale, x ? (e2 = transfromBoxToRect(x, F, y), n2 = (h.width - 0.05 * h.width) / e2[2], r2 = (h.height - 0.05 * h.height) / e2[3], r2 = h.width / h.height > e2[2] / e2[3] ? r2 : n2, o2 = e2[0] + e2[2], i2 = e2[1] + e2[3], (r2 = r2) == n2 ? (y.x = (h.width - o2 * r2 - 0.05 * h.width / 2) / r2, y.y = ((h.height - e2[3] * r2) / 2 - e2[1] * r2) / r2) : (y.x = ((h.width - e2[2] * r2) / 2 - e2[0] * r2) / r2, y.y = (h.height - i2 * r2 - 0.05 * h.height / 2) / r2), Z({ deltaY: 1, clientX: 0, clientY: 0, preventDefault() {
+        }, __zoom: r2 }, true)) : (t2.fit === "width" ? y.x = (h.width - v.width * m) / 2 : y.y = (h.height - v.height * m) / 2, x = { startX: 0, startY: 0, endX: 0 + v.width, endY: 0 + v.height }, a.isImgCrop && tt("add", D = [x])), drawImage(s, p, y.x, y.y, p.width * m, p.height * m), D = initBoundingArrScale(D, m, a.precision), R = initBoundingArrScale(R, m, a.precision), Y(), true;
       })) : Promise.reject("Error: can't get canvas height and width.") : Promise.reject("Error: can't find canvas element.");
     }().then(() => {
-      s = true;
+      l = true;
     });
   }, resize() {
     requestAnimationFrame(() => {
       console.log("resized"), async function() {
-        if (q(), await nextTick(), $(), d && p && h) {
-          if (!(v = amendDpi(getElementWH(d.canvas))))
+        if (q(), await nextTick(), A(), s && d && p) {
+          if (!(h = amendDpi(getElementWH(s.canvas))))
             return Promise.reject("Error: can't get canvas height and width.");
-          initCanvasWH(d, v), initCanvasWH(p, v), d.scale(T, T), p.scale(T, T), d.translate(-m.x, -m.y), p.translate(-m.x, -m.y), drawImage(d, h, w.x, w.y, h.width * x, h.height * x), S = initBoundingArrScale(S, x, a.precision), D = initBoundingArrScale(D, x, a.precision), Y(), s = true;
+          initCanvasWH(s, h), initCanvasWH(d, h), s.scale(I, I), d.scale(I, I), s.translate(-w.x, -w.y), d.translate(-w.x, -w.y), drawImage(s, p, y.x, y.y, p.width * m, p.height * m), D = initBoundingArrScale(D, m, a.precision), R = initBoundingArrScale(R, m, a.precision), Y(), l = true;
         } else
           console.error("ctx or ctx2 or img can't find on resize.");
       }();
     });
   } };
-  function N(t2) {
-    t2.code === "Space" && (t2.preventDefault(), A.onKeyDownSpace());
-  }
   function H(t2) {
-    t2.code === "KeyB" && t2.ctrlKey && A.onKeyUpCtrlB(), t2.code === "Space" && A.onKeyUpSpace();
+    t2.code === "Space" && (t2.preventDefault(), E.onKeyDownSpace());
   }
-  function $() {
-    var t2 = L.value.getBoundingClientRect();
-    I = { top: t2.top, right: t2.right, bottom: t2.bottom, left: t2.left, width: t2.width, height: t2.height, x: t2.x, y: t2.y };
+  function $(t2) {
+    t2.code === "KeyB" && t2.ctrlKey && E.onKeyUpCtrlB(), t2.code === "Space" && E.onKeyUpSpace();
+  }
+  function A() {
+    var t2 = O.value.getBoundingClientRect();
+    C = { top: t2.top, right: t2.right, bottom: t2.bottom, left: t2.left, width: t2.width, height: t2.height, x: t2.x, y: t2.y };
   }
   function q() {
-    c = null, s = false, v = lodash.exports.cloneDeep(defaultWH), _ = lodash.exports.cloneDeep(defaultPoint), y = lodash.exports.cloneDeep(defaultPoint), I = void 0;
+    c = null, l = false, h = lodash.exports.cloneDeep(defaultWH), g = lodash.exports.cloneDeep(defaultPoint), _ = lodash.exports.cloneDeep(defaultPoint), C = void 0;
   }
   function Y() {
-    p && (drawCropList(p, S, w, O.value), drawTagList(p, D, w, O.value));
+    d && (drawCropList(d, D, y, S.value), drawTagList(d, R, y, S.value));
   }
   function G() {
-    device.mobile() && (a.mobileOperation === "draw" && A.onKeyDownSpace(), a.mobileOperation === "move" && A.onKeyUpSpace());
+    device.mobile() && (a.mobileOperation === "draw" && E.onKeyDownSpace(), a.mobileOperation === "move" && E.onKeyUpSpace());
   }
   function K() {
-    A.resize();
+    E.resize();
   }
   function Z(t2, e2) {
     let n2 = t2;
-    if (!I)
+    if (!C)
       throw new Error("can't find  containerInfo.");
     var r2, o2;
-    (s || n2.__zoom) && (n2.preventDefault(), k.isDrawRecting || k.isMoving || (t2 = n2.onTouchMove ? 1 : DPI, r2 = e2 ? 0 : (n2.clientX - I.left) * t2, t2 = e2 ? 0 : (n2.clientY - I.top) * t2, o2 = n2.deltaY < 0 ? 1 : -1, o2 = e2 ? n2.__zoom : Math.exp(o2 * j), T * o2 < 0.2 || A.onWheel(o2, { x: r2, y: t2 }, e2)));
+    (l || n2.__zoom) && (n2.preventDefault(), L.isDrawRecting || L.isMoving || (t2 = n2.onTouchMove ? 1 : DPI, r2 = e2 ? 0 : (n2.clientX - C.left) * t2, t2 = e2 ? 0 : (n2.clientY - C.top) * t2, o2 = n2.deltaY < 0 ? 1 : -1, o2 = e2 ? n2.__zoom : Math.exp(o2 * j), I * o2 < 0.2 || E.onWheel(o2, { x: r2, y: t2 }, e2)));
   }
   function J(t2) {
-    k.resizeCropHovering && (S[k.resizeCropHovering.index] = t2, o("resizeEnd", { index: k.resizeCropHovering.index, box: t2 }), tt("resize", X([t2])));
+    L.resizeCropHovering && (D[L.resizeCropHovering.index] = t2, o("resizeEnd", { index: L.resizeCropHovering.index, box: t2 }), tt("resize", X([t2])));
   }
   function Q() {
-    if (s) {
+    if (l) {
       var t2, e2;
-      if (k.isMoving = false, C && (w = lodash.exports.cloneDeep(C)), C = void 0, k.isMouseUpDownPoints())
+      if (L.isMoving = false, b && (y = lodash.exports.cloneDeep(b)), b = void 0, L.isMouseUpDownPoints())
         if (a.mode === "crop") {
-          if (B) {
-            let t3 = __spreadValues(__spreadValues({}, c), transfromRect2Box(B, w, x));
-            c = null, k.resizeCropHovering ? !a.enableCropCross && getBoxIsIntersectWithBoxList(t3, S.filter((t4, e3) => {
+          if (T) {
+            let t3 = __spreadValues(__spreadValues({}, c), transfromRect2Box(T, y, m));
+            c = null, L.resizeCropHovering ? !a.enableCropCross && getBoxIsIntersectWithBoxList(t3, D.filter((t4, e3) => {
               var _a;
-              return e3 !== ((_a = k.resizeCropHovering) == null ? void 0 : _a.index);
-            })) ? (a.handleResizeCropCross === "reset" && Y(), a.handleResizeCropCross === "delete" && st([S[k.resizeCropHovering.index]])) : J(t3) : (t3 = initBoundingArrScale([t3], x, a.precision)[0], !a.enableCropCross && getBoxIsIntersectWithBoxList(t3, S) ? Y() : (S.push(t3), tt("add", X([t3])))), B = void 0;
+              return e3 !== ((_a = L.resizeCropHovering) == null ? void 0 : _a.index);
+            })) ? (a.handleResizeCropCross === "reset" && Y(), a.handleResizeCropCross === "delete" && st([D[L.resizeCropHovering.index]])) : J(t3) : (t3 = initBoundingArrScale([t3], m, a.precision)[0], !a.enableCropCross && getBoxIsIntersectWithBoxList(t3, D) ? Y() : (D.push(t3), tt("add", X([t3])))), T = void 0;
           }
         } else
-          R && (t2 = getVertexPositionByTwoPoints(_, y), e2 = initBoundingArrScale([e2 = transfromRect2Box(R, w, x)], x, a.precision)[0], Object.assign(e2, { isShow: true, __newAdd: true, __vertexPosition: t2 }), D.push(e2), et("add", z([e2])), R = void 0);
-      k.resizeCropHovering = void 0, k.isDrawRecting = false, _ = lodash.exports.cloneDeep(defaultPoint), y = lodash.exports.cloneDeep(defaultPoint), L.value.style.cursor = "auto";
+          B && (t2 = getVertexPositionByTwoPoints(g, _), e2 = initBoundingArrScale([e2 = transfromRect2Box(B, y, m)], m, a.precision)[0], Object.assign(e2, { isShow: true, __newAdd: true, __vertexPosition: t2 }), R.push(e2), et("add", z([e2])), B = void 0);
+      L.resizeCropHovering = void 0, L.isDrawRecting = false, g = lodash.exports.cloneDeep(defaultPoint), _ = lodash.exports.cloneDeep(defaultPoint), O.value.style.cursor = "auto";
     }
   }
   function tt(t2, e2) {
-    var n2 = X(S);
+    var n2 = X(D);
     o("update:cropList", n2), o("cropListChange", { type: t2, list: e2 });
   }
   function et(t2, e2) {
@@ -3241,11 +3241,11 @@ const _withScopeId = (t) => (pushScopeId("data-v-34957acf"), t = t(), popScopeId
       t3 && (n2.parentCrop = X([Reflect.get(t3, "__parentCrop")])[0], delete t3.__parentCrop);
     }
     o("tagListChange", n2);
-    t2 = z(D);
+    t2 = z(R);
     o("update:tagList", t2);
   }
   function z(t2) {
-    let e2 = t2 || D, r2 = S, o2 = [];
+    let e2 = t2 || R, r2 = D, o2 = [];
     return e2.forEach((t3) => {
       let e3 = t3;
       if (!a.enableDrawTagOutOfCrop && e3.__newAdd && e3.__vertexPosition) {
@@ -3255,15 +3255,15 @@ const _withScopeId = (t) => (pushScopeId("data-v-34957acf"), t = t(), popScopeId
         var n2 = getTwoBoxIntersectPart(e3, t3);
         n2 && isBoxValidity(n2) ? (Object.assign(e3, n2), e3.__parentCrop = t3) : e3.__isValidity = false;
       }
-      delete e3.__newAdd, Reflect.deleteProperty(e3, "__vertexPosition"), a.enableDrawTagOutOfCrop && !a.enableDrawTagOutOfImg && (t3 = { startX: 0, startY: 0, endX: (n2 = g).width, endY: n2.height }, (n2 = getTwoBoxIntersectPart(e3, t3)) && isBoxValidity(n2) ? Object.assign(e3, n2) : e3.__isValidity = false);
+      delete e3.__newAdd, Reflect.deleteProperty(e3, "__vertexPosition"), a.enableDrawTagOutOfCrop && !a.enableDrawTagOutOfImg && (t3 = { startX: 0, startY: 0, endX: (n2 = v).width, endY: n2.height }, (n2 = getTwoBoxIntersectPart(e3, t3)) && isBoxValidity(n2) ? Object.assign(e3, n2) : e3.__isValidity = false);
       t3 = fixBoxInfo(e3);
       o2.push(transformBoxPrecision(t3.info, a.precision));
     }), o2.filter((t3) => t3.__isValidity !== false);
   }
   function X(t2) {
-    let e2 = t2 || S, n2 = e2.map((t3) => {
+    let e2 = t2 || D, n2 = e2.map((t3) => {
       let e3 = t3;
-      a.enableDrawCropOutOfImg || (n3 = { startX: 0, startY: 0, endX: (n3 = g).width, endY: n3.height }, (n3 = getTwoBoxIntersectPart(e3, n3)) && isBoxValidity(n3) ? e3 = __spreadValues(__spreadValues({}, t3), n3) : e3._del = true), Reflect.deleteProperty(e3, "__vertexPosition");
+      a.enableDrawCropOutOfImg || (n3 = { startX: 0, startY: 0, endX: (n3 = v).width, endY: n3.height }, (n3 = getTwoBoxIntersectPart(e3, n3)) && isBoxValidity(n3) ? e3 = __spreadValues(__spreadValues({}, t3), n3) : e3._del = true), Reflect.deleteProperty(e3, "__vertexPosition");
       var n3, t3 = fixBoxInfo(e3);
       return transformBoxPrecision(t3.info, a.precision);
     });
@@ -3271,65 +3271,65 @@ const _withScopeId = (t) => (pushScopeId("data-v-34957acf"), t = t(), popScopeId
   }
   function nt(t2) {
     var e2;
-    s && d && p && (e2 = new Date().getTime(), i = e2, f.prev.down ? f.last.down = e2 : f.prev.down = e2, e2 = amendDpi(e2 = { layerX: Reflect.get(t2, "layerX"), layerY: Reflect.get(t2, "layerY") }, ["layerX", "layerY"]), _ = { x: e2.layerX, y: e2.layerY }, a.mode === "crop" && !r && a.enableCropResize && (t2 = detectEventIsTriggerOnCropBorderOrVertex(e2, S, T, w, m)).hasIn && (k.resizeCropHovering = findOneBorderOrVertex(t2.list), o("resizeStart", { index: k.resizeCropHovering.index, box: S[k.resizeCropHovering.index] })));
+    l && s && d && (e2 = new Date().getTime(), i = e2, f.prev.down ? f.last.down = e2 : f.prev.down = e2, e2 = amendDpi(e2 = { layerX: Reflect.get(t2, "layerX"), layerY: Reflect.get(t2, "layerY") }, ["layerX", "layerY"]), g = { x: e2.layerX, y: e2.layerY }, a.mode === "crop" && !r && a.enableCropResize && (t2 = detectEventIsTriggerOnCropBorderOrVertex(e2, D, I, y, w)).hasIn && (L.resizeCropHovering = findOneBorderOrVertex(t2.list), o("resizeStart", { index: L.resizeCropHovering.index, box: D[L.resizeCropHovering.index] })));
   }
   onBeforeUnmount(() => {
-    window.removeEventListener("resize", K), device.mobile() || (document.removeEventListener("keydown", N), document.removeEventListener("keyup", H)), P();
+    window.removeEventListener("resize", K), device.mobile() || (document.removeEventListener("keydown", H), document.removeEventListener("keyup", $)), M();
   }), onMounted(() => {
-    A.init(), window.addEventListener("resize", K);
+    E.init(), window.addEventListener("resize", K);
   }), watch(() => a.mode, (t2) => {
-    t2 === "tag" && (L.value.style.cursor = "auto");
+    t2 === "tag" && (O.value.style.cursor = "auto");
   }), watch(() => a.src, (t2) => {
-    t2 && A.init();
+    t2 && E.init();
   }), watch(() => a.mobileOperation, (t2) => {
-    s && G();
+    l && G();
   }), watch(() => a.tagList, (t2) => {
-    s && (D = initBoundingArrScale(t2, x, a.precision), Y());
+    l && (R = initBoundingArrScale(t2, m, a.precision), Y());
   }, { deep: true }), watch(() => a.cropList, (t2) => {
-    s && (S = initBoundingArrScale(t2, x, a.precision), Y());
+    l && (D = initBoundingArrScale(t2, m, a.precision), Y());
   });
   let rt = lodash.exports.throttle(function(e2) {
     if (e2) {
-      e2 = getTouchPoint(e2, T, m, "over");
+      e2 = getTouchPoint(e2, I, w, "over");
       let t2 = lodash.exports.cloneDeep(e2);
-      t2.x -= w.x, t2.y -= w.y, t2.x /= x, t2.y /= x, o("mouseOverInfo", { canvas: e2, img: t2 });
+      t2.x -= y.x, t2.y -= y.y, t2.x /= m, t2.y /= m, o("mouseOverInfo", { canvas: e2, img: t2 });
     } else
       o("mouseOverInfo", { canvas: null, img: null });
   }, 100, { leading: false, trailing: true });
   function ot(t2) {
-    s && (t2 = amendDpi(t2 = { layerX: Reflect.get(t2, "layerX"), layerY: Reflect.get(t2, "layerY") }, ["layerX", "layerY"]), u = new Date().getTime(), A.onMouseOverMove(t2), rt(t2));
+    l && (t2 = amendDpi(t2 = { layerX: Reflect.get(t2, "layerX"), layerY: Reflect.get(t2, "layerY") }, ["layerX", "layerY"]), u = new Date().getTime(), E.onMouseOverMove(t2), rt(t2));
   }
   function it() {
     var t2;
-    s && (t2 = new Date().getTime(), f.prev.up ? f.last.up = t2 : f.prev.up = t2, Q());
+    l && (t2 = new Date().getTime(), f.prev.up ? f.last.up = t2 : f.prev.up = t2, Q());
   }
   function at() {
-    s && (L.value.style.cursor = "auto", Q(), rt());
+    l && (O.value.style.cursor = "auto", Q(), rt());
   }
   function ut(t2) {
     var e2;
-    s && (t2 = getTouchPoint(amendDpi({ layerX: Reflect.get(t2, "layerX"), layerY: Reflect.get(t2, "layerY") }, ["layerX", "layerY"]), T, m, "click"), e2 = u && i ? u - i : 0, i = void 0, u = void 0, 100 < e2 || (A.onCick(t2), f.prev.up && f.prev.down && f.last.up && f.last.down && (f.last.up - f.prev.down < 360 && A.onDoubleClick(t2), f.prev.down = f.last.down, f.prev.up = f.last.up, f.last.down = void 0, f.last.up = void 0)));
+    A(), l && (t2 = getTouchPoint(amendDpi({ layerX: Reflect.get(t2, "layerX"), layerY: Reflect.get(t2, "layerY") }, ["layerX", "layerY"]), I, w, "click"), e2 = u && i ? u - i : 0, i = void 0, u = void 0, 100 < e2 || (E.onCick(t2), f.prev.up && f.prev.down && f.last.up && f.last.down && (f.last.up - f.prev.down < 360 && E.onDoubleClick(t2), f.prev.down = f.last.down, f.prev.up = f.last.up, f.last.down = void 0, f.last.up = void 0)));
   }
   function ct(t2) {
-    i = new Date().getTime();
+    A(), i = new Date().getTime();
     var e2 = t2.touches;
     if (t2.touches.length === 1 && nt({ layerX: e2[0].clientX, layerY: e2[0].clientY }), t2.touches.length == 2) {
-      if (!I)
+      if (!C)
         throw new Error("can't find  containerInfo.");
       e2 = amendMobileTouchEventDpi(t2);
-      getTwoFingerTouchListDistence(e2), M = { x: (e2[0].clientX + e2[1].clientX) / 2 - I.left, y: (e2[0].clientY + e2[1].clientY) / 2 - I.top };
+      getTwoFingerTouchListDistence(e2), W = { x: (e2[0].clientX + e2[1].clientX) / 2 - C.left, y: (e2[0].clientY + e2[1].clientY) / 2 - C.top };
     }
   }
   async function ft(t2) {
     u = new Date().getTime();
     var e2 = t2.touches;
     if (t2.touches.length === 1 && ot({ layerX: e2[0].clientX, layerY: e2[0].clientY }), t2.touches.length == 2) {
-      if (!I)
+      if (!C)
         throw new Error("can't find  containerInfo.");
-      var { width: e2, height: t2 } = getTwoFingerTouchListDistence(amendMobileTouchEventDpi(t2)), e2 = getHypotenuseValue(e2, t2), t2 = -(e2 - W);
-      W = e2, Z({ onTouchMove: true, deltaY: t2, preventDefault() {
+      var { width: e2, height: t2 } = getTwoFingerTouchListDistence(amendMobileTouchEventDpi(t2)), e2 = getHypotenuseValue(e2, t2), t2 = -(e2 - U);
+      U = e2, Z({ onTouchMove: true, deltaY: t2, preventDefault() {
         console.log("none");
-      }, clientX: M.x, clientY: M.y });
+      }, clientX: W.x, clientY: W.y });
     }
   }
   function lt(t2) {
@@ -3343,7 +3343,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-34957acf"), t = t(), popScopeId
           t3 = fixBoxInfo(t3).info;
           return t3.startX === e3.startX && t3.endX === e3.endX && t3.startY === e3.startY && t3.endY === e3.endY;
         }) ? n2 : t2).push(e3);
-      }), S = initBoundingArrScale(t2, x, a.precision), o("delCrop", n2), Y(), tt("delete", X(n2));
+      }), D = initBoundingArrScale(t2, m, a.precision), o("delCrop", n2), Y(), tt("delete", X(n2));
     }
   }
   return t({ removeTagItems: function(n2) {
@@ -3357,14 +3357,14 @@ const _withScopeId = (t) => (pushScopeId("data-v-34957acf"), t = t(), popScopeId
         }) ? o2 : r2).push(e2);
       });
     }
-    D = initBoundingArrScale(r2, x, a.precision), Y(), et("delete", o2);
+    R = initBoundingArrScale(r2, m, a.precision), Y(), et("delete", o2);
   }, getTagListGroupByCropIndex: function(n2 = "startPoint") {
     let t2 = z(), r2 = X();
     return t2.forEach((t3) => {
       var e2;
       n2 === "startPoint" && (e2 = pointIsInBoxList({ x: t3.startX, y: t3.startY }, r2), t3.__groupIndex = e2.indexList[0]), n2 === "allIn" && (e2 = boxAllInBoxList(t3, r2), t3.__groupIndex = e2.indexList[0]);
     }), lodash.exports.groupBy(t2, "__groupIndex");
-  } }), (t2, e2) => (openBlock(), createElementBlock("div", { class: "comp-ocr-img", ref_key: "containerRef", ref: L, onMousedown: nt, onMouseenter: $, onClick: ut, onMouseup: it, onMousemove: ot, onMouseout: at, onMousewheel: withModifiers(Z, ["stop"]), onTouchmove: withModifiers(ft, ["stop", "prevent"]), onTouchstart: withModifiers(ct, ["stop"]), onTouchend: withModifiers(lt, ["stop"]) }, [createElementVNode("canvas", { class: "canvas", ref_key: "canvasRef", ref: F }, null, 512), createElementVNode("canvas", { class: "canvas2", ref_key: "canvas2Ref", ref: V }, null, 512), unref(a).isShowTip ? (openBlock(), createElementBlock("div", _hoisted_2, [createElementVNode("div", _hoisted_3, [createElementVNode("div", { class: normalizeClass(["circle", { crop: n.mode === "crop", tag: n.mode === "tag" }]) }, null, 2), createElementVNode("div", _hoisted_4, toDisplayString(n.mode === "crop" ? "\u88C1\u526A\u6A21\u5F0F" : "\u6807\u8BB0\u9519\u8BEF\u884C"), 1)]), createElementVNode("div", _hoisted_5, [renderSlot(t2.$slots, "tip", {}, () => [_hoisted_6, _hoisted_7, _hoisted_8, _hoisted_9], true)])])) : createCommentVNode("", true)], 40, _hoisted_1));
+  } }), (t2, e2) => (openBlock(), createElementBlock("div", { class: "comp-ocr-img", ref_key: "containerRef", ref: O, onMousedown: nt, onMouseenter: A, onClick: ut, onMouseup: it, onMousemove: ot, onMouseout: at, onMousewheel: withModifiers(Z, ["stop"]), onTouchmove: withModifiers(ft, ["stop", "prevent"]), onTouchstart: withModifiers(ct, ["stop"]), onTouchend: withModifiers(lt, ["stop"]) }, [createElementVNode("canvas", { class: "canvas", ref_key: "canvasRef", ref: V }, null, 512), createElementVNode("canvas", { class: "canvas2", ref_key: "canvas2Ref", ref: N }, null, 512), unref(a).isShowTip ? (openBlock(), createElementBlock("div", _hoisted_2, [createElementVNode("div", _hoisted_3, [createElementVNode("div", { class: normalizeClass(["circle", { crop: n.mode === "crop", tag: n.mode === "tag" }]) }, null, 2), createElementVNode("div", _hoisted_4, toDisplayString(n.mode === "crop" ? "\u88C1\u526A\u6A21\u5F0F" : "\u6807\u8BB0\u9519\u8BEF\u884C"), 1)]), createElementVNode("div", _hoisted_5, [renderSlot(t2.$slots, "tip", {}, () => [_hoisted_6, _hoisted_7, _hoisted_8, _hoisted_9], true)])])) : createCommentVNode("", true)], 40, _hoisted_1));
 } });
-var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-34957acf"]]);
+var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-607285b8"]]);
 export { ImgMark, boxIsAllInOtherBox, transformTagBoxRelativeTo, transformTagListBoxRelativeTo };

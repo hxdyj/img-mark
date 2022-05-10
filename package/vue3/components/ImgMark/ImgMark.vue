@@ -271,10 +271,10 @@ let inited = false
 let ctx: CanvasRenderingContext2D | null = null
 let ctx2: CanvasRenderingContext2D | null = null
 let img: HTMLImageElement | undefined
-let canvasWH: RectDom | undefined = cloneDeep(defaultWH)
+let canvasWH: RectDom | undefined = cloneDeep(defaultWH) as RectDom
 let imgWH: WH = cloneDeep(defaultWH)
-let startMousePoint: Point = cloneDeep(defaultPoint)
-let endMousePoint: Point = cloneDeep(defaultPoint)
+let startMousePoint: Point = cloneDeep(defaultPoint) as Point
+let endMousePoint: Point = cloneDeep(defaultPoint) as Point
 let twoFingerCenterPoint: Point = {
 	x: 0,
 	y: 0,
@@ -312,10 +312,10 @@ function initDataVar() {
 	ctx = null
 	ctx2 = null
 	img = undefined
-	canvasWH = cloneDeep(defaultWH)
-	imgWH = cloneDeep(defaultWH)
-	startMousePoint = cloneDeep(defaultPoint)
-	endMousePoint = cloneDeep(defaultPoint)
+	canvasWH = cloneDeep(defaultWH) as RectDom
+	imgWH = cloneDeep(defaultWH) as WH
+	startMousePoint = cloneDeep(defaultPoint) as Point
+	endMousePoint = cloneDeep(defaultPoint) as Point
 	currentPosition = {
 		x: 0,
 		y: 0,
@@ -760,9 +760,9 @@ async function initComponent() {
 function initResizeVar() {
 	clickedCrop = null
 	inited = false
-	canvasWH = cloneDeep(defaultWH)
-	startMousePoint = cloneDeep(defaultPoint)
-	endMousePoint = cloneDeep(defaultPoint)
+	canvasWH = cloneDeep(defaultWH) as RectDom
+	startMousePoint = cloneDeep(defaultPoint) as Point
+	endMousePoint = cloneDeep(defaultPoint) as Point
 	containerInfo = undefined
 }
 
@@ -983,8 +983,8 @@ function cleartMousePoints() {
 
 	status.resizeCropHovering = undefined
 	status.isDrawRecting = false
-	startMousePoint = cloneDeep(defaultPoint)
-	endMousePoint = cloneDeep(defaultPoint)
+	startMousePoint = cloneDeep(defaultPoint) as Point
+	endMousePoint = cloneDeep(defaultPoint) as Point
 	containerRef.style.cursor = 'auto'
 }
 
@@ -1202,6 +1202,7 @@ function onMouseOut() {
 }
 
 function onClick(e) {
+	getContainerInfo()
 	if (!inited) return
 
 	let event = {
@@ -1233,6 +1234,7 @@ function onClick(e) {
 }
 
 function onTouchStart(event: TouchEvent) {
+	getContainerInfo()
 	mouseDownTime = new Date().getTime()
 	let touchList = event.touches
 	if (event.touches.length === 1) {
@@ -1250,6 +1252,7 @@ function onTouchStart(event: TouchEvent) {
 		let { width, height } = getTwoFingerTouchListDistence(amendTouchList)
 		let hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
 		hypotenuse = hypotenuse
+
 		twoFingerCenterPoint = {
 			x: (amendTouchList[0].clientX + amendTouchList[1].clientX) / 2 - containerInfo.left,
 			y: (amendTouchList[0].clientY + amendTouchList[1].clientY) / 2 - containerInfo.top,

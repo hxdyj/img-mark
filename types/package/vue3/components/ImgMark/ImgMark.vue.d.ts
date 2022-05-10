@@ -235,7 +235,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     ctx: null;
     ctx2: null;
     img: HTMLImageElement | undefined;
-    canvasWH: RectDom | undefined;
+    canvasWH: RectDom;
     imgWH: WH;
     startMousePoint: Point;
     endMousePoint: Point;
