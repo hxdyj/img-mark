@@ -313,7 +313,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onMouseOut: () => void;
     onClick: (e: any) => void;
     onTouchStart: (event: TouchEvent) => void;
-    onTouchMove: (event: TouchEvent) => Promise<void>;
+    onTouchMove: (event: TouchEvent) => void;
     onTouchEnd: (event: any) => void;
     refreshDrawTags: () => void;
     removeTagItems: (removeList: BoundingBox[]) => void;

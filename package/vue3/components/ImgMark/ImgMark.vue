@@ -1260,7 +1260,7 @@ function onTouchStart(event: TouchEvent) {
 	}
 }
 
-async function onTouchMove(event: TouchEvent) {
+function onTouchMove(event: TouchEvent) {
 	mouseUpTime = new Date().getTime()
 	let touchList = event.touches
 	// let touchList = amendMobileTouchEventDpi(event)
