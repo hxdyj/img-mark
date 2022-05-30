@@ -144,6 +144,7 @@ type BoundingBox = {
 	isShow?: boolean //tag是否显示
 	showOutLine?: boolean //tag是否边框是否高亮
 	labelText?: string //tag的标签文字
+	tagConfig?: TagConfig //单独定义某个tagConfig
 }
 
 type CropConfig = {

@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash'
-import { Config } from './ImgMark.vue'
+import { Config, TagConfig } from './ImgMark.vue'
 import device from 'current-device'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
@@ -261,6 +261,7 @@ export type BoundingBox = {
 	isShow?: boolean
 	showOutLine?: boolean
 	labelText?: string
+	tagConfig?: TagConfig
 }
 
 type FixBoxInfoReturn = {
@@ -364,7 +365,8 @@ export function drawTagRect(
 	touchPoint?: TypePoint,
 	isShow?: boolean,
 	showOutLine?: boolean,
-	tagLabel?: string
+	tagLabel?: string,
+	tagConfig?: TagConfig
 ):
 	| {
 			isShow: boolean
@@ -372,22 +374,25 @@ export function drawTagRect(
 	  }
 	| undefined {
 	// if (debug) console.log(`DRAW ITEM${index}`, touchPoint, [left, top, width, height], isShow)
-
-	ctx.font = `${config.tagConfig.fontSize}px sans-serif`
+	let finalTagConfig = cloneDeep(config.tagConfig)
+	if (tagConfig) {
+		Object.assign(finalTagConfig, tagConfig)
+	}
+	ctx.font = `${finalTagConfig.fontSize}px sans-serif`
 	if (!touchPoint && !isShow) return
 	if (isShow && (!touchPoint || touchPoint.type !== 'move')) {
-		ctx.fillStyle = config.tagConfig.fillStyle
+		ctx.fillStyle = finalTagConfig.fillStyle
 		ctx.fillRect(left, top, width, height)
-		if (index && config.tagConfig.showText) {
+		if (index && finalTagConfig.showText) {
 			let fontsize = parseFloat(ctx.font.split(' ')[0])
-			ctx.fillStyle = config.tagConfig.textFillStyle
+			ctx.fillStyle = finalTagConfig.textFillStyle
 			ctx.fillText(tagLabel || index + '', left + 4, top + height / 2 + fontsize / 2)
 		}
 	}
 	if (showOutLine) {
-		ctx.strokeStyle = config.tagConfig.highlightStrokeStyle
-		ctx.lineWidth = config.tagConfig.highlightLineWidth
-		ctx.setLineDash(config.tagConfig.highlightLineDash)
+		ctx.strokeStyle = finalTagConfig.highlightStrokeStyle
+		ctx.lineWidth = finalTagConfig.highlightLineWidth
+		ctx.setLineDash(finalTagConfig.highlightLineDash)
 		ctx.strokeRect(left, top, width, height)
 	}
 	let isCrash = false
@@ -403,9 +408,9 @@ export function drawTagRect(
 				}
 			}
 			if (touchPoint.type === 'move' && !isShow) {
-				ctx.strokeStyle = config.tagConfig.hoverStrokeStyle
-				ctx.lineWidth = config.tagConfig.hoverLineWidth
-				ctx.setLineDash(config.tagConfig.hoverLineDash)
+				ctx.strokeStyle = finalTagConfig.hoverStrokeStyle
+				ctx.lineWidth = finalTagConfig.hoverLineWidth
+				ctx.setLineDash(finalTagConfig.hoverLineDash)
 				ctx.strokeRect(left, top, width, height)
 			}
 		}
@@ -435,7 +440,7 @@ export function drawTagList(
 		positions[0] += offsetInfo!.offsetX
 		positions[1] += offsetInfo!.offsetY
 		// if (debug) console.log(`DRAW ITEM${index}`, tagInfo, positions)
-		let drawTagInfo = drawTagRect(ctx, ...positions, config, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine, tagInfo.labelText)
+		let drawTagInfo = drawTagRect(ctx, ...positions, config, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine, tagInfo.labelText, tagInfo.tagConfig)
 		if (drawTagInfo !== undefined) {
 			tagInfo.isShow = drawTagInfo.isShow
 			if (drawTagInfo.isCrash) {

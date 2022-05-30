@@ -1,4 +1,4 @@
-import { Config } from './ImgMark.vue';
+import { Config, TagConfig } from './ImgMark.vue';
 export declare const DPI: number;
 export declare const debug = false;
 export declare const DEFAULT_CONFIG: Config;
@@ -64,6 +64,7 @@ export declare type BoundingBox = {
     isShow?: boolean;
     showOutLine?: boolean;
     labelText?: string;
+    tagConfig?: TagConfig;
 };
 declare type FixBoxInfoReturn = {
     info: BoundingBox;
@@ -77,7 +78,7 @@ declare type TouchType = 'move' | 'click' | 'over';
 export declare type TypePoint = Point & {
     type: TouchType;
 };
-export declare function drawTagRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, index?: number, touchPoint?: TypePoint, isShow?: boolean, showOutLine?: boolean, tagLabel?: string): {
+export declare function drawTagRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, index?: number, touchPoint?: TypePoint, isShow?: boolean, showOutLine?: boolean, tagLabel?: string, tagConfig?: TagConfig): {
     isShow: boolean;
     isCrash: boolean;
 } | undefined;

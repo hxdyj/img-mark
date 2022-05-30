@@ -89,6 +89,9 @@ let tagList = $ref<MyBoundingBox[]>([
 		isShow: true,
 		type: 1,
 		labelText: 'haha',
+		tagConfig: {
+			highlightStrokeStyle: '#ccc',
+		},
 	},
 	{
 		__uid: '2',
@@ -98,6 +101,11 @@ let tagList = $ref<MyBoundingBox[]>([
 		endY: 100,
 		isShow: true,
 		type: 1,
+		showOutLine: true,
+		tagConfig: {
+			highlightStrokeStyle: 'red',
+			highlightLineDash: [0],
+		},
 	},
 ])
 
