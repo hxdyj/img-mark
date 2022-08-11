@@ -307,7 +307,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagList: (tagList?: BoundingBox[] | undefined) => TagItemTmp[];
     getCropList: (cropList?: BoundingBox[] | undefined) => BoundingBox[];
     onMouseDown: (e: MouseEvent) => void;
-    triggerMouseOverInfo: ((event?: LayerTouchEvent | undefined) => void) & import("lodash").Cancelable;
+    triggerMouseOverInfo: any;
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: () => void;
     onMouseOut: () => void;

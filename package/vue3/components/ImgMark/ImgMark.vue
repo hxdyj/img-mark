@@ -546,15 +546,30 @@ let hooks = {
 			let removeCropInfo = pointIsInBoxList(touchPoint, cropArr, scale, currentPosition)
 			removeCropItems(removeCropInfo.boxList)
 		}
+
+		if (props.mode === 'tag') {
+			let { boxList } = pointIsInBoxList(touchPoint, tagArr, scale, currentPosition)
+			boxList.forEach(item => {
+				item?.onDoubleClick?.('', item)
+			})
+		}
 	},
 	onCick(touchPoint: TypePoint) {
 		if (props.mode !== 'tag') return
-		if (!ctx2 || !props.enableInteractiveTagChangeStatus) return
-		drawCropList(ctx2, cropArr, currentPosition, config)
-		let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, config, undefined, touchPoint)
-		if (isReDraw) {
-			renderCtx2()
-			triggerTagListChange('statusChange', getTagList(redrawList))
+		if (!ctx2) return
+
+		let { boxList } = pointIsInBoxList(touchPoint, tagArr, scale, currentPosition)
+		boxList.forEach(item => {
+			item?.onClick?.('', item)
+		})
+
+		if (props.enableInteractiveTagChangeStatus) {
+			drawCropList(ctx2, cropArr, currentPosition, config)
+			let { isReDraw, redrawList } = drawTagList(ctx2, tagArr, currentPosition, config, undefined, touchPoint)
+			if (isReDraw) {
+				renderCtx2()
+				triggerTagListChange('statusChange', getTagList(redrawList))
+			}
 		}
 	},
 	onWheel(zoom: number, mouse: Point, privateCall?: boolean) {
@@ -1204,7 +1219,6 @@ function onMouseOut() {
 function onClick(e) {
 	getContainerInfo()
 	if (!inited) return
-
 	let event = {
 		layerX: Reflect.get(e, 'layerX'),
 		layerY: Reflect.get(e, 'layerY'),

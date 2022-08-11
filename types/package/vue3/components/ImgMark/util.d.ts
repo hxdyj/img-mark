@@ -55,6 +55,10 @@ export declare function transfromBoxSize2Visual(box: BoundingBox, scale: number,
 export declare function pointIsInBox(point: Point, box: BoundingBox): boolean;
 export declare function pointIsInRect(point: Point, rect: Rect): boolean;
 export declare function transfromTwoPoints2Rect(pointStart: Point, pointEnd: Point): Rect;
+export declare type Event = {
+    onClick?: (e: unknown, list: BoundingBox) => void;
+    onDoubleClick?: (e: unknown, list: BoundingBox) => void;
+};
 export declare type BoundingBox = {
     startX: number;
     startY: number;
@@ -65,7 +69,7 @@ export declare type BoundingBox = {
     showOutLine?: boolean;
     labelText?: string;
     tagConfig?: TagConfig;
-};
+} & Event;
 declare type FixBoxInfoReturn = {
     info: BoundingBox;
     position: Rect;

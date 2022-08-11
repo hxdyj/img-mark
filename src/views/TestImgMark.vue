@@ -15,6 +15,7 @@
 				@tagListChange="tagsListChange"
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"
+				:enableInteractiveTagChangeStatus="false"
 				:tagConfig="{
 					fontSize: 50,
 				}"
@@ -91,6 +92,12 @@ let tagList = $ref<MyBoundingBox[]>([
 		labelText: 'haha',
 		tagConfig: {
 			highlightStrokeStyle: '#ccc',
+		},
+		onClick(e, item) {
+			console.log('Custom Click:', item)
+		},
+		onDoubleClick(e, item) {
+			console.log('Custom Double Click:', item)
 		},
 	},
 	{

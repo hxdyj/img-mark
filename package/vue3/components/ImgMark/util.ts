@@ -230,6 +230,7 @@ export function pointIsInBox(point: Point, box: BoundingBox) {
 	}
 	return false
 }
+
 export function pointIsInRect(point: Point, rect: Rect) {
 	let rectPositionInfo = {
 		startX: rect[0],
@@ -252,6 +253,11 @@ export function transfromTwoPoints2Rect(pointStart: Point, pointEnd: Point): Rec
 	return [left, top, width, height]
 }
 
+export type Event = {
+	onClick?: (e: unknown, list: BoundingBox) => void
+	onDoubleClick?: (e: unknown, list: BoundingBox) => void
+}
+
 export type BoundingBox = {
 	startX: number
 	startY: number
@@ -262,7 +268,7 @@ export type BoundingBox = {
 	showOutLine?: boolean
 	labelText?: string
 	tagConfig?: TagConfig
-}
+} & Event
 
 type FixBoxInfoReturn = {
 	info: BoundingBox

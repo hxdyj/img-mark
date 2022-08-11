@@ -136,6 +136,11 @@ function getGroupInfo() {
 ## 类型
 
 ```ts
+type Event = {
+	onClick?: (e: unknown, list: BoundingBox) => void //tag click事件
+	onDoubleClick?: (e: unknown, list: BoundingBox) => void //tag double click事件
+}
+
 type BoundingBox = {
 	startX: number
 	endX: number
@@ -145,7 +150,7 @@ type BoundingBox = {
 	showOutLine?: boolean //tag是否边框是否高亮
 	labelText?: string //tag的标签文字
 	tagConfig?: TagConfig //单独定义某个tagConfig
-}
+} & Event
 
 type CropConfig = {
 	lineDash?: number[]
