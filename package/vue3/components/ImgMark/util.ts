@@ -533,7 +533,7 @@ export function moveDrawTagRect(
 		if (position[2] > 5 || position[3] > 5) {
 			// if (debug) console.log('DRAW Tag', position)
 			drawTagList(ctx, tagArr, currentPosition, config)
-			drawTagRect(ctx, ...position, config, tagArr.length + 1, undefined, true)
+			drawTagRect(ctx, ...position, config, tagArr.length + 1, undefined, true, undefined, config.drawingText)
 			return position
 		}
 	}

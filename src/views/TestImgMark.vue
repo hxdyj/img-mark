@@ -12,6 +12,7 @@
 				@resizeStart="resizeStart"
 				@resizeEnd="resizeEnd"
 				@delCrop="delCrop"
+				:drawingText="'lala'"
 				@tagListChange="tagsListChange"
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"

@@ -3,6 +3,38 @@ export declare type CropConfig = {
     strokeStyle?: string;
     lineWidth?: number;
 };
+export declare type Props = {
+    cropConfig?: CropConfig;
+    layerConfig?: LayerConfig;
+    tagConfig?: TagConfig;
+    drawingText?: string;
+    isShowTip?: boolean;
+    enableScale?: boolean;
+    enableMove?: boolean;
+    enableDrawCrop?: boolean;
+    enableDrawTag?: boolean;
+    enableInteractiveTagChangeStatus?: boolean;
+    enableCropCross?: boolean;
+    handleResizeCropCross?: 'delete' | 'reset';
+    enableInteractiveCropDelete?: boolean;
+    enableCropResize?: boolean;
+    enableDrawCropOutOfImg?: boolean;
+    enableDrawTagOutOfCrop?: boolean;
+    enableDrawTagOutOfImg?: boolean;
+    isImgCrop?: boolean;
+    isCropSingle?: boolean;
+    cropList?: BoundingBox[];
+    tagList?: BoundingBox[];
+    mode?: Mode;
+    mobileOperation?: MobileOperation;
+    src: string;
+    precision?: number;
+};
+export declare type Config = {
+    cropConfig: Required<CropConfig>;
+    layerConfig: Required<LayerConfig>;
+    tagConfig: Required<TagConfig>;
+} & Pick<Props, 'drawingText'>;
 export declare type MobileOperation = 'draw' | 'move';
 export declare type LayerConfig = {
     fillStyle?: string;
@@ -18,11 +50,6 @@ export declare type TagConfig = {
     highlightStrokeStyle?: string;
     highlightLineWidth?: number;
     highlightLineDash?: number[];
-};
-export declare type Config = {
-    cropConfig: Required<CropConfig>;
-    layerConfig: Required<LayerConfig>;
-    tagConfig: Required<TagConfig>;
 };
 export declare type ResizeEmitType = {
     index: number;
@@ -64,6 +91,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
         type: ObjectConstructor;
         required: false;
         default: () => Required<TagConfig>;
+    };
+    drawingText: {
+        type: StringConstructor;
+        required: false;
     };
     isShowTip: {
         type: BooleanConstructor;
@@ -192,6 +223,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         cropConfig: CropConfig;
         layerConfig: LayerConfig;
         tagConfig: TagConfig;
+        drawingText?: string | undefined;
         isShowTip: boolean;
         enableScale: boolean;
         enableMove: boolean;
@@ -336,6 +368,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
         type: ObjectConstructor;
         required: false;
         default: () => Required<TagConfig>;
+    };
+    drawingText: {
+        type: StringConstructor;
+        required: false;
     };
     isShowTip: {
         type: BooleanConstructor;

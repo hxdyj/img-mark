@@ -52,6 +52,45 @@ export type CropConfig = {
 	lineWidth?: number
 }
 
+export type Props = {
+	cropConfig?: CropConfig
+	layerConfig?: LayerConfig
+	tagConfig?: TagConfig
+	drawingText?: string
+	isShowTip?: boolean
+	enableScale?: boolean
+	enableMove?: boolean
+	enableDrawCrop?: boolean
+	enableDrawTag?: boolean
+	enableInteractiveTagChangeStatus?: boolean
+	enableCropCross?: boolean
+	handleResizeCropCross?: 'delete' | 'reset'
+	enableInteractiveCropDelete?: boolean
+	enableCropResize?: boolean
+	//是否允许crop画到图片外
+	enableDrawCropOutOfImg?: boolean
+	//是否允许Tag画到crop外
+	enableDrawTagOutOfCrop?: boolean
+	//是否允许Tag画到img外
+	enableDrawTagOutOfImg?: boolean
+	//是否在无crop的时候以全图为crop
+	isImgCrop?: boolean
+	//是否crop为数量维持一个，新画crop的时候会自动清空之前的
+	isCropSingle?: boolean
+	cropList?: BoundingBox[]
+	tagList?: BoundingBox[]
+	mode?: Mode
+	mobileOperation?: MobileOperation
+	src: string
+	precision?: number
+}
+
+export type Config = {
+	cropConfig: Required<CropConfig>
+	layerConfig: Required<LayerConfig>
+	tagConfig: Required<TagConfig>
+} & Pick<Props, 'drawingText'>
+
 export type MobileOperation = 'draw' | 'move'
 
 export type LayerConfig = {
@@ -69,12 +108,6 @@ export type TagConfig = {
 	highlightStrokeStyle?: string
 	highlightLineWidth?: number
 	highlightLineDash?: number[]
-}
-
-export type Config = {
-	cropConfig: Required<CropConfig>
-	layerConfig: Required<LayerConfig>
-	tagConfig: Required<TagConfig>
 }
 
 export type ResizeEmitType = {
@@ -148,6 +181,7 @@ import {
 	boxAllInBoxList,
 	transformBoxPrecision,
 } from './util'
+
 let spaceKeyDown = false
 
 let mouseDownTime: number | undefined = undefined
@@ -185,64 +219,31 @@ function initVar() {
 	status.resizeCropHovering = undefined
 }
 
-let props = withDefaults(
-	defineProps<{
-		cropConfig?: CropConfig
-		layerConfig?: LayerConfig
-		tagConfig?: TagConfig
-		isShowTip?: boolean
-		enableScale?: boolean
-		enableMove?: boolean
-		enableDrawCrop?: boolean
-		enableDrawTag?: boolean
-		enableInteractiveTagChangeStatus?: boolean
-		enableCropCross?: boolean
-		handleResizeCropCross?: 'delete' | 'reset'
-		enableInteractiveCropDelete?: boolean
-		enableCropResize?: boolean
-		//是否允许crop画到图片外
-		enableDrawCropOutOfImg?: boolean
-		//是否允许Tag画到crop外
-		enableDrawTagOutOfCrop?: boolean
-		//是否允许Tag画到img外
-		enableDrawTagOutOfImg?: boolean
-		//是否在无crop的时候以全图为crop
-		isImgCrop?: boolean
-		//是否crop为数量维持一个，新画crop的时候会自动清空之前的
-		isCropSingle?: boolean
-		cropList?: BoundingBox[]
-		tagList?: BoundingBox[]
-		mode?: Mode
-		mobileOperation?: MobileOperation
-		src: string
-		precision?: number
-	}>(),
-	{
-		tagConfig: () => DEFAULT_CONFIG.tagConfig,
-		layerConfig: () => DEFAULT_CONFIG.layerConfig,
-		cropConfig: () => DEFAULT_CONFIG.cropConfig,
-		isShowTip: false,
-		enableMove: true,
-		enableScale: true,
-		enableDrawCrop: true,
-		enableDrawTag: true,
-		enableCropCross: false,
-		enableInteractiveTagChangeStatus: true,
-		handleResizeCropCross: 'reset',
-		enableCropResize: true,
-		enableInteractiveCropDelete: true,
-		enableDrawCropOutOfImg: true,
-		enableDrawTagOutOfCrop: true,
-		enableDrawTagOutOfImg: true,
-		isCropSingle: false,
-		isImgCrop: false,
-		mode: 'crop',
-		mobileOperation: 'move',
-		precision: 0,
-		tagList: () => Array(),
-		cropList: () => Array(),
-	}
-)
+let props = withDefaults(defineProps<Props>(), {
+	tagConfig: () => DEFAULT_CONFIG.tagConfig,
+	layerConfig: () => DEFAULT_CONFIG.layerConfig,
+	cropConfig: () => DEFAULT_CONFIG.cropConfig,
+	isShowTip: false,
+	enableMove: true,
+	enableScale: true,
+	enableDrawCrop: true,
+	enableDrawTag: true,
+	enableCropCross: false,
+	enableInteractiveTagChangeStatus: true,
+	handleResizeCropCross: 'reset',
+	enableCropResize: true,
+	enableInteractiveCropDelete: true,
+	enableDrawCropOutOfImg: true,
+	enableDrawTagOutOfCrop: true,
+	enableDrawTagOutOfImg: true,
+	isCropSingle: false,
+	isImgCrop: false,
+	mode: 'crop',
+	mobileOperation: 'move',
+	precision: 0,
+	tagList: () => Array(),
+	cropList: () => Array(),
+})
 
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
@@ -304,6 +305,7 @@ let config = $computed<Config>(() => {
 	Object.assign(obj.cropConfig, props.cropConfig)
 	Object.assign(obj.tagConfig, props.tagConfig)
 	Object.assign(obj.layerConfig, props.layerConfig)
+	obj.drawingText = props.drawingText
 	return obj
 })
 
