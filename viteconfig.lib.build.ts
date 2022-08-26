@@ -24,14 +24,10 @@ export default defineConfig({
 		},
 	},
 	plugins: [
-		// {
-		// 	...typescript2({}),
-		// 	apply: 'build',
-		// },
 		vue({
 			reactivityTransform: true,
 		}),
-		strip(),
+		strip({ include: '**/*.(js|ts|vue)' }),
 		dts({
 			outputDir: 'types',
 			exclude: ['vue.d.ts'],

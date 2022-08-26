@@ -22,7 +22,7 @@ Bugs
 		@mouseup="onMouseUp"
 		@mousemove="onMouseMove"
 		@mouseout="onMouseOut"
-		@mousewheel.stop="onMouseWheel"
+		@mousewheel="onMouseWheel"
 		@touchmove.stop.prevent="onTouchMove"
 		@touchstart.stop="onTouchStart"
 		@touchend.stop="onTouchEnd"
@@ -884,6 +884,9 @@ watch(
 )
 
 function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
+	if (props.enableScale) {
+		e.stopPropagation()
+	}
 	let event = e as unknown as LayerTouchEvent &
 		MouseEvent & {
 			deltaY: number
@@ -1015,9 +1018,6 @@ function triggerCropListChange(type: CropListChangeType, changedList: BoundingBo
 }
 
 function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[]) {
-	// let list1 = getTagList(tagArr)
-	// console.log(222, changedList[changedList.length - 1] === list1[list1.length - 1])
-	// debugger
 	let changeParam: TagListChangeEmitRetunType = {
 		type,
 		list: changedList,
