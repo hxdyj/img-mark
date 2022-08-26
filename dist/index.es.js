@@ -3099,7 +3099,7 @@ var ImgMark_vue_vue_type_style_index_0_scoped_true_lang = "", _export_sfc = (t, 
     n[r] = o;
   return n;
 };
-const _withScopeId = (t) => (pushScopeId("data-v-326bd931"), t = t(), popScopeId(), t), _hoisted_1 = ["onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, drawingText: null, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, isImgCrop: { type: Boolean, default: false }, isCropSingle: { type: Boolean, default: false }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop", "drawCropStart", "drawTagStart", "mouseOverInfo"], setup(n, { expose: t, emit: o }) {
+const _withScopeId = (t) => (pushScopeId("data-v-dfa1ee7e"), t = t(), popScopeId(), t), _hoisted_1 = ["onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, drawingText: null, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, isImgCrop: { type: Boolean, default: false }, isCropSingle: { type: Boolean, default: false }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop", "drawCropStart", "drawTagStart", "mouseOverInfo"], setup(n, { expose: t, emit: o }) {
   const a = n;
   let r = false, i = void 0, u = void 0, c = null, f = { last: { down: void 0, up: void 0 }, prev: { down: void 0, up: void 0 } };
   const e = device.mobile() ? 0.1 / DPI * 1.5 : 0.1;
@@ -3175,6 +3175,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-326bd931"), t = t(), popScopeId
         p = t2, v = { width: p.width, height: p.height };
         var e2, n2, r2, o2, i2, t2 = initScale(h, p);
         return m = F = t2.scale, x ? (e2 = transfromBoxToRect(x, F, y), n2 = (h.width - 0.05 * h.width) / e2[2], r2 = (h.height - 0.05 * h.height) / e2[3], r2 = h.width / h.height > e2[2] / e2[3] ? r2 : n2, o2 = e2[0] + e2[2], i2 = e2[1] + e2[3], (r2 = r2) == n2 ? (y.x = (h.width - o2 * r2 - 0.05 * h.width / 2) / r2, y.y = ((h.height - e2[3] * r2) / 2 - e2[1] * r2) / r2) : (y.x = ((h.width - e2[2] * r2) / 2 - e2[0] * r2) / r2, y.y = (h.height - i2 * r2 - 0.05 * h.height / 2) / r2), Z({ deltaY: 1, clientX: 0, clientY: 0, preventDefault() {
+        }, stopPropagation() {
         }, __zoom: r2 }, true)) : (t2.fit === "width" ? y.x = (h.width - v.width * m) / 2 : y.y = (h.height - v.height * m) / 2, x = { startX: 0, startY: 0, endX: 0 + v.width, endY: 0 + v.height }, a.isImgCrop && tt("add", S = [x])), drawImage(s, p, y.x, y.y, p.width * m, p.height * m), S = initBoundingArrScale(S, m, a.precision), D = initBoundingArrScale(D, m, a.precision), Y(), true;
       })) : Promise.reject("Error: can't get canvas height and width.") : Promise.reject("Error: can't find canvas element.");
     }().then(() => {
@@ -3214,12 +3215,11 @@ const _withScopeId = (t) => (pushScopeId("data-v-326bd931"), t = t(), popScopeId
     E.resize();
   }
   function Z(t2, e2) {
-    a.enableScale && t2.stopPropagation();
-    let n2 = t2;
+    a.enableScale && (t2.stopPropagation(), t2.preventDefault());
+    var n2, r2, o2;
     if (!C)
       throw new Error("can't find  containerInfo.");
-    var r2, o2;
-    (l || n2.__zoom) && (n2.preventDefault(), O.isDrawRecting || O.isMoving || (t2 = n2.onTouchMove ? 1 : DPI, r2 = e2 ? 0 : (n2.clientX - C.left) * t2, t2 = e2 ? 0 : (n2.clientY - C.top) * t2, o2 = n2.deltaY < 0 ? 1 : -1, o2 = e2 ? n2.__zoom : Math.exp(o2 * X), I * o2 < 0.2 || E.onWheel(o2, { x: r2, y: t2 }, e2)));
+    !l && !t2.__zoom || O.isDrawRecting || O.isMoving || (r2 = t2.onTouchMove ? 1 : DPI, n2 = e2 ? 0 : (t2.clientX - C.left) * r2, r2 = e2 ? 0 : (t2.clientY - C.top) * r2, o2 = t2.deltaY < 0 ? 1 : -1, t2 = e2 ? t2.__zoom : Math.exp(o2 * X), I * t2 < 0.2 || E.onWheel(t2, { x: n2, y: r2 }, e2));
   }
   function J(t2) {
     O.resizeCropHovering && (S[O.resizeCropHovering.index] = t2, o("resizeEnd", { index: O.resizeCropHovering.index, box: t2 }), tt("resize", j([t2])));
@@ -3339,6 +3339,7 @@ const _withScopeId = (t) => (pushScopeId("data-v-326bd931"), t = t(), popScopeId
         throw new Error("can't find  containerInfo.");
       var { width: e2, height: t2 } = getTwoFingerTouchListDistence(amendMobileTouchEventDpi(t2)), e2 = getHypotenuseValue(e2, t2), t2 = -(e2 - U);
       U = e2, Z({ onTouchMove: true, deltaY: t2, preventDefault() {
+      }, stopPropagation() {
       }, clientX: W.x, clientY: W.y });
     }
   }
@@ -3376,5 +3377,5 @@ const _withScopeId = (t) => (pushScopeId("data-v-326bd931"), t = t(), popScopeId
     }), lodash.exports.groupBy(t2, "__groupIndex");
   } }), (t2, e2) => (openBlock(), createElementBlock("div", { class: "comp-ocr-img", ref_key: "containerRef", ref: L, onMousedown: nt, onMouseenter: A, onClick: ut, onMouseup: it, onMousemove: ot, onMouseout: at, onMousewheel: Z, onTouchmove: withModifiers(ft, ["stop", "prevent"]), onTouchstart: withModifiers(ct, ["stop"]), onTouchend: withModifiers(lt, ["stop"]) }, [createElementVNode("canvas", { class: "canvas", ref_key: "canvasRef", ref: N }, null, 512), createElementVNode("canvas", { class: "canvas2", ref_key: "canvas2Ref", ref: V }, null, 512), unref(a).isShowTip ? (openBlock(), createElementBlock("div", _hoisted_2, [createElementVNode("div", _hoisted_3, [createElementVNode("div", { class: normalizeClass(["circle", { crop: n.mode === "crop", tag: n.mode === "tag" }]) }, null, 2), createElementVNode("div", _hoisted_4, toDisplayString(n.mode === "crop" ? "\u88C1\u526A\u6A21\u5F0F" : "\u6807\u8BB0\u9519\u8BEF\u884C"), 1)]), createElementVNode("div", _hoisted_5, [renderSlot(t2.$slots, "tip", {}, () => [_hoisted_6, _hoisted_7, _hoisted_8, _hoisted_9], true)])])) : createCommentVNode("", true)], 40, _hoisted_1));
 } });
-var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-326bd931"]]);
+var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-dfa1ee7e"]]);
 export { ImgMark, boxIsAllInOtherBox, transformTagBoxRelativeTo, transformTagListBoxRelativeTo };

@@ -8,6 +8,7 @@
 				ref="imgMarkRef"
 				style="width: 100%; height: 100%"
 				:src="src"
+				:enableScale="false"
 				v-model:mode="mode"
 				v-model:cropBounding="cropInfo"
 				v-model:tagList="tagList"

@@ -758,6 +758,9 @@ async function initComponent() {
 					preventDefault() {
 						if (debug) console.log('preventDefault')
 					},
+					stopPropagation() {
+						if (debug) console.log('preventDefault')
+					},
 					__zoom: canvasZoom,
 				} as unknown as MouseEvent,
 				true
@@ -886,6 +889,7 @@ watch(
 function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	if (props.enableScale) {
 		e.stopPropagation()
+		e.preventDefault()
 	}
 	let event = e as unknown as LayerTouchEvent &
 		MouseEvent & {
@@ -898,7 +902,7 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	}
 
 	if (!inited && !event.__zoom) return
-	event.preventDefault()
+
 	//空格键按下的时候不能缩放
 	if (status.isDrawRecting || status.isMoving) return
 	//有startMousePoint的时候也不能缩放
@@ -1300,6 +1304,9 @@ function onTouchMove(event: TouchEvent) {
 			onTouchMove: true,
 			deltaY: zoom,
 			preventDefault() {
+				console.log('none')
+			},
+			stopPropagation() {
 				console.log('none')
 			},
 			clientX: twoFingerCenterPoint.x,
