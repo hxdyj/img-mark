@@ -595,9 +595,11 @@ let hooks = {
 	},
 }
 
-function onKeyDownListener(e) {
+function onKeyDownListener(e: KeyboardEvent) {
 	if (e.code === 'Space') {
-		e.preventDefault()
+		if (e.target === document.body) {
+			e.preventDefault()
+		}
 		hooks.onKeyDownSpace()
 	}
 }
@@ -612,14 +614,14 @@ function onKeyUpListener(e) {
 }
 function addListenerKeyUpDown() {
 	if (device.mobile()) return
-	document.addEventListener('keydown', onKeyDownListener)
-	document.addEventListener('keyup', onKeyUpListener)
+	window.addEventListener('keydown', onKeyDownListener)
+	window.addEventListener('keyup', onKeyUpListener)
 }
 
 function removeListenerKeyUpDown() {
 	if (device.mobile()) return
-	document.removeEventListener('keydown', onKeyDownListener)
-	document.removeEventListener('keyup', onKeyUpListener)
+	window.removeEventListener('keydown', onKeyDownListener)
+	window.removeEventListener('keyup', onKeyUpListener)
 }
 
 function initCropInfo() {

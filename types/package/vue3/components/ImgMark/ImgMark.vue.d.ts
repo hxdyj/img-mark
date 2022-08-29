@@ -319,7 +319,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         init(): void;
         resize(): void;
     };
-    onKeyDownListener: (e: any) => void;
+    onKeyDownListener: (e: KeyboardEvent) => void;
     onKeyUpListener: (e: any) => void;
     addListenerKeyUpDown: () => void;
     removeListenerKeyUpDown: () => void;

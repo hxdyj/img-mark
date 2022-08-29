@@ -35,6 +35,7 @@
 				:enableDrawTagOutOfImg="true"
 			></ImgMark>
 		</div>
+		<el-input v-model="value"></el-input>
 	</div>
 </template>
 <script setup lang="ts">
@@ -50,6 +51,7 @@ type MyBoundingBox = BoundingBox & {
 	type: number
 }
 let mouseInfo = $ref<any>()
+let value = $ref('')
 let cropList = $ref<MyBoundingBox[]>([])
 let tagList = $ref<MyBoundingBox[]>([
 	{
