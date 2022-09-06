@@ -83,6 +83,7 @@ export type Props = {
 	mobileOperation?: MobileOperation
 	src: string
 	precision?: number
+	splitClickAndDoubleClickEvent?: boolean
 }
 
 export type Config = {
@@ -186,7 +187,7 @@ let spaceKeyDown = false
 
 let mouseDownTime: number | undefined = undefined
 let mouseUpTime: number | undefined = undefined
-
+let clickTimeout: null | ReturnType<typeof setTimeout> = null
 let clickedCrop: BoundingBox | null = null
 
 let mouseQuickDoubleTapTime: {
@@ -241,6 +242,7 @@ let props = withDefaults(defineProps<Props>(), {
 	mode: 'crop',
 	mobileOperation: 'move',
 	precision: 0,
+	splitClickAndDoubleClickEvent: false,
 	tagList: () => Array(),
 	cropList: () => Array(),
 })
@@ -1224,6 +1226,13 @@ function onMouseOut() {
 	triggerMouseOverInfo()
 }
 
+function clearClickTimeout() {
+	if (clickTimeout) {
+		clearTimeout(clickTimeout)
+	}
+	clickTimeout = null
+}
+
 function onClick(e) {
 	getContainerInfo()
 	if (!inited) return
@@ -1240,18 +1249,35 @@ function onClick(e) {
 	if (clickInterval > 100) {
 		return
 	}
-	hooks.onCick(touchPoint)
 
-	const minInterval = 360
+	if (props.splitClickAndDoubleClickEvent) {
+		clearClickTimeout()
+		clickTimeout = setTimeout(() => {
+			hooks.onCick(touchPoint)
+			clickTimeout = null
+		}, 230)
+	} else {
+		hooks.onCick(touchPoint)
+	}
+
+	const minInterval = props.splitClickAndDoubleClickEvent ? 320 : 360
 	if (mouseQuickDoubleTapTime.prev.up && mouseQuickDoubleTapTime.prev.down && mouseQuickDoubleTapTime.last.up && mouseQuickDoubleTapTime.last.down) {
 		if (mouseQuickDoubleTapTime.last.up - mouseQuickDoubleTapTime.prev.down < minInterval) {
+			if (props.splitClickAndDoubleClickEvent) {
+				clearClickTimeout()
+			}
 			hooks.onDoubleClick(touchPoint)
+			mouseQuickDoubleTapTime.prev.down = undefined
+			mouseQuickDoubleTapTime.prev.up = undefined
+			mouseQuickDoubleTapTime.last.down = undefined
+			mouseQuickDoubleTapTime.last.up = undefined
+		} else {
+			//将last值设置为prev，last设置为空
+			mouseQuickDoubleTapTime.prev.down = mouseQuickDoubleTapTime.last.down
+			mouseQuickDoubleTapTime.prev.up = mouseQuickDoubleTapTime.last.up
+			mouseQuickDoubleTapTime.last.down = undefined
+			mouseQuickDoubleTapTime.last.up = undefined
 		}
-		//将last值设置为prev，last设置为空
-		mouseQuickDoubleTapTime.prev.down = mouseQuickDoubleTapTime.last.down
-		mouseQuickDoubleTapTime.prev.up = mouseQuickDoubleTapTime.last.up
-		mouseQuickDoubleTapTime.last.down = undefined
-		mouseQuickDoubleTapTime.last.up = undefined
 	}
 }
 

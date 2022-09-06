@@ -20,6 +20,7 @@
 				:tagConfig="{
 					fontSize: 50,
 				}"
+				:splitClickAndDoubleClickEvent="true"
 				:isCropSingle="true"
 				:isImgCrop="true"
 				:isShowTip="true"

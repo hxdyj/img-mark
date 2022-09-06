@@ -29,6 +29,7 @@ export declare type Props = {
     mobileOperation?: MobileOperation;
     src: string;
     precision?: number;
+    splitClickAndDoubleClickEvent?: boolean;
 };
 export declare type Config = {
     cropConfig: Required<CropConfig>;
@@ -200,10 +201,16 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: number;
     };
+    splitClickAndDoubleClickEvent: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
 }, {
     spaceKeyDown: boolean;
     mouseDownTime: undefined;
     mouseUpTime: undefined;
+    clickTimeout: null;
     clickedCrop: null;
     mouseQuickDoubleTapTime: {
         last: {
@@ -245,6 +252,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         mobileOperation: MobileOperation;
         src: string;
         precision: number;
+        splitClickAndDoubleClickEvent: boolean;
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
@@ -343,6 +351,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: () => void;
     onMouseOut: () => void;
+    clearClickTimeout: () => void;
     onClick: (e: any) => void;
     onTouchStart: (event: TouchEvent) => void;
     onTouchMove: (event: TouchEvent) => void;
@@ -477,6 +486,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: number;
     };
+    splitClickAndDoubleClickEvent: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
 }>> & {
     "onUpdate:cropList"?: ((...args: any[]) => any) | undefined;
     onCropListChange?: ((...args: any[]) => any) | undefined;
@@ -514,5 +528,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     mode: any;
     mobileOperation: string;
     precision: number;
+    splitClickAndDoubleClickEvent: boolean;
 }>;
 export default _sfc_main;
