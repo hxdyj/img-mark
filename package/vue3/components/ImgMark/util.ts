@@ -71,6 +71,8 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 export function drawImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, left: number, top: number, width: number, height: number) {
+	ctx.imageSmoothingEnabled = true
+	ctx.imageSmoothingQuality = 'high'
 	ctx.drawImage(img, left, top, width, height)
 }
 

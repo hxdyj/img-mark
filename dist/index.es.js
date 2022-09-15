@@ -2844,7 +2844,7 @@ function loadImage(t) {
   });
 }
 function drawImage(t, e, n, r, o, i) {
-  t.drawImage(e, n, r, o, i);
+  t.imageSmoothingEnabled = true, t.imageSmoothingQuality = "high", t.drawImage(e, n, r, o, i);
 }
 function drawLayerBg(t, e) {
   t.fillStyle = e.layerConfig.fillStyle, t.fillRect(-CancasSafeArea / 2, -CancasSafeArea / 2, CancasSafeArea, CancasSafeArea);
