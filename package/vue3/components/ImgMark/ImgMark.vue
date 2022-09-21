@@ -126,6 +126,10 @@ export type MouseOverInfoEmitType = {
 	canvas: Point | null
 	img: Point | null
 }
+export type OnLoadImageEmitType = {
+	status: 'loading' | 'success' | 'error'
+	msg?: string
+}
 
 export type TagListChangeType = 'add' | 'delete' | 'statusChange'
 export type CropListChangeType = 'add' | 'delete' | 'resize'
@@ -266,6 +270,7 @@ let emits = defineEmits<{
 	(e: 'drawCropStart'): void
 	(e: 'drawTagStart'): void
 	(e: 'mouseOverInfo', info: MouseOverInfoEmitType): void
+	(e: 'onLoadImage', data: OnLoadImageEmitType): void
 }>()
 
 type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>
@@ -691,94 +696,107 @@ async function initComponent() {
 	if (!canvasWH) return Promise.reject(`Error: can't get canvas height and width.`)
 	initCanvasWH(ctx, canvasWH)
 	initCanvasWH(ctx2, canvasWH)
-	return loadImage(props.src).then(_img => {
-		if (!canvasWH || !ctx || !ctx2) return Promise.reject(`canvasWH or canvas var not has valid values.`)
-		img = _img
-		imgWH = {
-			width: img.width,
-			height: img.height,
-		}
-		// console.log('WH', canvasWH, imgWH)
-		// if (debug) console.log('Image WH', imgWH, canvasWH)
-		let initScaleInfo = initScale(canvasWH, img)
-		scale = cropScale = initScaleInfo.scale
-		// if (debug) console.log('Scale', scale)
-		// if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
-		//处理没有cropInfo的情况
-		if (!cropInfo) {
-			if (initScaleInfo.fit === 'width') {
-				currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
-			} else {
-				currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
+	emits('onLoadImage', {
+		status: 'loading',
+	})
+	return loadImage(props.src)
+		.then(_img => {
+			emits('onLoadImage', {
+				status: 'success',
+			})
+			if (!canvasWH || !ctx || !ctx2) return Promise.reject(`canvasWH or canvas var not has valid values.`)
+			img = _img
+			imgWH = {
+				width: img.width,
+				height: img.height,
 			}
-			cropInfo = {
-				startX: 0,
-				startY: 0,
-				endX: 0 + imgWH.width,
-				endY: 0 + imgWH.height,
-			}
+			// console.log('WH', canvasWH, imgWH)
+			// if (debug) console.log('Image WH', imgWH, canvasWH)
+			let initScaleInfo = initScale(canvasWH, img)
+			scale = cropScale = initScaleInfo.scale
+			// if (debug) console.log('Scale', scale)
+			// if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
+			//处理没有cropInfo的情况
+			if (!cropInfo) {
+				if (initScaleInfo.fit === 'width') {
+					currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
+				} else {
+					currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
+				}
+				cropInfo = {
+					startX: 0,
+					startY: 0,
+					endX: 0 + imgWH.width,
+					endY: 0 + imgWH.height,
+				}
 
-			if (props.isImgCrop) {
-				cropArr = [cropInfo]
-				triggerCropListChange('add', cropArr)
+				if (props.isImgCrop) {
+					cropArr = [cropInfo]
+					triggerCropListChange('add', cropArr)
+				}
 			}
-		}
-		//处理有CropInfo的情况，放大裁剪区域至全屏中间
-		else {
-			// if (debug) console.log(cropInfo)
-			let cropBoxInfo = transfromBoxToRect(cropInfo, cropScale, currentPosition)
-			let whiteRate = 0.05
-			let widthRate = (canvasWH.width - canvasWH.width * whiteRate) / cropBoxInfo[2]
-			let heightRate = (canvasWH.height - canvasWH.height * whiteRate) / cropBoxInfo[3]
+			//处理有CropInfo的情况，放大裁剪区域至全屏中间
+			else {
+				// if (debug) console.log(cropInfo)
+				let cropBoxInfo = transfromBoxToRect(cropInfo, cropScale, currentPosition)
+				let whiteRate = 0.05
+				let widthRate = (canvasWH.width - canvasWH.width * whiteRate) / cropBoxInfo[2]
+				let heightRate = (canvasWH.height - canvasWH.height * whiteRate) / cropBoxInfo[3]
 
-			// if (debug) console.log('RATE', widthRate, heightRate)
-			// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
-			/* tips
+				// if (debug) console.log('RATE', widthRate, heightRate)
+				// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
+				/* tips
 			box
 			innerBox
 
 			boxAspectRatio<innerBoxAspectRatio  width fix
 			boxAspectRatio>innerBoxAspectRatio  height fix
 			*/
-			let boxStretchScale = canvasWH.width / canvasWH.height > cropBoxInfo[2] / cropBoxInfo[3] ? heightRate : widthRate // 长边尽量展示出来
-			let canvasZoom = boxStretchScale
+				let boxStretchScale = canvasWH.width / canvasWH.height > cropBoxInfo[2] / cropBoxInfo[3] ? heightRate : widthRate // 长边尽量展示出来
+				let canvasZoom = boxStretchScale
 
-			let cropX = cropBoxInfo[0] + cropBoxInfo[2]
-			let cropY = cropBoxInfo[1] + cropBoxInfo[3]
+				let cropX = cropBoxInfo[0] + cropBoxInfo[2]
+				let cropY = cropBoxInfo[1] + cropBoxInfo[3]
 
-			if (boxStretchScale === widthRate) {
-				currentPosition.x = (canvasWH.width - cropX * canvasZoom - (canvasWH.width * whiteRate) / 2) / canvasZoom
-				currentPosition.y = ((canvasWH.height - cropBoxInfo[3] * canvasZoom) / 2 - cropBoxInfo[1] * canvasZoom) / canvasZoom
-			} else {
-				currentPosition.x = ((canvasWH.width - cropBoxInfo[2] * canvasZoom) / 2 - cropBoxInfo[0] * canvasZoom) / canvasZoom
-				currentPosition.y = (canvasWH.height - cropY * canvasZoom - (canvasWH.height * whiteRate) / 2) / canvasZoom
+				if (boxStretchScale === widthRate) {
+					currentPosition.x = (canvasWH.width - cropX * canvasZoom - (canvasWH.width * whiteRate) / 2) / canvasZoom
+					currentPosition.y = ((canvasWH.height - cropBoxInfo[3] * canvasZoom) / 2 - cropBoxInfo[1] * canvasZoom) / canvasZoom
+				} else {
+					currentPosition.x = ((canvasWH.width - cropBoxInfo[2] * canvasZoom) / 2 - cropBoxInfo[0] * canvasZoom) / canvasZoom
+					currentPosition.y = (canvasWH.height - cropY * canvasZoom - (canvasWH.height * whiteRate) / 2) / canvasZoom
+				}
+
+				onMouseWheel(
+					{
+						deltaY: 1,
+						clientX: 0,
+						clientY: 0,
+						preventDefault() {
+							if (debug) console.log('preventDefault')
+						},
+						stopPropagation() {
+							if (debug) console.log('preventDefault')
+						},
+						__zoom: canvasZoom,
+					} as unknown as MouseEvent,
+					true
+				)
 			}
-
-			onMouseWheel(
-				{
-					deltaY: 1,
-					clientX: 0,
-					clientY: 0,
-					preventDefault() {
-						if (debug) console.log('preventDefault')
-					},
-					stopPropagation() {
-						if (debug) console.log('preventDefault')
-					},
-					__zoom: canvasZoom,
-				} as unknown as MouseEvent,
-				true
-			)
-		}
-		drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
-		// let initPosition = transfromBoxToRect(cropInfo, cropScale, currentPosition)
-		// if (debug) console.log('Crop Current', initPosition)
-		// drawCropRect(ctx2, ...initPosition)
-		cropArr = initBoundingArrScale(cropArr, scale, props.precision)
-		tagArr = initBoundingArrScale(tagArr, scale, props.precision)
-		renderCtx2()
-		return true
-	})
+			drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
+			// let initPosition = transfromBoxToRect(cropInfo, cropScale, currentPosition)
+			// if (debug) console.log('Crop Current', initPosition)
+			// drawCropRect(ctx2, ...initPosition)
+			cropArr = initBoundingArrScale(cropArr, scale, props.precision)
+			tagArr = initBoundingArrScale(tagArr, scale, props.precision)
+			renderCtx2()
+			return true
+		})
+		.catch(err => {
+			emits('onLoadImage', {
+				status: 'error',
+				msg: JSON.stringify(err),
+			})
+		})
 }
 
 function initResizeVar() {

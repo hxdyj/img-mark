@@ -65,6 +65,10 @@ export declare type MouseOverInfoEmitType = {
     canvas: Point | null;
     img: Point | null;
 };
+export declare type OnLoadImageEmitType = {
+    status: 'loading' | 'success' | 'error';
+    msg?: string;
+};
 export declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
 export declare type CropListChangeType = 'add' | 'delete' | 'resize';
 import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
@@ -270,6 +274,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'drawCropStart'): void;
         (e: 'drawTagStart'): void;
         (e: 'mouseOverInfo', info: MouseOverInfoEmitType): void;
+        (e: 'onLoadImage', data: OnLoadImageEmitType): void;
     };
     inited: boolean;
     ctx: null;
@@ -333,7 +338,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     removeListenerKeyUpDown: () => void;
     initCropInfo: () => void;
     getContainerInfo: () => void;
-    initComponent: () => Promise<boolean>;
+    initComponent: () => Promise<true | void>;
     initResizeVar: () => void;
     renderCtx2: () => void;
     resizeRender: () => Promise<undefined>;
@@ -362,7 +367,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagListGroupByCropIndex: (type?: 'startPoint' | 'allIn') => {
         [index: number]: BoundingBox[];
     };
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
         type: ObjectConstructor;
         required: false;
@@ -504,6 +509,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onDrawCropStart?: ((...args: any[]) => any) | undefined;
     onDrawTagStart?: ((...args: any[]) => any) | undefined;
     onMouseOverInfo?: ((...args: any[]) => any) | undefined;
+    onOnLoadImage?: ((...args: any[]) => any) | undefined;
 }, {
     cropConfig: Record<string, any>;
     layerConfig: Record<string, any>;
