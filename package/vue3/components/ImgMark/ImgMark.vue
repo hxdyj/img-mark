@@ -62,6 +62,7 @@ export type Props = {
 	enableMove?: boolean
 	enableDrawCrop?: boolean
 	enableDrawTag?: boolean
+	initScale?: boolean
 	enableInteractiveTagChangeStatus?: boolean
 	enableCropCross?: boolean
 	handleResizeCropCross?: 'delete' | 'reset'
@@ -228,6 +229,7 @@ let props = withDefaults(defineProps<Props>(), {
 	tagConfig: () => DEFAULT_CONFIG.tagConfig,
 	layerConfig: () => DEFAULT_CONFIG.layerConfig,
 	cropConfig: () => DEFAULT_CONFIG.cropConfig,
+	initScale: true,
 	isShowTip: false,
 	enableMove: true,
 	enableScale: true,
@@ -712,76 +714,78 @@ async function initComponent() {
 			}
 			// console.log('WH', canvasWH, imgWH)
 			// if (debug) console.log('Image WH', imgWH, canvasWH)
-			let initScaleInfo = initScale(canvasWH, img)
-			scale = cropScale = initScaleInfo.scale
-			// if (debug) console.log('Scale', scale)
-			// if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
-			//处理没有cropInfo的情况
-			if (!cropInfo) {
-				if (initScaleInfo.fit === 'width') {
-					currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
-				} else {
-					currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
-				}
-				cropInfo = {
-					startX: 0,
-					startY: 0,
-					endX: 0 + imgWH.width,
-					endY: 0 + imgWH.height,
-				}
+			if (props.initScale) {
+				let initScaleInfo = initScale(canvasWH, img)
+				scale = cropScale = initScaleInfo.scale
+				// if (debug) console.log('Scale', scale)
+				// if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
+				//处理没有cropInfo的情况
+				if (!cropInfo) {
+					if (initScaleInfo.fit === 'width') {
+						currentPosition.x = (canvasWH.width - imgWH.width * scale) / 2
+					} else {
+						currentPosition.y = (canvasWH.height - imgWH.height * scale) / 2
+					}
+					cropInfo = {
+						startX: 0,
+						startY: 0,
+						endX: 0 + imgWH.width,
+						endY: 0 + imgWH.height,
+					}
 
-				if (props.isImgCrop) {
-					cropArr = [cropInfo]
-					triggerCropListChange('add', cropArr)
+					if (props.isImgCrop) {
+						cropArr = [cropInfo]
+						triggerCropListChange('add', cropArr)
+					}
+				} //处理有CropInfo的情况，放大裁剪区域至全屏中间
+				else {
+					// if (debug) console.log(cropInfo)
+					let cropBoxInfo = transfromBoxToRect(cropInfo, cropScale, currentPosition)
+					let whiteRate = 0.05
+					let widthRate = (canvasWH.width - canvasWH.width * whiteRate) / cropBoxInfo[2]
+					let heightRate = (canvasWH.height - canvasWH.height * whiteRate) / cropBoxInfo[3]
+
+					// if (debug) console.log('RATE', widthRate, heightRate)
+					// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
+					/* tips
+					box
+					innerBox
+
+					boxAspectRatio<innerBoxAspectRatio  width fix
+					boxAspectRatio>innerBoxAspectRatio  height fix
+					*/
+					let boxStretchScale = canvasWH.width / canvasWH.height > cropBoxInfo[2] / cropBoxInfo[3] ? heightRate : widthRate // 长边尽量展示出来
+					let canvasZoom = boxStretchScale
+
+					let cropX = cropBoxInfo[0] + cropBoxInfo[2]
+					let cropY = cropBoxInfo[1] + cropBoxInfo[3]
+
+					if (boxStretchScale === widthRate) {
+						currentPosition.x = (canvasWH.width - cropX * canvasZoom - (canvasWH.width * whiteRate) / 2) / canvasZoom
+						currentPosition.y = ((canvasWH.height - cropBoxInfo[3] * canvasZoom) / 2 - cropBoxInfo[1] * canvasZoom) / canvasZoom
+					} else {
+						currentPosition.x = ((canvasWH.width - cropBoxInfo[2] * canvasZoom) / 2 - cropBoxInfo[0] * canvasZoom) / canvasZoom
+						currentPosition.y = (canvasWH.height - cropY * canvasZoom - (canvasWH.height * whiteRate) / 2) / canvasZoom
+					}
+
+					onMouseWheel(
+						{
+							deltaY: 1,
+							clientX: 0,
+							clientY: 0,
+							preventDefault() {
+								if (debug) console.log('preventDefault')
+							},
+							stopPropagation() {
+								if (debug) console.log('preventDefault')
+							},
+							__zoom: canvasZoom,
+						} as unknown as MouseEvent,
+						true
+					)
 				}
 			}
-			//处理有CropInfo的情况，放大裁剪区域至全屏中间
-			else {
-				// if (debug) console.log(cropInfo)
-				let cropBoxInfo = transfromBoxToRect(cropInfo, cropScale, currentPosition)
-				let whiteRate = 0.05
-				let widthRate = (canvasWH.width - canvasWH.width * whiteRate) / cropBoxInfo[2]
-				let heightRate = (canvasWH.height - canvasWH.height * whiteRate) / cropBoxInfo[3]
 
-				// if (debug) console.log('RATE', widthRate, heightRate)
-				// let boxStretchScale = cropBoxInfo[2] * widthRate <= canvasWH.width ? widthRate : heightRate  //宽度放大
-				/* tips
-			box
-			innerBox
-
-			boxAspectRatio<innerBoxAspectRatio  width fix
-			boxAspectRatio>innerBoxAspectRatio  height fix
-			*/
-				let boxStretchScale = canvasWH.width / canvasWH.height > cropBoxInfo[2] / cropBoxInfo[3] ? heightRate : widthRate // 长边尽量展示出来
-				let canvasZoom = boxStretchScale
-
-				let cropX = cropBoxInfo[0] + cropBoxInfo[2]
-				let cropY = cropBoxInfo[1] + cropBoxInfo[3]
-
-				if (boxStretchScale === widthRate) {
-					currentPosition.x = (canvasWH.width - cropX * canvasZoom - (canvasWH.width * whiteRate) / 2) / canvasZoom
-					currentPosition.y = ((canvasWH.height - cropBoxInfo[3] * canvasZoom) / 2 - cropBoxInfo[1] * canvasZoom) / canvasZoom
-				} else {
-					currentPosition.x = ((canvasWH.width - cropBoxInfo[2] * canvasZoom) / 2 - cropBoxInfo[0] * canvasZoom) / canvasZoom
-					currentPosition.y = (canvasWH.height - cropY * canvasZoom - (canvasWH.height * whiteRate) / 2) / canvasZoom
-				}
-
-				onMouseWheel(
-					{
-						deltaY: 1,
-						clientX: 0,
-						clientY: 0,
-						preventDefault() {
-							if (debug) console.log('preventDefault')
-						},
-						stopPropagation() {
-							if (debug) console.log('preventDefault')
-						},
-						__zoom: canvasZoom,
-					} as unknown as MouseEvent,
-					true
-				)
-			}
 			drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
 			// let initPosition = transfromBoxToRect(cropInfo, cropScale, currentPosition)
 			// if (debug) console.log('Crop Current', initPosition)

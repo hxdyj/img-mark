@@ -13,6 +13,7 @@ export declare type Props = {
     enableMove?: boolean;
     enableDrawCrop?: boolean;
     enableDrawTag?: boolean;
+    initScale?: boolean;
     enableInteractiveTagChangeStatus?: boolean;
     enableCropCross?: boolean;
     handleResizeCropCross?: 'delete' | 'reset';
@@ -122,6 +123,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         default: boolean;
     };
     enableDrawTag: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
+    initScale: {
         type: BooleanConstructor;
         required: false;
         default: boolean;
@@ -240,6 +246,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         enableMove: boolean;
         enableDrawCrop: boolean;
         enableDrawTag: boolean;
+        initScale: boolean;
         enableInteractiveTagChangeStatus: boolean;
         enableCropCross: boolean;
         handleResizeCropCross: 'delete' | 'reset';
@@ -412,6 +419,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    initScale: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     enableInteractiveTagChangeStatus: {
         type: BooleanConstructor;
         required: false;
@@ -519,6 +531,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     enableMove: boolean;
     enableDrawCrop: boolean;
     enableDrawTag: boolean;
+    initScale: boolean;
     enableInteractiveTagChangeStatus: boolean;
     enableCropCross: boolean;
     handleResizeCropCross: string;
