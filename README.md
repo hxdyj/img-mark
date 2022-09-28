@@ -29,7 +29,6 @@ import 'img-mark/dist/style.css'
 				v-model:mode="mode"
 				v-model:tagList="tagList"
 				v-model:cropList="cropList"
-				@tagsStatusChange="tagsStatusChange"
 				:enableDrawCropOutOfImg="false"
 				:enableDrawTagOutOfCrop="false"
 				:enableDrawTagOutOfImg="false"
@@ -108,13 +107,6 @@ function removeHoverItem(item: BoundingBox) {
 	item.showOutLine = false
 }
 
-function tagsStatusChange(list: BoundingBox[]) {
-	let removeList = list.filter(i => !i.type)
-	if (removeList.length !== 0) {
-		removeTag(removeList)
-	}
-}
-
 function getGroupInfo() {
 	let groupInfo = imgMarkRef.getTagListGroupByCropIndex()
 	console.log(groupInfo)
@@ -137,8 +129,8 @@ function getGroupInfo() {
 
 ```ts
 type Event = {
-	onClick?: (e: unknown, list: BoundingBox) => void //tag click事件
-	onDoubleClick?: (e: unknown, list: BoundingBox) => void //tag double click事件
+	onClick?: (e: unknown, item: BoundingBox) => void //tag click事件
+	onDoubleClick?: (e: unknown, item: BoundingBox) => void //tag double click事件
 }
 
 type BoundingBox = {
@@ -199,6 +191,21 @@ type OnLoadImageEmitType = {
 	status: 'loading' | 'success' | 'error'
 	msg?: string
 }
+
+type TagListChangeType = 'add' | 'delete' | 'statusChange'
+
+type TagListChangeEmitRetunType = {
+	type: TagListChangeType
+	list: BoundingBox[]
+	parentCrop?: BoundingBox
+}
+
+type CropListChangeType = 'add' | 'delete' | 'resize'
+
+type CropListChangeEmitType = {
+	type: CropListChangeType
+	list: BoundingBox[]
+}
 ```
 
 ## 组件属性
@@ -235,23 +242,24 @@ type OnLoadImageEmitType = {
 
 ## 组件事件
 
-| 事件名         | 说明                                                                                   | 参数                                                                              |
-| -------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| tagListChange  | 当添加或者删除或者改变组件状态 `tag` 项触发,`parentCrop` 只在 `type` 为 `add` 时候返回 | {type:'add'/'delete'/'statusChange', list:BoundingBox[],parentCrop?:BoundingBox } |
-| cropListChange | 当添加或者删除或者改变 `crop` 大小触发                                                 | {type:'add'/'delete'/'resize', list:BoundingBox[] }                               |
-| resizeStart    | `crop` 开始 resize 触发                                                                | data:ResizeEmitType                                                               |
-| resizeEnd      | `crop` 结束 resize 触发                                                                | data:ResizeEmitType                                                               |
-| delCrop        | 删除 `crop` 触发                                                                       | list:BoundingBox[]                                                                |
-| drawCropStart  | 添加 `crop` 之前触发                                                                   | ——                                                                                |
-| drawTagStart   | 添加 `tag` 之前触发                                                                    | ——                                                                                |
-| mouseOverInfo  | 鼠标在组件上移动或者移除时候触发                                                       | info:MouseOverInfoEmitType                                                        |
-| onLoadImage    | 图片加载状态事件                                                                       | data:OnLoadImageEmitType                                                          |
+| 事件名         | 说明                                                                                   | 参数                                                |
+| -------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| tagListChange  | 当添加或者删除或者改变组件状态 `tag` 项触发,`parentCrop` 只在 `type` 为 `add` 时候返回 | data:TagListChangeEmitRetunType                     |
+| cropListChange | 当添加或者删除或者改变 `crop` 大小触发                                                 | {type:'add'/'delete'/'resize', list:BoundingBox[] } |
+| resizeStart    | `crop` 开始 resize 触发                                                                | data:ResizeEmitType                                 |
+| resizeEnd      | `crop` 结束 resize 触发                                                                | data:ResizeEmitType                                 |
+| delCrop        | 删除 `crop` 触发                                                                       | list:BoundingBox[]                                  |
+| drawCropStart  | 添加 `crop` 之前触发                                                                   | ——                                                  |
+| drawTagStart   | 添加 `tag` 之前触发                                                                    | ——                                                  |
+| mouseOverInfo  | 鼠标在组件上移动或者移除时候触发                                                       | info:MouseOverInfoEmitType                          |
+| onLoadImage    | 图片加载状态事件                                                                       | data:OnLoadImageEmitType                            |
 
 ## 组件方法
 
 | 方法                       | 说明                                 | 参数                                      | 返回类型                |
 | -------------------------- | ------------------------------------ | ----------------------------------------- | ----------------------- |
 | removeTagItems             | 移除 `tag` 项                        | list:BoundingBox[]                        | void                    |
+| hooks                      | 调用组件抽象方法                     | 详情参见源码                              | ——                      |
 | getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组 | type: 'startPoint'/'allIn' = 'startPoint' | TagListGroupByCropIndex |
 
 ## Slots

@@ -56,8 +56,8 @@ export declare function pointIsInBox(point: Point, box: BoundingBox): boolean;
 export declare function pointIsInRect(point: Point, rect: Rect): boolean;
 export declare function transfromTwoPoints2Rect(pointStart: Point, pointEnd: Point): Rect;
 export declare type Event = {
-    onClick?: (e: unknown, list: BoundingBox) => void;
-    onDoubleClick?: (e: unknown, list: BoundingBox) => void;
+    onClick?: (e: unknown, item: BoundingBox) => void;
+    onDoubleClick?: (e: unknown, item: BoundingBox) => void;
 };
 export declare type BoundingBox = {
     startX: number;

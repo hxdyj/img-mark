@@ -17,7 +17,7 @@
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"
 				@onLoadImage="onLoadImage"
-				:enableInteractiveTagChangeStatus="false"
+				:enableInteractiveTagChangeStatus="true"
 				:tagConfig="{
 					fontSize: 50,
 				}"
@@ -96,12 +96,12 @@ let tagList = $ref<MyBoundingBox[]>([
 		tagConfig: {
 			highlightStrokeStyle: '#ccc',
 		},
-		onClick(e, item) {
-			console.log('Custom Click:', item)
-		},
-		onDoubleClick(e, item) {
-			console.log('Custom Double Click:', item)
-		},
+		// onClick(e, item) {
+		// 	console.log('Custom Click:', item)
+		// },
+		// onDoubleClick(e, item) {
+		// 	console.log('Custom Double Click:', item)
+		// },
 	},
 	{
 		__uid: '2',
@@ -158,6 +158,7 @@ function tagsListChange(data: any) {
 	// 	removeTag([tagList[0]])
 	// }
 	console.log('tagsListChange', data)
+	imgMarkRef.hooks.onKeyDownSpace()
 }
 
 function setHoverItem(item: MyBoundingBox) {

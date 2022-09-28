@@ -122,6 +122,10 @@ export type TagListChangeEmitRetunType = {
 	list: BoundingBox[]
 	parentCrop?: BoundingBox
 }
+export type CropListChangeEmitType = {
+	type: CropListChangeType
+	list: BoundingBox[]
+}
 
 export type MouseOverInfoEmitType = {
 	canvas: Point | null
@@ -255,13 +259,7 @@ let props = withDefaults(defineProps<Props>(), {
 
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
-	(
-		e: 'cropListChange',
-		data: {
-			type: CropListChangeType
-			list: BoundingBox[]
-		}
-	): void
+	(e: 'cropListChange', data: CropListChangeEmitType): void
 	(e: 'update:tagList', list: BoundingBox[]): void
 	(e: 'tagListChange', data: TagListChangeEmitRetunType): void
 	(e: 'update:mode', mode: Mode): void
@@ -498,6 +496,7 @@ let hooks = {
 		spaceKeyDown = false
 	},
 	onKeyDownSpace() {
+		console.log('---------------------HAHAHAHA---------------------')
 		if ((props.enableDrawCrop && props.mode === 'crop') || (props.enableDrawTag && props.mode === 'tag')) {
 			containerRef.style.cursor = 'crosshair'
 		}
@@ -1462,6 +1461,7 @@ function getTagListGroupByCropIndex(type: 'startPoint' | 'allIn' = 'startPoint')
 defineExpose({
 	removeTagItems,
 	getTagListGroupByCropIndex,
+	hooks,
 })
 </script>
 

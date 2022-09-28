@@ -62,6 +62,10 @@ export declare type TagListChangeEmitRetunType = {
     list: BoundingBox[];
     parentCrop?: BoundingBox;
 };
+export declare type CropListChangeEmitType = {
+    type: CropListChangeType;
+    list: BoundingBox[];
+};
 export declare type MouseOverInfoEmitType = {
     canvas: Point | null;
     img: Point | null;
@@ -267,10 +271,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
-        (e: 'cropListChange', data: {
-            type: CropListChangeType;
-            list: BoundingBox[];
-        }): void;
+        (e: 'cropListChange', data: CropListChangeEmitType): void;
         (e: 'update:tagList', list: BoundingBox[]): void;
         (e: 'tagListChange', data: TagListChangeEmitRetunType): void;
         (e: 'update:mode', mode: Mode): void;

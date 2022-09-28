@@ -256,8 +256,8 @@ export function transfromTwoPoints2Rect(pointStart: Point, pointEnd: Point): Rec
 }
 
 export type Event = {
-	onClick?: (e: unknown, list: BoundingBox) => void
-	onDoubleClick?: (e: unknown, list: BoundingBox) => void
+	onClick?: (e: unknown, item: BoundingBox) => void
+	onDoubleClick?: (e: unknown, item: BoundingBox) => void
 }
 
 export type BoundingBox = {
