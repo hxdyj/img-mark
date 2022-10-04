@@ -231,6 +231,7 @@ type CropListChangeEmitType = {
 | enableDrawTagOutOfImg                   | 是否允许 `tag` 画到图片外                                                                                                                            | boolean       | true/false   | true   |
 | splitClickAndDoubleClickEvent           | 是否分离单击和双击事件                                                                                                                               | boolean       | true/false   | false  |
 | enableCropResize                        | 是否允许 `crop` 改变大小                                                                                                                             | boolean       | true/false   | true   |
+| enableTagResize                         | 是否允许 `tag` 改变大小                                                                                                                              | boolean       | true/false   | false  |
 | enableCropCross                         | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交，新画的`crop`会不添加，如果是 resize 操作相交以后，按照下方 `handleResizeCropCross` 属性去处理 | boolean       | true/false   | true   |
 | handleResizeCropCross                   | 当`enableCropCross`属性为 false，resize 操作相交后该如何处理进行 resize 操作的`crop`                                                                 | string        | delete/reset | reset  |
 | isShowTip                               | 是否显示底部提示区域                                                                                                                                 | boolean       | true/false   | false  |

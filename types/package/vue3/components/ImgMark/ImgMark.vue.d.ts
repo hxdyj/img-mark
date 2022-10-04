@@ -19,6 +19,7 @@ export declare type Props = {
     handleResizeCropCross?: 'delete' | 'reset';
     enableInteractiveCropDelete?: boolean;
     enableCropResize?: boolean;
+    enableTagResize?: boolean;
     enableDrawCropOutOfImg?: boolean;
     enableDrawTagOutOfCrop?: boolean;
     enableDrawTagOutOfImg?: boolean;
@@ -36,7 +37,7 @@ export declare type Config = {
     cropConfig: Required<CropConfig>;
     layerConfig: Required<LayerConfig>;
     tagConfig: Required<TagConfig>;
-} & Pick<Props, 'drawingText'>;
+} & Pick<Props, 'drawingText' | 'mode'>;
 export declare type MobileOperation = 'draw' | 'move';
 export declare type LayerConfig = {
     fillStyle?: string;
@@ -161,6 +162,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    enableTagResize: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     enableDrawCropOutOfImg: {
         type: BooleanConstructor;
         required: false;
@@ -225,7 +231,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     mouseDownTime: undefined;
     mouseUpTime: undefined;
     clickTimeout: null;
-    clickedCrop: null;
+    clickedBox: null;
     mouseQuickDoubleTapTime: {
         last: {
             down: number | undefined;
@@ -256,6 +262,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         handleResizeCropCross: 'delete' | 'reset';
         enableInteractiveCropDelete: boolean;
         enableCropResize: boolean;
+        enableTagResize: boolean;
         enableDrawCropOutOfImg: boolean;
         enableDrawTagOutOfCrop: boolean;
         enableDrawTagOutOfImg: boolean;
@@ -302,7 +309,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     cropScale: number;
     containerInfo: RectDom | undefined;
     zoomScale: number;
-    tmpCropPositionInfo: Rect | undefined;
+    tmpBoxPositionInfo: Rect | undefined;
     tmpTagPositionInfo: Rect | undefined;
     tagArr: BoundingBox[];
     cropArr: BoundingBox[];
@@ -315,13 +322,13 @@ declare const _sfc_main: import("vue").DefineComponent<{
         isScaleing: boolean;
         isDrawRecting: boolean;
         isMoving: boolean;
-        resizeCropHovering: ResizeItem | undefined;
+        resizeHovering: ResizeItem | undefined;
         isMouseDown: () => boolean;
         isMouseUpDownPoints: () => boolean;
     };
     actions: {
         dragCreatRectInterrupt(): void;
-        dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resizeCrop'): void;
+        dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resize'): void;
         changeMode(): void;
         scale(zoom: number, mouse: Point): void;
         move(): void;
@@ -450,6 +457,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    enableTagResize: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     enableDrawCropOutOfImg: {
         type: BooleanConstructor;
         required: false;
@@ -538,6 +550,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     handleResizeCropCross: string;
     enableInteractiveCropDelete: boolean;
     enableCropResize: boolean;
+    enableTagResize: boolean;
     enableDrawCropOutOfImg: boolean;
     enableDrawTagOutOfCrop: boolean;
     enableDrawTagOutOfImg: boolean;

@@ -270,6 +270,7 @@ export type BoundingBox = {
 	showOutLine?: boolean
 	labelText?: string
 	tagConfig?: TagConfig
+	index?: number
 } & Event
 
 type FixBoxInfoReturn = {
@@ -443,12 +444,22 @@ export function drawTagList(
 ) {
 	let isReDraw = false
 	let redrawList: BoundingBox[] = []
-	list.forEach((tagInfo, index) => {
+	list.forEach(tagInfo => {
 		let positions = transfromBoxToRect(tagInfo, tagInfo.scale, currentPosition)
 		positions[0] += offsetInfo!.offsetX
 		positions[1] += offsetInfo!.offsetY
 		// if (debug) console.log(`DRAW ITEM${index}`, tagInfo, positions)
-		let drawTagInfo = drawTagRect(ctx, ...positions, config, index + 1, touchPoint, tagInfo.isShow, tagInfo.showOutLine, tagInfo.labelText, tagInfo.tagConfig)
+		let drawTagInfo = drawTagRect(
+			ctx,
+			...positions,
+			config,
+			(tagInfo.index || 0) + 1,
+			touchPoint,
+			tagInfo.isShow,
+			tagInfo.showOutLine,
+			tagInfo.labelText,
+			tagInfo.tagConfig
+		)
 		if (drawTagInfo !== undefined) {
 			tagInfo.isShow = drawTagInfo.isShow
 			if (drawTagInfo.isCrash) {
@@ -697,8 +708,8 @@ export type ResizeItem = {
 	positions: Rect
 }
 
-export function getCropFourBorderRect(cropInfo: BoundingBox, currentPosition: Point, index: number) {
-	let positions = transfromBoxToRect(cropInfo, cropInfo.scale, currentPosition)
+export function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index: number = -1) {
+	let positions = transfromBoxToRect(box, box.scale, currentPosition)
 	const BorderWidth = device.mobile() ? DPI * 6 : 6
 	let HalfBorder = BorderWidth / 2
 	let list: ResizeItem[] = [
@@ -773,17 +784,17 @@ export function pointIsInRectList(point: Point, list: Rect[]) {
 	}
 }
 
-export function detectEventIsTriggerOnCropBorderOrVertex(
+export function detectEventIsTriggerOnBoxBorderOrVertex(
 	event: LayerTouchEvent,
-	cropList: BoundingBox[],
+	boxList: BoundingBox[],
 	zoomScale: number,
 	currentPosition: Point,
 	origin: Point
 ) {
 	let touchPoint = getTouchPoint(event, zoomScale, origin, 'move')
-	let borderList = cropList
-		.map((cropInfo, index) => {
-			return getCropFourBorderRect(cropInfo, currentPosition, index)
+	let borderList = boxList
+		.map((box, index) => {
+			return getBoxFourBorderRect(box, currentPosition, index)
 		})
 		.flat()
 
@@ -803,19 +814,18 @@ export function findOneBorderOrVertex(list: ResizeItem[]) {
 	return find
 }
 
-export function moveDetectCropBorderSetCursor(
+export function moveDetectBoxBorderSetCursor(
 	ele: HTMLElement,
 	event: LayerTouchEvent,
-	mode: Mode,
-	cropList: BoundingBox[],
+	boxList: BoundingBox[],
 	zoomScale: number,
 	currentPosition: Point,
 	origin: Point,
 	isScaleing: boolean
 ) {
 	//判断鼠标是否在裁剪框的4个边加四个顶点，在的话更改container鼠标手势  nwse-resize nesw-resize
-	if (mode === 'crop' && !isScaleing) {
-		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropList, zoomScale, currentPosition, origin)
+	if (!isScaleing) {
+		let detectResult = detectEventIsTriggerOnBoxBorderOrVertex(event, boxList, zoomScale, currentPosition, origin)
 		if (!detectResult.hasIn) {
 			ele.style.cursor = 'auto'
 		} else {
@@ -837,32 +847,32 @@ export function moveDetectCropBorderSetCursor(
 	}
 }
 
-export function getResizeCropInfo(cropInfo: BoundingBox, offsetInfo: Offset, borderOrVertexInfo?: ResizeItem) {
-	if (!borderOrVertexInfo) return cropInfo
-	let newCropInfo: BoundingBox = cloneDeep(cropInfo)
+export function getResizeBoundingBoxInfo(box: BoundingBox, offsetInfo: Offset, borderOrVertexInfo?: ResizeItem) {
+	if (!borderOrVertexInfo) return box
+	let newBox: BoundingBox = cloneDeep(box)
 	let name = borderOrVertexInfo.name
 	let { offsetX, offsetY } = offsetInfo
 	if (name.includes('left')) {
-		newCropInfo.startX += offsetX
+		newBox.startX += offsetX
 	}
 	if (name.includes('top')) {
-		newCropInfo.startY += offsetY
+		newBox.startY += offsetY
 	}
 	if (name.includes('right')) {
-		newCropInfo.endX += offsetX
+		newBox.endX += offsetX
 	}
 	if (name.includes('bottom')) {
-		newCropInfo.endY += offsetY
+		newBox.endY += offsetY
 	}
-	return newCropInfo
+	return newBox
 }
 
-export function moveResizeCrop(
+export function moveResizeBox(
 	ctx: CanvasRenderingContext2D,
 	startPoint: Point,
 	endPoint: Point,
-	cropInfo: BoundingBox,
-	cropScale: number,
+	box: BoundingBox,
+	scale: number,
 	zoomScale: number,
 	currentPosition: Point,
 	tagArr: BoundingBox[],
@@ -875,20 +885,24 @@ export function moveResizeCrop(
 		if (offsetResult.isStartMove) {
 			let borderOrVertex = resizeCropHovering
 			let { offsetX, offsetY } = offsetResult.offsetInfo
-			let newCropInfo = getResizeCropInfo(
-				cropInfo,
+			let newBoxInfo = getResizeBoundingBoxInfo(
+				box,
 				{
-					offsetX: offsetX / cropScale,
-					offsetY: offsetY / cropScale,
+					offsetX: offsetX / scale,
+					offsetY: offsetY / scale,
 				},
 				borderOrVertex
 			)
 
-			let position = transfromBoxToRect(newCropInfo, cropScale, currentPosition)
-
+			let position = transfromBoxToRect(newBoxInfo, scale, currentPosition)
 			drawCropList(ctx, cropList, currentPosition, config)
-			drawCropRect(ctx, ...position, config, true)
+			if (config.mode == 'crop') {
+				drawCropRect(ctx, ...position, config, true)
+			}
 			drawTagList(ctx, tagArr, currentPosition, config)
+			if (config.mode == 'tag') {
+				drawTagRect(ctx, ...position, config, (box.index || 0) + 1, undefined, box.isShow, box.showOutLine, box.labelText, box.tagConfig)
+			}
 			return position
 		}
 	}
@@ -930,8 +944,9 @@ export function transfromRect2Box(rect: Rect, currentPosition: Point, scale = 1)
 }
 
 export function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number) {
-	return tagArr.map(tag => {
+	return tagArr.map((tag, tagIndex) => {
 		tag.scale = scale
+		tag.index = tagIndex
 		return fixBoxInfo(transformBoxPrecision(tag, precision)).info
 	})
 }

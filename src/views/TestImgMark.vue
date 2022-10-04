@@ -17,16 +17,18 @@
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"
 				@onLoadImage="onLoadImage"
+				:enableCropResize="true"
+				:enable-tag-resize="true"
 				:enableInteractiveTagChangeStatus="true"
 				:tagConfig="{
 					fontSize: 50,
 				}"
 				:splitClickAndDoubleClickEvent="true"
-				:isCropSingle="true"
+				:isCropSingle="false"
 				:isImgCrop="true"
 				:isShowTip="true"
 				:enableDrawCropOutOfImg="false"
-				:enableDrawTagOutOfCrop="false"
+				:enableDrawTagOutOfCrop="true"
 				:enableDrawTagOutOfImg="false"
 			>
 				<template #tip> 111 </template>
@@ -158,7 +160,7 @@ function tagsListChange(data: any) {
 	// 	removeTag([tagList[0]])
 	// }
 	console.log('tagsListChange', data)
-	imgMarkRef.hooks.onKeyDownSpace()
+	// imgMarkRef.hooks.onKeyDownSpace()
 }
 
 function setHoverItem(item: MyBoundingBox) {

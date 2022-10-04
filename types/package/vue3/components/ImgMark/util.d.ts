@@ -69,6 +69,7 @@ export declare type BoundingBox = {
     showOutLine?: boolean;
     labelText?: string;
     tagConfig?: TagConfig;
+    index?: number;
 } & Event;
 declare type FixBoxInfoReturn = {
     info: BoundingBox;
@@ -123,20 +124,20 @@ export declare type ResizeItem = {
     name: ResizeType[keyof ResizeType];
     positions: Rect;
 };
-export declare function getCropFourBorderRect(cropInfo: BoundingBox, currentPosition: Point, index: number): ResizeItem[];
+export declare function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index?: number): ResizeItem[];
 export declare function pointIsInRectList(point: Point, list: Rect[]): {
     hasIn: boolean;
     coverList: Rect[];
     coverIndexList: number[];
 };
-export declare function detectEventIsTriggerOnCropBorderOrVertex(event: LayerTouchEvent, cropList: BoundingBox[], zoomScale: number, currentPosition: Point, origin: Point): {
+export declare function detectEventIsTriggerOnBoxBorderOrVertex(event: LayerTouchEvent, boxList: BoundingBox[], zoomScale: number, currentPosition: Point, origin: Point): {
     hasIn: boolean;
     list: ResizeItem[];
 };
 export declare function findOneBorderOrVertex(list: ResizeItem[]): ResizeItem;
-export declare function moveDetectCropBorderSetCursor(ele: HTMLElement, event: LayerTouchEvent, mode: Mode, cropList: BoundingBox[], zoomScale: number, currentPosition: Point, origin: Point, isScaleing: boolean): void;
-export declare function getResizeCropInfo(cropInfo: BoundingBox, offsetInfo: Offset, borderOrVertexInfo?: ResizeItem): BoundingBox;
-export declare function moveResizeCrop(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, cropInfo: BoundingBox, cropScale: number, zoomScale: number, currentPosition: Point, tagArr: BoundingBox[], resizeCropHovering: ResizeItem, cropList: BoundingBox[], config: Config): Rect | undefined;
+export declare function moveDetectBoxBorderSetCursor(ele: HTMLElement, event: LayerTouchEvent, boxList: BoundingBox[], zoomScale: number, currentPosition: Point, origin: Point, isScaleing: boolean): void;
+export declare function getResizeBoundingBoxInfo(box: BoundingBox, offsetInfo: Offset, borderOrVertexInfo?: ResizeItem): BoundingBox;
+export declare function moveResizeBox(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, box: BoundingBox, scale: number, zoomScale: number, currentPosition: Point, tagArr: BoundingBox[], resizeCropHovering: ResizeItem, cropList: BoundingBox[], config: Config): Rect | undefined;
 export declare function getHypotenuseValue(width: number, height: number): number;
 export declare function getDotDistence(start: number, end: number): number;
 export declare function getTwoFingerTouchListDistence(touchList: Array<{

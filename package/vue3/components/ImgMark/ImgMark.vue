@@ -68,6 +68,7 @@ export type Props = {
 	handleResizeCropCross?: 'delete' | 'reset'
 	enableInteractiveCropDelete?: boolean
 	enableCropResize?: boolean
+	enableTagResize?: boolean
 	//是否允许crop画到图片外
 	enableDrawCropOutOfImg?: boolean
 	//是否允许Tag画到crop外
@@ -91,7 +92,7 @@ export type Config = {
 	cropConfig: Required<CropConfig>
 	layerConfig: Required<LayerConfig>
 	tagConfig: Required<TagConfig>
-} & Pick<Props, 'drawingText'>
+} & Pick<Props, 'drawingText' | 'mode'>
 
 export type MobileOperation = 'draw' | 'move'
 
@@ -136,7 +137,7 @@ export type OnLoadImageEmitType = {
 	msg?: string
 }
 
-export type TagListChangeType = 'add' | 'delete' | 'statusChange'
+export type TagListChangeType = 'add' | 'delete' | 'statusChange' | 'resize'
 export type CropListChangeType = 'add' | 'delete' | 'resize'
 // console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
@@ -164,13 +165,12 @@ import {
 	transfromRect2Box,
 	isBoxValidity,
 	getTwoBoxIntersectPart,
-	detectEventIsTriggerOnCropBorderOrVertex,
 	findOneBorderOrVertex,
 	LayerTouchEvent,
 	moveDrawUnshowTagDashRect,
-	moveDetectCropBorderSetCursor,
+	moveDetectBoxBorderSetCursor,
 	moveCanvas,
-	moveResizeCrop,
+	moveResizeBox,
 	moveDrawCropRect,
 	moveDrawTagRect,
 	getTouchPoint,
@@ -190,6 +190,8 @@ import {
 	getBoxIsIntersectWithBoxList,
 	boxAllInBoxList,
 	transformBoxPrecision,
+	detectEventIsTriggerOnBoxBorderOrVertex,
+	getBoxFourBorderRect,
 } from './util'
 
 let spaceKeyDown = false
@@ -197,7 +199,7 @@ let spaceKeyDown = false
 let mouseDownTime: number | undefined = undefined
 let mouseUpTime: number | undefined = undefined
 let clickTimeout: null | ReturnType<typeof setTimeout> = null
-let clickedCrop: BoundingBox | null = null
+let clickedBox: BoundingBox | null = null
 
 let mouseQuickDoubleTapTime: {
 	last: {
@@ -223,10 +225,10 @@ let zoomIntensity = __zoomIntensity
 let hasHoverRectInTagItem = false
 
 function initVar() {
-	clickedCrop = null
+	clickedBox = null
 	hasHoverRectInTagItem = false
 	zoomIntensity = __zoomIntensity
-	status.resizeCropHovering = undefined
+	status.resizeHovering = undefined
 }
 
 let props = withDefaults(defineProps<Props>(), {
@@ -243,6 +245,7 @@ let props = withDefaults(defineProps<Props>(), {
 	enableInteractiveTagChangeStatus: true,
 	handleResizeCropCross: 'reset',
 	enableCropResize: true,
+	enableTagResize: false,
 	enableInteractiveCropDelete: true,
 	enableDrawCropOutOfImg: true,
 	enableDrawTagOutOfCrop: true,
@@ -302,17 +305,17 @@ let tmpCurrentPosition: Point | undefined
 let cropScale = 1
 let containerInfo: RectDom | undefined
 let zoomScale = 1
-let tmpCropPositionInfo: Rect | undefined
-let tmpTagPositionInfo: Rect | undefined
+let tmpBoxPositionInfo: Rect | undefined
 let tagArr: BoundingBox[] = []
 let cropArr: BoundingBox[] = []
 
 let config = $computed<Config>(() => {
-	let obj = cloneDeep(DEFAULT_CONFIG)
+	let obj: Config = cloneDeep(DEFAULT_CONFIG)
 	Object.assign(obj.cropConfig, props.cropConfig)
 	Object.assign(obj.tagConfig, props.tagConfig)
 	Object.assign(obj.layerConfig, props.layerConfig)
 	obj.drawingText = props.drawingText
+	obj.mode = props.mode
 	return obj
 })
 
@@ -339,8 +342,7 @@ function initDataVar() {
 	cropScale = 1
 	containerInfo = undefined
 	zoomScale = 1
-	tmpCropPositionInfo = undefined
-	tmpTagPositionInfo = undefined
+	tmpBoxPositionInfo = undefined
 	tagArr = []
 	cropArr = []
 }
@@ -354,7 +356,7 @@ let status = {
 	isScaleing: false,
 	isDrawRecting: false,
 	isMoving: false,
-	resizeCropHovering: undefined as unknown as ResizeItem | undefined,
+	resizeHovering: undefined as unknown as ResizeItem | undefined,
 	isMouseDown: () => (startMousePoint.x === undefined ? false : true),
 	isMouseUpDownPoints: () => startMousePoint.x !== undefined && endMousePoint.x !== undefined,
 }
@@ -365,7 +367,7 @@ let actions = {
 	dragCreatRectInterrupt() {
 		cleartMousePoints()
 	},
-	dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resizeCrop') {
+	dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resize') {
 		if (!ctx2) return
 		if (type == 'drawCrop') {
 			if (props.isCropSingle && !status.isDrawRecting) {
@@ -376,7 +378,7 @@ let actions = {
 			}
 			status.isDrawRecting = true
 
-			tmpCropPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, cropArr, currentPosition, config)
+			tmpBoxPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, cropArr, currentPosition, config)
 			drawTagList(ctx2, tagArr, currentPosition, config)
 		}
 
@@ -386,32 +388,59 @@ let actions = {
 			}
 			status.isDrawRecting = true
 			drawCropList(ctx2, cropArr, currentPosition, config)
-			tmpTagPositionInfo = moveDrawTagRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, tagArr, currentPosition, config)
+			tmpBoxPositionInfo = moveDrawTagRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, tagArr, currentPosition, config)
 		}
 
-		if (type == 'resizeCrop') {
-			if (props.enableCropResize && status.resizeCropHovering) {
-				clickedCrop = cropArr[status.resizeCropHovering.index || 0]
-				if (!status.resizeCropHovering || !clickedCrop) return
-
-				status.isDrawRecting = true
-
-				tmpCropPositionInfo = moveResizeCrop(
-					ctx2,
-					startMousePoint,
-					endMousePoint,
-					clickedCrop,
-					clickedCrop.scale || 1,
-					zoomScale,
-					currentPosition,
-					tagArr,
-					status.resizeCropHovering,
-					cropArr.filter((item, i) => i !== status.resizeCropHovering?.index),
-					config
-				)
-			} else {
-				actions.move()
+		if (type == 'resize') {
+			let resizeStratagem: {
+				[key in Mode]: () => void
+			} = {
+				crop() {
+					if (props.enableCropResize && status.resizeHovering && ctx2) {
+						clickedBox = cropArr[status.resizeHovering.index || 0]
+						if (!status.resizeHovering || !clickedBox) return
+						status.isDrawRecting = true
+						tmpBoxPositionInfo = moveResizeBox(
+							ctx2,
+							startMousePoint,
+							endMousePoint,
+							clickedBox,
+							clickedBox.scale || 1,
+							zoomScale,
+							currentPosition,
+							tagArr,
+							status.resizeHovering,
+							cropArr.filter((item, i) => i !== status.resizeHovering?.index),
+							config
+						)
+					} else {
+						actions.move()
+					}
+				},
+				tag() {
+					if (props.enableTagResize && status.resizeHovering && ctx2) {
+						clickedBox = tagArr[status.resizeHovering.index || 0]
+						if (!status.resizeHovering || !clickedBox) return
+						status.isDrawRecting = true
+						tmpBoxPositionInfo = moveResizeBox(
+							ctx2,
+							startMousePoint,
+							endMousePoint,
+							clickedBox,
+							clickedBox.scale || 1,
+							zoomScale,
+							currentPosition,
+							tagArr.filter((item, i) => i !== status.resizeHovering?.index),
+							status.resizeHovering,
+							cropArr,
+							config
+						)
+					} else {
+						actions.move()
+					}
+				},
 			}
+			resizeStratagem[props.mode]()
 		}
 	},
 	changeMode() {
@@ -475,9 +504,15 @@ let actions = {
 			hasHoverRectInTagItem,
 			config
 		)
-		if (props.enableCropResize && !spaceKeyDown) {
+		if (!spaceKeyDown) {
 			//检测鼠标是否在裁剪框四边上
-			moveDetectCropBorderSetCursor(containerRef, event, props.mode, cropArr, zoomScale, currentPosition, origin, status.isScaleing)
+			if (props.enableCropResize && props.mode === 'crop') {
+				console.log('---------------MAMAMA-----------------')
+				moveDetectBoxBorderSetCursor(containerRef, event, cropArr, zoomScale, currentPosition, origin, status.isScaleing)
+			}
+			if (props.enableTagResize && props.mode === 'tag') {
+				moveDetectBoxBorderSetCursor(containerRef, event, tagArr, zoomScale, currentPosition, origin, status.isScaleing)
+			}
 		}
 	},
 }
@@ -490,7 +525,7 @@ let hooks = {
 	},
 	/* Space 弹起 */
 	onKeyUpSpace() {
-		if (!status.isMoving && !status.resizeCropHovering) {
+		if (!status.isMoving && !status.resizeHovering) {
 			actions.dragCreatRectInterrupt()
 		}
 		spaceKeyDown = false
@@ -536,16 +571,10 @@ let hooks = {
 
 		if (!spaceKeyDown) {
 			//在crop模式的时候 检测是否在crop的边或者顶点上， 是的话执行放大缩小crop的逻辑，否的话拖动画布
-			if (props.mode === 'tag') {
+			if (status.resizeHovering) {
+				actions.dragCreatOrResizeRect('resize')
+			} else {
 				actions.move()
-			}
-			if (props.mode === 'crop') {
-				if (status.resizeCropHovering) {
-					// console.log('AT RESIZE CROP.')
-					actions.dragCreatOrResizeRect('resizeCrop')
-				} else {
-					actions.move()
-				}
 			}
 		} else {
 			this.onSpaceMove()
@@ -803,7 +832,7 @@ async function initComponent() {
 }
 
 function initResizeVar() {
-	clickedCrop = null
+	clickedBox = null
 	inited = false
 	canvasWH = cloneDeep(defaultWH) as RectDom
 	startMousePoint = cloneDeep(defaultPoint) as Point
@@ -950,14 +979,40 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	)
 }
 
-function setResizeCrop(newCropInfo: BoundingBox) {
-	if (status.resizeCropHovering) {
-		cropArr[status.resizeCropHovering.index] = newCropInfo
+function setBoxResize(newBoxInfo: BoundingBox) {
+	if (status.resizeHovering) {
+		let resizeStratagem: {
+			[key in Mode]: {
+				boxList: BoundingBox[]
+				trigger: typeof triggerCropListChange | typeof triggerTagListChange
+				getBoxFunc: typeof getCropList | typeof getTagList
+			}
+		} = {
+			crop: {
+				boxList: cropArr,
+				trigger: triggerCropListChange,
+				getBoxFunc: getCropList,
+			},
+			tag: {
+				boxList: tagArr,
+				trigger: triggerTagListChange,
+				getBoxFunc: getTagList,
+			},
+		}
+		let resizeInfo = resizeStratagem[props.mode]
+		resizeInfo.boxList[status.resizeHovering.index] = newBoxInfo
 		emits('resizeEnd', {
-			index: status.resizeCropHovering.index,
-			box: newCropInfo,
+			index: status.resizeHovering.index,
+			box: newBoxInfo,
 		})
-		triggerCropListChange('resize', getCropList([newCropInfo]))
+		if (props.mode === 'tag') {
+			let vertexPosition = getVertexPositionByTwoPoints(startMousePoint, endMousePoint)
+			Object.assign(newBoxInfo, {
+				__oprateType: 'resize',
+				__vertexPosition: vertexPosition,
+			})
+		}
+		resizeInfo.trigger('resize', resizeInfo.getBoxFunc([newBoxInfo]))
 	}
 }
 
@@ -969,31 +1024,31 @@ function cleartMousePoints() {
 
 	if (status.isMouseUpDownPoints()) {
 		if (props.mode === 'crop') {
-			if (tmpCropPositionInfo) {
+			if (tmpBoxPositionInfo) {
 				let newCropInfo = {
-					...clickedCrop,
-					...transfromRect2Box(tmpCropPositionInfo, currentPosition, scale),
+					...clickedBox,
+					...transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale),
 				}
-				clickedCrop = null
-				if (status.resizeCropHovering) {
+				clickedBox = null
+				if (status.resizeHovering) {
 					if (!props.enableCropCross) {
 						let intersectFlag = getBoxIsIntersectWithBoxList(
 							newCropInfo,
-							cropArr.filter((item, index) => index !== status.resizeCropHovering?.index)
+							cropArr.filter((item, index) => index !== status.resizeHovering?.index)
 						)
 						if (intersectFlag) {
 							if (props.handleResizeCropCross === 'reset') {
 								renderCtx2()
 							}
 							if (props.handleResizeCropCross === 'delete') {
-								let removeItem = cropArr[status.resizeCropHovering.index]
+								let removeItem = cropArr[status.resizeHovering.index]
 								removeCropItems([removeItem])
 							}
 						} else {
-							setResizeCrop(newCropInfo)
+							setBoxResize(newCropInfo)
 						}
 					} else {
-						setResizeCrop(newCropInfo)
+						setBoxResize(newCropInfo)
 					}
 				} else {
 					newCropInfo = initBoundingArrScale([newCropInfo], scale, props.precision)[0]
@@ -1011,26 +1066,35 @@ function cleartMousePoints() {
 						}
 					}
 				}
-				tmpCropPositionInfo = undefined
+				tmpBoxPositionInfo = undefined
 			}
 		} else {
-			if (tmpTagPositionInfo) {
-				let vertexPosition = getVertexPositionByTwoPoints(startMousePoint, endMousePoint)
-				let tagInfo = transfromRect2Box(tmpTagPositionInfo, currentPosition, scale)
-				tagInfo = initBoundingArrScale([tagInfo], scale, props.precision)[0]
-				Object.assign(tagInfo, {
-					isShow: true,
-					__newAdd: true,
-					__vertexPosition: vertexPosition,
-				})
-				tagArr.push(tagInfo)
-				triggerTagListChange('add', getTagList([tagInfo]))
-				tmpTagPositionInfo = undefined
+			if (tmpBoxPositionInfo) {
+				let newCropInfo = {
+					...clickedBox,
+					...transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale),
+				}
+				clickedBox = null
+				if (status.resizeHovering) {
+					setBoxResize(newCropInfo)
+				} else {
+					let vertexPosition = getVertexPositionByTwoPoints(startMousePoint, endMousePoint)
+					let tagInfo = transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale)
+					tagInfo = initBoundingArrScale([tagInfo], scale, props.precision)[0]
+					Object.assign(tagInfo, {
+						isShow: true,
+						__oprateType: 'add',
+						__vertexPosition: vertexPosition,
+					})
+					tagArr.push(tagInfo)
+					triggerTagListChange('add', getTagList([tagInfo]))
+				}
+				tmpBoxPositionInfo = undefined
 			}
 		}
 	}
 
-	status.resizeCropHovering = undefined
+	status.resizeHovering = undefined
 	status.isDrawRecting = false
 	startMousePoint = cloneDeep(defaultPoint) as Point
 	endMousePoint = cloneDeep(defaultPoint) as Point
@@ -1063,11 +1127,11 @@ function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[
 	let list = getTagList(tagArr)
 	emits('update:tagList', list)
 }
-
+const OPRATE_TYPE_LIST = ['add', 'resize'] as const
 type TagItemTmp = BoundingBox & {
 	scale?: number
 	__isValidity?: boolean
-	__newAdd?: boolean
+	__oprateType?: typeof OPRATE_TYPE_LIST[number]
 	__vertexPosition?: VertexPosition
 	__groupIndex?: number
 	__parentCrop?: BoundingBox
@@ -1079,23 +1143,25 @@ function getTagList(tagList?: BoundingBox[]) {
 	let resultList: TagItemTmp[] = []
 	list.forEach(tag => {
 		let newTagInfo: TagItemTmp = tag
-		if (!props.enableDrawTagOutOfCrop && newTagInfo.__newAdd && newTagInfo.__vertexPosition) {
-			let tagStartXYinCropList = pointIsInBoxList(getPointByBoxAndVertexPosition(newTagInfo, newTagInfo.__vertexPosition), cropList)
-			let mousePointCropInfo = tagStartXYinCropList.boxList[0]
-			if (!mousePointCropInfo) return
-			let intersectPart = getTwoBoxIntersectPart(newTagInfo, mousePointCropInfo)
-			if (!intersectPart) {
-				newTagInfo.__isValidity = false
-			} else {
-				if (!isBoxValidity(intersectPart)) {
+		if (!props.enableDrawTagOutOfCrop) {
+			if (newTagInfo.__oprateType && newTagInfo.__vertexPosition) {
+				let tagStartXYinCropList = pointIsInBoxList(getPointByBoxAndVertexPosition(newTagInfo, newTagInfo.__vertexPosition), cropList)
+				let mousePointCropInfo = tagStartXYinCropList.boxList[0]
+				if (!mousePointCropInfo) return
+				let intersectPart = getTwoBoxIntersectPart(newTagInfo, mousePointCropInfo)
+				if (!intersectPart) {
 					newTagInfo.__isValidity = false
 				} else {
-					Object.assign(newTagInfo, intersectPart)
-					newTagInfo.__parentCrop = mousePointCropInfo
+					if (!isBoxValidity(intersectPart)) {
+						newTagInfo.__isValidity = false
+					} else {
+						Object.assign(newTagInfo, intersectPart)
+						newTagInfo.__parentCrop = mousePointCropInfo
+					}
 				}
 			}
 		}
-		delete newTagInfo.__newAdd
+		delete newTagInfo.__oprateType
 		Reflect.deleteProperty(newTagInfo, '__vertexPosition')
 		if (props.enableDrawTagOutOfCrop && !props.enableDrawTagOutOfImg) {
 			let whObj = imgWH
@@ -1179,12 +1245,25 @@ function onMouseDown(e: MouseEvent) {
 
 	//检测是否点在了crop的border或者vertex上边
 	if (props.mode === 'crop' && !spaceKeyDown && props.enableCropResize) {
-		let detectResult = detectEventIsTriggerOnCropBorderOrVertex(event, cropArr, zoomScale, currentPosition, origin)
+		let detectResult = detectEventIsTriggerOnBoxBorderOrVertex(event, cropArr, zoomScale, currentPosition, origin)
 		if (detectResult.hasIn) {
-			status.resizeCropHovering = findOneBorderOrVertex(detectResult.list)
+			status.resizeHovering = findOneBorderOrVertex(detectResult.list)
 			emits('resizeStart', {
-				index: status.resizeCropHovering.index,
-				box: cropArr[status.resizeCropHovering.index],
+				index: status.resizeHovering.index,
+				box: cropArr[status.resizeHovering.index],
+			})
+		}
+	}
+
+	//检测是否点在了tag的border或者vertex上边
+	if (props.mode === 'tag' && !spaceKeyDown && props.enableTagResize) {
+		let detectResult = detectEventIsTriggerOnBoxBorderOrVertex(event, tagArr, zoomScale, currentPosition, origin)
+		if (detectResult.hasIn) {
+			status.resizeHovering = findOneBorderOrVertex(detectResult.list)
+			console.log('over tag resize:', status.resizeHovering)
+			emits('resizeStart', {
+				index: status.resizeHovering.index,
+				box: tagArr[status.resizeHovering.index],
 			})
 		}
 	}
