@@ -17,6 +17,7 @@
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"
 				@onLoadImage="onLoadImage"
+				:disableDefaultShortcuts="['space', 'ctrl+b']"
 				:enableCropResize="true"
 				:enable-tag-resize="true"
 				:enableInteractiveTagChangeStatus="true"
@@ -54,7 +55,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType } from 'img-mark'
+import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagListChangeEmitRetunType } from 'img-mark'
 import { uid } from 'uid'
 import { nextTick } from 'vue'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
@@ -154,13 +155,19 @@ function removeTag(data?: BoundingBox[]) {
 function cropListChange(data: any) {
 	console.log(111, data)
 }
-function tagsListChange(data: any) {
+function tagsListChange(data: TagListChangeEmitRetunType) {
 	// if (data.type === 'add') {
 	// 	data.list[0].__uid = '333333'
 	// 	removeTag([tagList[0]])
 	// }
 	console.log('tagsListChange', data)
-	// imgMarkRef.hooks.onKeyDownSpace()
+	if (data.type == 'statusChange') {
+		imgMarkRef.hooks.shiftDrawSwitch('on')
+	}
+
+	if (data.type == 'add') {
+		imgMarkRef.hooks.shiftDrawSwitch('off')
+	}
 }
 
 function setHoverItem(item: MyBoundingBox) {

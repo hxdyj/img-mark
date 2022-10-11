@@ -2,7 +2,6 @@ import ImgMark from './ImgMark/ImgMark.vue'
 
 export type {
 	ResizeEmitType,
-	TagListChangeType,
 	CropConfig,
 	LayerConfig,
 	TagConfig,

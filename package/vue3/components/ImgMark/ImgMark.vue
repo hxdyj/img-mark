@@ -86,6 +86,7 @@ export type Props = {
 	src: string
 	precision?: number
 	splitClickAndDoubleClickEvent?: boolean
+	disableDefaultShortcuts?: Array<'ctrl+b' | 'space'>
 }
 
 export type Config = {
@@ -194,7 +195,8 @@ import {
 	getBoxFourBorderRect,
 } from './util'
 
-let spaceKeyDown = false
+//是否开始画模式
+let drawSwitch = false
 
 let mouseDownTime: number | undefined = undefined
 let mouseUpTime: number | undefined = undefined
@@ -258,6 +260,7 @@ let props = withDefaults(defineProps<Props>(), {
 	splitClickAndDoubleClickEvent: false,
 	tagList: () => Array(),
 	cropList: () => Array(),
+	disableDefaultShortcuts: () => Array(),
 })
 
 let emits = defineEmits<{
@@ -362,7 +365,7 @@ let status = {
 }
 
 /* 抽象动作相关 */
-let actions = {
+const actions = {
 	//画方块一半被打断
 	dragCreatRectInterrupt() {
 		cleartMousePoints()
@@ -504,7 +507,7 @@ let actions = {
 			hasHoverRectInTagItem,
 			config
 		)
-		if (!spaceKeyDown) {
+		if (!drawSwitch) {
 			//检测鼠标是否在裁剪框四边上
 			if (props.enableCropResize && props.mode === 'crop') {
 				console.log('---------------MAMAMA-----------------')
@@ -517,28 +520,7 @@ let actions = {
 	},
 }
 
-/* 抽象组件hooks */
-let hooks = {
-	/* Ctrl+B 弹起 */
-	onKeyUpCtrlB() {
-		actions.changeMode()
-	},
-	/* Space 弹起 */
-	onKeyUpSpace() {
-		if (!status.isMoving && !status.resizeHovering) {
-			actions.dragCreatRectInterrupt()
-		}
-		spaceKeyDown = false
-	},
-	onKeyDownSpace() {
-		console.log('---------------------HAHAHAHA---------------------')
-		if ((props.enableDrawCrop && props.mode === 'crop') || (props.enableDrawTag && props.mode === 'tag')) {
-			containerRef.style.cursor = 'crosshair'
-		}
-		if (!status.isMouseDown()) {
-			spaceKeyDown = true
-		}
-	},
+const events = {
 	onMouseOverMove(event: LayerTouchEvent) {
 		//当没有鼠标按下的时候
 		if (device.mobile()) {
@@ -551,25 +533,13 @@ let hooks = {
 			this.onHoldMouseLeftBtnMove(event)
 		}
 	},
-	/* 按着空格移动 */
-	onSpaceMove() {
-		if (props.mode === 'crop') {
-			if (props.enableDrawCrop) {
-				actions.dragCreatOrResizeRect('drawCrop')
-			}
-		} else {
-			if (props.enableDrawTag) {
-				actions.dragCreatOrResizeRect('drawTag')
-			}
-		}
-	},
 	onHoldMouseLeftBtnMove(event: LayerTouchEvent) {
 		endMousePoint = {
 			x: event.layerX,
 			y: event.layerY,
 		}
 
-		if (!spaceKeyDown) {
+		if (!drawSwitch) {
 			//在crop模式的时候 检测是否在crop的边或者顶点上， 是的话执行放大缩小crop的逻辑，否的话拖动画布
 			if (status.resizeHovering) {
 				actions.dragCreatOrResizeRect('resize')
@@ -577,7 +547,7 @@ let hooks = {
 				actions.move()
 			}
 		} else {
-			this.onSpaceMove()
+			this.onDrawSwitchOnStartDraw()
 		}
 	},
 	onDoubleClick(touchPoint: TypePoint) {
@@ -616,13 +586,49 @@ let hooks = {
 			actions.scale(zoom, mouse)
 		}
 	},
+	/* 画模式打开后开始画 */
+	onDrawSwitchOnStartDraw() {
+		if (props.mode === 'crop') {
+			if (props.enableDrawCrop) {
+				actions.dragCreatOrResizeRect('drawCrop')
+			}
+		} else {
+			if (props.enableDrawTag) {
+				actions.dragCreatOrResizeRect('drawTag')
+			}
+		}
+	},
+}
+
+/* 抽象组件hooks */
+const hooks = {
+	shiftMode() {
+		actions.changeMode()
+	},
+	shiftDrawSwitch(onOrOff: 'on' | 'off') {
+		nextTick(() => {
+			if (onOrOff === 'on') {
+				if ((props.enableDrawCrop && props.mode === 'crop') || (props.enableDrawTag && props.mode === 'tag')) {
+					containerRef.style.cursor = 'crosshair'
+				}
+				if (!status.isMouseDown()) {
+					drawSwitch = true
+				}
+			}
+			if (onOrOff === 'off') {
+				if (!status.isMoving && !status.resizeHovering) {
+					actions.dragCreatRectInterrupt()
+				}
+				drawSwitch = false
+			}
+		})
+	},
 	/* 初始化 */
 	init() {
 		initComponent().then(() => {
 			inited = true
 		})
 	},
-
 	/* window resize */
 	resize() {
 		requestAnimationFrame(() => {
@@ -634,19 +640,22 @@ let hooks = {
 
 function onKeyDownListener(e: KeyboardEvent) {
 	if (e.code === 'Space') {
+		if (props.disableDefaultShortcuts.includes('space')) return
 		if (e.target === document.body) {
 			e.preventDefault()
 		}
-		hooks.onKeyDownSpace()
+		hooks.shiftDrawSwitch('on')
 	}
 }
 
 function onKeyUpListener(e) {
 	if (e.code === 'KeyB' && e.ctrlKey) {
-		hooks.onKeyUpCtrlB()
+		if (props.disableDefaultShortcuts.includes('ctrl+b')) return
+		hooks.shiftMode()
 	}
 	if (e.code === 'Space') {
-		hooks.onKeyUpSpace()
+		if (props.disableDefaultShortcuts.includes('space')) return
+		hooks.shiftDrawSwitch('off')
 	}
 }
 function addListenerKeyUpDown() {
@@ -873,11 +882,11 @@ async function resizeRender() {
 function initMobileOperation() {
 	if (!device.mobile()) return
 	if (props.mobileOperation === 'draw') {
-		hooks.onKeyDownSpace()
+		hooks.shiftDrawSwitch('on')
 	}
 
 	if (props.mobileOperation === 'move') {
-		hooks.onKeyUpSpace()
+		hooks.shiftDrawSwitch('off')
 	}
 }
 
@@ -969,7 +978,7 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 
 	//缩放系数过小，不能缩放
 	if (zoomScale * zoom < 0.2) return
-	hooks.onWheel(
+	events.onWheel(
 		zoom,
 		{
 			x: mousex,
@@ -1127,11 +1136,11 @@ function triggerTagListChange(type: TagListChangeType, changedList: BoundingBox[
 	let list = getTagList(tagArr)
 	emits('update:tagList', list)
 }
-const OPRATE_TYPE_LIST = ['add', 'resize'] as const
+// const OPRATE_TYPE_LIST = ['add', 'resize'] as const
 type TagItemTmp = BoundingBox & {
 	scale?: number
 	__isValidity?: boolean
-	__oprateType?: typeof OPRATE_TYPE_LIST[number]
+	__oprateType?: 'add' | 'resize'
 	__vertexPosition?: VertexPosition
 	__groupIndex?: number
 	__parentCrop?: BoundingBox
@@ -1244,7 +1253,7 @@ function onMouseDown(e: MouseEvent) {
 	}
 
 	//检测是否点在了crop的border或者vertex上边
-	if (props.mode === 'crop' && !spaceKeyDown && props.enableCropResize) {
+	if (props.mode === 'crop' && !drawSwitch && props.enableCropResize) {
 		let detectResult = detectEventIsTriggerOnBoxBorderOrVertex(event, cropArr, zoomScale, currentPosition, origin)
 		if (detectResult.hasIn) {
 			status.resizeHovering = findOneBorderOrVertex(detectResult.list)
@@ -1256,7 +1265,7 @@ function onMouseDown(e: MouseEvent) {
 	}
 
 	//检测是否点在了tag的border或者vertex上边
-	if (props.mode === 'tag' && !spaceKeyDown && props.enableTagResize) {
+	if (props.mode === 'tag' && !drawSwitch && props.enableTagResize) {
 		let detectResult = detectEventIsTriggerOnBoxBorderOrVertex(event, tagArr, zoomScale, currentPosition, origin)
 		if (detectResult.hasIn) {
 			status.resizeHovering = findOneBorderOrVertex(detectResult.list)
@@ -1303,7 +1312,7 @@ function onMouseMove(e: MouseEvent) {
 	} as LayerTouchEvent
 	event = amendDpi(event, ['layerX', 'layerY'])
 	mouseUpTime = new Date().getTime()
-	hooks.onMouseOverMove(event)
+	events.onMouseOverMove(event)
 	triggerMouseOverInfo(event)
 }
 
@@ -1353,11 +1362,11 @@ function onClick(e) {
 	if (props.splitClickAndDoubleClickEvent) {
 		clearClickTimeout()
 		clickTimeout = setTimeout(() => {
-			hooks.onCick(touchPoint)
+			events.onCick(touchPoint)
 			clickTimeout = null
 		}, 230)
 	} else {
-		hooks.onCick(touchPoint)
+		events.onCick(touchPoint)
 	}
 
 	const minInterval = props.splitClickAndDoubleClickEvent ? 320 : 360
@@ -1366,7 +1375,7 @@ function onClick(e) {
 			if (props.splitClickAndDoubleClickEvent) {
 				clearClickTimeout()
 			}
-			hooks.onDoubleClick(touchPoint)
+			events.onDoubleClick(touchPoint)
 			mouseQuickDoubleTapTime.prev.down = undefined
 			mouseQuickDoubleTapTime.prev.up = undefined
 			mouseQuickDoubleTapTime.last.down = undefined

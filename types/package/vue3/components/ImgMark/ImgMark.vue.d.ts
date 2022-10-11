@@ -32,6 +32,7 @@ export declare type Props = {
     src: string;
     precision?: number;
     splitClickAndDoubleClickEvent?: boolean;
+    disableDefaultShortcuts?: Array<'ctrl+b' | 'space'>;
 };
 export declare type Config = {
     cropConfig: Required<CropConfig>;
@@ -75,14 +76,14 @@ export declare type OnLoadImageEmitType = {
     status: 'loading' | 'success' | 'error';
     msg?: string;
 };
-export declare type TagListChangeType = 'add' | 'delete' | 'statusChange';
+export declare type TagListChangeType = 'add' | 'delete' | 'statusChange' | 'resize';
 export declare type CropListChangeType = 'add' | 'delete' | 'resize';
 import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
     __isValidity?: boolean;
-    __newAdd?: boolean;
+    __oprateType?: 'add' | 'resize';
     __vertexPosition?: VertexPosition;
     __groupIndex?: number;
     __parentCrop?: BoundingBox;
@@ -226,8 +227,13 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    disableDefaultShortcuts: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
 }, {
-    spaceKeyDown: boolean;
+    drawSwitch: boolean;
     mouseDownTime: undefined;
     mouseUpTime: undefined;
     clickTimeout: null;
@@ -275,6 +281,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         src: string;
         precision: number;
         splitClickAndDoubleClickEvent: boolean;
+        disableDefaultShortcuts: Array<'ctrl+b' | 'space'>;
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
@@ -310,7 +317,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     containerInfo: RectDom | undefined;
     zoomScale: number;
     tmpBoxPositionInfo: Rect | undefined;
-    tmpTagPositionInfo: Rect | undefined;
     tagArr: BoundingBox[];
     cropArr: BoundingBox[];
     config: any;
@@ -334,16 +340,17 @@ declare const _sfc_main: import("vue").DefineComponent<{
         move(): void;
         hoverRect(event: LayerTouchEvent): void;
     };
-    hooks: {
-        onKeyUpCtrlB(): void;
-        onKeyUpSpace(): void;
-        onKeyDownSpace(): void;
+    events: {
         onMouseOverMove(event: LayerTouchEvent): void;
-        onSpaceMove(): void;
         onHoldMouseLeftBtnMove(event: LayerTouchEvent): void;
         onDoubleClick(touchPoint: TypePoint): void;
         onCick(touchPoint: TypePoint): void;
         onWheel(zoom: number, mouse: Point, privateCall?: boolean | undefined): void;
+        onDrawSwitchOnStartDraw(): void;
+    };
+    hooks: {
+        shiftMode(): void;
+        shiftDrawSwitch(onOrOff: 'on' | 'off'): void;
         init(): void;
         resize(): void;
     };
@@ -360,7 +367,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     initMobileOperation: () => void;
     onWindowResize: () => void;
     onMouseWheel: (e: MouseEvent, privateCall?: boolean | undefined) => void;
-    setResizeCrop: (newCropInfo: BoundingBox) => void;
+    setBoxResize: (newBoxInfo: BoundingBox) => void;
     cleartMousePoints: () => void;
     triggerCropListChange: (type: CropListChangeType, changedList: BoundingBox[]) => void;
     triggerTagListChange: (type: TagListChangeType, changedList: BoundingBox[]) => void;
@@ -521,6 +528,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    disableDefaultShortcuts: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
 }>> & {
     "onUpdate:cropList"?: ((...args: any[]) => any) | undefined;
     onCropListChange?: ((...args: any[]) => any) | undefined;
@@ -562,5 +574,6 @@ declare const _sfc_main: import("vue").DefineComponent<{
     mobileOperation: string;
     precision: number;
     splitClickAndDoubleClickEvent: boolean;
+    disableDefaultShortcuts: unknown[];
 }>;
 export default _sfc_main;

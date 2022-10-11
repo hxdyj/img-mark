@@ -133,6 +133,13 @@ type Event = {
 	onDoubleClick?: (e: unknown, item: BoundingBox) => void //tag double click事件
 }
 
+type Hooks = {
+	shiftMode(): void //切换模式
+	shiftDrawSwitch(onOrOff: 'on' | 'off'): void //切换是否开始画的开关
+	init(): void //初始化组件
+	resize(): void //resize后重新初始化组件
+}
+
 type BoundingBox = {
 	startX: number
 	endX: number
@@ -255,12 +262,17 @@ type CropListChangeEmitType = {
 | mouseOverInfo  | 鼠标在组件上移动或者移除时候触发                                                       | info:MouseOverInfoEmitType                          |
 | onLoadImage    | 图片加载状态事件                                                                       | data:OnLoadImageEmitType                            |
 
-## 组件方法
+## 组件暴露对象
+
+| 对象  | 类型  | 说明             |
+| ----- | ----- | ---------------- |
+| hooks | Hooks | 调用组件抽象方法 |
+
+## 组件暴露方法
 
 | 方法                       | 说明                                 | 参数                                      | 返回类型                |
 | -------------------------- | ------------------------------------ | ----------------------------------------- | ----------------------- |
 | removeTagItems             | 移除 `tag` 项                        | list:BoundingBox[]                        | void                    |
-| hooks                      | 调用组件抽象方法                     | 详情参见源码                              | ——                      |
 | getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组 | type: 'startPoint'/'allIn' = 'startPoint' | TagListGroupByCropIndex |
 
 ## Slots
