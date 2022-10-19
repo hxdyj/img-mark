@@ -2877,7 +2877,7 @@ function drawCropRect(t, e, n, r, i, o, a) {
 }
 function drawCropList(n, t, r, i, o, e) {
   e || (clearCanvas(n), drawLayerBg(n, i)), t.forEach((t2) => {
-    let e2 = transfromBoxToRect(t2, t2.scale, r);
+    let e2 = transfromBoxToRect(t2, t2.__scale, r);
     o && (e2[0] += o.offsetX, e2[1] += o.offsetY), drawLayerImageData(n, ...e2), drawLayerBorder(n, ...e2, i);
   });
 }
@@ -2938,9 +2938,9 @@ function drawTagRect(t, e, n, r, i, o, a, u, c, f, l, s) {
 function drawTagList(r, t, i, o, a = { offsetX: 0, offsetY: 0 }, u) {
   let c = false, f = [];
   return t.forEach((t2) => {
-    let e = transfromBoxToRect(t2, t2.scale, i);
+    let e = transfromBoxToRect(t2, t2.__scale, i);
     e[0] += a.offsetX, e[1] += a.offsetY;
-    var n = drawTagRect(r, ...e, o, (t2.index || 0) + 1, u, t2.isShow, t2.showOutLine, t2.labelText, t2.tagConfig);
+    var n = drawTagRect(r, ...e, o, (t2.__index || 0) + 1, u, t2.isShow, t2.showOutLine, t2.labelText, t2.tagConfig);
     void 0 !== n && (t2.isShow = n.isShow, n.isCrash && (c = true, f.push(t2)));
   }), { isReDraw: c, redrawList: f };
 }
@@ -2992,14 +2992,14 @@ function moveDrawUnshowTagDashRect(e, t, o, a, u, c, f, l, n, s, d) {
   if ("tag" === t && !n) {
     let t2 = o.filter((t3) => !t3.isShow), n2 = false, r = getTouchPoint(f, a, c, "move"), i = [];
     t2.forEach((t3) => {
-      var e2 = transfromBoxToRect(t3, t3.scale, u);
+      var e2 = transfromBoxToRect(t3, t3.__scale, u);
       pointIsInRect(r, e2) && (i.push(t3), n2 = true);
     }), n2 ? (s = true, drawTagList(e, i, u, d, void 0, r)) : s && (drawCropList(e, l, u, d), drawTagList(e, o, u, d), s = false);
   }
   return s;
 }
 function getBoxFourBorderRect(t, e, n = -1) {
-  var t = transfromBoxToRect(t, t.scale, e), e = device.mobile() ? 6 * DPI : 6, r = e / 2;
+  var t = transfromBoxToRect(t, t.__scale, e), e = device.mobile() ? 6 * DPI : 6, r = e / 2;
   return [{ index: n, name: "left-top", type: "vertex", positions: [t[0] - r, t[1] - r, e, e] }, { index: n, name: "right-top", type: "vertex", positions: [t[0] + t[2] - r, t[1] - r, e, e] }, { index: n, name: "left-bottom", type: "vertex", positions: [t[0] - r, t[1] + t[3] - r, e, e] }, { index: n, name: "right-bottom", type: "vertex", positions: [t[0] + t[2] - r, t[1] + t[3] - r, e, e] }, { index: n, name: "left", type: "border", positions: [t[0] - r, t[1] + r, e, t[3] - r] }, { index: n, name: "top", type: "border", positions: [t[0] + r, t[1] - r, t[2] - r, e] }, { index: n, name: "right", type: "border", positions: [t[0] + t[2] - r, t[1] + r, e, t[3] - r] }, { index: n, name: "bottom", type: "border", positions: [t[0] + r, t[1] + t[3] - r, t[2] - r, e] }];
 }
 function pointIsInRectList(n, t) {
@@ -3033,7 +3033,7 @@ function moveResizeBox(t, e, n, r, i, o, a, u, c, f, l) {
   if (e && void 0 !== e.x && n && void 0 !== n.x) {
     var e = getTwoPointsOffsetInfo(e, n, o);
     if (e.isStartMove)
-      return { offsetX: n, offsetY: o } = e.offsetInfo, e = transfromBoxToRect(getResizeBoundingBoxInfo(r, { offsetX: n / i, offsetY: o / i }, c), i, a), drawCropList(t, f, a, l), "crop" == l.mode && drawCropRect(t, ...e, l, true), drawTagList(t, u, a, l), "tag" == l.mode && drawTagRect(t, ...e, l, (r.index || 0) + 1, void 0, r.isShow, r.showOutLine, r.labelText, r.tagConfig), e;
+      return { offsetX: n, offsetY: o } = e.offsetInfo, e = transfromBoxToRect(getResizeBoundingBoxInfo(r, { offsetX: n / i, offsetY: o / i }, c), i, a), drawCropList(t, f, a, l), "crop" == l.mode && drawCropRect(t, ...e, l, true), drawTagList(t, u, a, l), "tag" == l.mode && drawTagRect(t, ...e, l, (r.__index || 0) + 1, void 0, r.isShow, r.showOutLine, r.labelText, r.tagConfig), e;
   }
 }
 function getHypotenuseValue(t, e) {
@@ -3049,7 +3049,7 @@ function transfromRect2Box(t, e, n = 1) {
   return fixBoxInfo({ startX: (t[0] - e.x) / n, startY: (t[1] - e.y) / n, endX: (t[0] + t[2] - e.x) / n, endY: (t[1] + t[3] - e.y) / n }).info;
 }
 function initBoundingArrScale(t, n, r) {
-  return t.map((t2, e) => (t2.scale = n, t2.index = e, fixBoxInfo(transformBoxPrecision(t2, r)).info));
+  return t.map((t2, e) => (t2.__scale = n, t2.__index = e, fixBoxInfo(transformBoxPrecision(t2, r)).info));
 }
 function getBoxIsIntersectWithBoxList(t, e) {
   for (const n of e)
@@ -3083,7 +3083,7 @@ var ImgMark_vue_vue_type_style_index_0_scoped_true_lang = "", _export_sfc = (t, 
     n[r] = i;
   return n;
 };
-const _withScopeId = (t) => (pushScopeId("data-v-10cc444c"), t = t(), popScopeId(), t), _hoisted_1 = ["onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, drawingText: null, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, initScale: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableTagResize: { type: Boolean, default: false }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, isImgCrop: { type: Boolean, default: false }, isCropSingle: { type: Boolean, default: false }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 }, splitClickAndDoubleClickEvent: { type: Boolean, default: false }, disableDefaultShortcuts: { default: () => Array() } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop", "drawCropStart", "drawTagStart", "mouseOverInfo", "onLoadImage"], setup(j, { expose: t, emit: a }) {
+const _withScopeId = (t) => (pushScopeId("data-v-966577e8"), t = t(), popScopeId(), t), _hoisted_1 = ["onTouchmove", "onTouchstart", "onTouchend"], _hoisted_2 = { key: 0, class: "mode-panel" }, _hoisted_3 = { class: "status" }, _hoisted_4 = { class: "text" }, _hoisted_5 = { class: "tip" }, _hoisted_6 = _withScopeId(() => createElementVNode("kbd", null, "Ctrl", -1)), _hoisted_7 = createTextVNode(" + "), _hoisted_8 = _withScopeId(() => createElementVNode("kbd", null, "B", -1)), _hoisted_9 = _withScopeId(() => createElementVNode("span", { style: { "font-size": "14px", "margin-left": "10px" } }, "\u5207\u6362\u6A21\u5F0F", -1)), _sfc_main = defineComponent({ props: { cropConfig: { default: () => DEFAULT_CONFIG.cropConfig }, layerConfig: { default: () => DEFAULT_CONFIG.layerConfig }, tagConfig: { default: () => DEFAULT_CONFIG.tagConfig }, drawingText: null, isShowTip: { type: Boolean, default: false }, enableScale: { type: Boolean, default: true }, enableMove: { type: Boolean, default: true }, enableDrawCrop: { type: Boolean, default: true }, enableDrawTag: { type: Boolean, default: true }, initScale: { type: Boolean, default: true }, enableInteractiveTagChangeStatus: { type: Boolean, default: true }, enableCropCross: { type: Boolean, default: false }, handleResizeCropCross: { default: "reset" }, enableInteractiveCropDelete: { type: Boolean, default: true }, enableCropResize: { type: Boolean, default: true }, enableTagResize: { type: Boolean, default: false }, enableDrawCropOutOfImg: { type: Boolean, default: true }, enableDrawTagOutOfCrop: { type: Boolean, default: true }, enableDrawTagOutOfImg: { type: Boolean, default: true }, isImgCrop: { type: Boolean, default: false }, isCropSingle: { type: Boolean, default: false }, cropList: { default: () => Array() }, tagList: { default: () => Array() }, mode: { default: "crop" }, mobileOperation: { default: "move" }, src: null, precision: { default: 0 }, splitClickAndDoubleClickEvent: { type: Boolean, default: false }, disableDefaultShortcuts: { default: () => Array() } }, emits: ["update:cropList", "cropListChange", "update:tagList", "tagListChange", "update:mode", "update:mobileOperation", "resizeStart", "resizeEnd", "delCrop", "drawCropStart", "drawTagStart", "mouseOverInfo", "onLoadImage"], setup(j, { expose: t, emit: a }) {
   const u = j;
   let n = false, r = void 0, i = void 0, o = null, c = null, f = { last: { down: void 0, up: void 0 }, prev: { down: void 0, up: void 0 } };
   const P = device.mobile() ? 0.1 / DPI * 1.5 : 0.1;
@@ -3101,12 +3101,12 @@ const _withScopeId = (t) => (pushScopeId("data-v-10cc444c"), t = t(), popScopeId
   }, dragCreatOrResizeRect(t2) {
     if (d && ("drawCrop" == t2 && (u.isCropSingle && !L.isDrawRecting && (D = []), L.isDrawRecting || a("drawCropStart"), L.isDrawRecting = true, B = moveDrawCropRect(d, g, _, I, w, D, y, S.value), drawTagList(d, T, y, S.value)), "drawTag" == t2 && (L.isDrawRecting || a("drawTagStart"), L.isDrawRecting = true, drawCropList(d, D, y, S.value), B = moveDrawTagRect(d, g, _, I, w, T, y, S.value)), "resize" == t2)) {
       let t3 = { crop() {
-        u.enableCropResize && L.resizeHovering && d ? (c = D[L.resizeHovering.index || 0], L.resizeHovering && c && (L.isDrawRecting = true, B = moveResizeBox(d, g, _, c, c.scale || 1, I, y, T, L.resizeHovering, D.filter((t4, e2) => {
+        u.enableCropResize && L.resizeHovering && d ? (c = D[L.resizeHovering.index || 0], L.resizeHovering && c && (L.isDrawRecting = true, B = moveResizeBox(d, g, _, c, c.__scale || 1, I, y, T, L.resizeHovering, D.filter((t4, e2) => {
           var _a;
           return e2 !== ((_a = L.resizeHovering) == null ? void 0 : _a.index);
         }), S.value))) : O.move();
       }, tag() {
-        u.enableTagResize && L.resizeHovering && d ? (c = T[L.resizeHovering.index || 0], L.resizeHovering && c && (L.isDrawRecting = true, B = moveResizeBox(d, g, _, c, c.scale || 1, I, y, T.filter((t4, e2) => {
+        u.enableTagResize && L.resizeHovering && d ? (c = T[L.resizeHovering.index || 0], L.resizeHovering && c && (L.isDrawRecting = true, B = moveResizeBox(d, g, _, c, c.__scale || 1, I, y, T.filter((t4, e2) => {
           var _a;
           return e2 !== ((_a = L.resizeHovering) == null ? void 0 : _a.index);
         }), L.resizeHovering, D, S.value))) : O.move();
@@ -3388,5 +3388,5 @@ const _withScopeId = (t) => (pushScopeId("data-v-10cc444c"), t = t(), popScopeId
     }), lodash.exports.groupBy(t2, "__groupIndex");
   }, hooks: e }), (t2, e2) => (openBlock(), createElementBlock("div", { class: "comp-ocr-img", ref_key: "containerRef", ref: R, onMousedown: rt, onMouseenter: E, onClick: ft, onMouseup: at, onMousemove: ot, onMouseout: ut, onMousewheel: J, onTouchmove: withModifiers(st, ["stop", "prevent"]), onTouchstart: withModifiers(lt, ["stop"]), onTouchend: withModifiers(dt, ["stop"]) }, [createElementVNode("canvas", { class: "canvas", ref_key: "canvasRef", ref: N }, null, 512), createElementVNode("canvas", { class: "canvas2", ref_key: "canvas2Ref", ref: U }, null, 512), unref(u).isShowTip ? (openBlock(), createElementBlock("div", _hoisted_2, [createElementVNode("div", _hoisted_3, [createElementVNode("div", { class: normalizeClass(["circle", { crop: "crop" === j.mode, tag: "tag" === j.mode }]) }, null, 2), createElementVNode("div", _hoisted_4, toDisplayString("crop" === j.mode ? "\u88C1\u526A\u6A21\u5F0F" : "\u6807\u8BB0\u9519\u8BEF\u884C"), 1)]), createElementVNode("div", _hoisted_5, [renderSlot(t2.$slots, "tip", {}, () => [_hoisted_6, _hoisted_7, _hoisted_8, _hoisted_9], true)])])) : createCommentVNode("", true)], 40, _hoisted_1));
 } });
-var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-10cc444c"]]);
+var ImgMark = _export_sfc(_sfc_main, [["__scopeId", "data-v-966577e8"]]);
 export { ImgMark, boxIsAllInOtherBox, transformTagBoxRelativeTo, transformTagListBoxRelativeTo };

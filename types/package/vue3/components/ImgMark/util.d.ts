@@ -64,12 +64,12 @@ export declare type BoundingBox = {
     startY: number;
     endX: number;
     endY: number;
-    scale?: number;
     isShow?: boolean;
     showOutLine?: boolean;
     labelText?: string;
     tagConfig?: TagConfig;
-    index?: number;
+    __scale?: number;
+    __index?: number;
 } & Event;
 declare type FixBoxInfoReturn = {
     info: BoundingBox;

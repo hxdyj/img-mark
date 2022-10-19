@@ -178,7 +178,7 @@ export function drawCropList(
 		drawLayerBg(ctx, config)
 	}
 	cropList.forEach(crop => {
-		let position = transfromBoxToRect(crop, crop.scale, currentPosition)
+		let position = transfromBoxToRect(crop, crop.__scale, currentPosition)
 		if (offset) {
 			position[0] += offset.offsetX
 			position[1] += offset.offsetY
@@ -265,12 +265,12 @@ export type BoundingBox = {
 	startY: number
 	endX: number
 	endY: number
-	scale?: number
 	isShow?: boolean
 	showOutLine?: boolean
 	labelText?: string
 	tagConfig?: TagConfig
-	index?: number
+	__scale?: number
+	__index?: number
 } & Event
 
 type FixBoxInfoReturn = {
@@ -445,7 +445,7 @@ export function drawTagList(
 	let isReDraw = false
 	let redrawList: BoundingBox[] = []
 	list.forEach(tagInfo => {
-		let positions = transfromBoxToRect(tagInfo, tagInfo.scale, currentPosition)
+		let positions = transfromBoxToRect(tagInfo, tagInfo.__scale, currentPosition)
 		positions[0] += offsetInfo!.offsetX
 		positions[1] += offsetInfo!.offsetY
 		// if (debug) console.log(`DRAW ITEM${index}`, tagInfo, positions)
@@ -453,7 +453,7 @@ export function drawTagList(
 			ctx,
 			...positions,
 			config,
-			(tagInfo.index || 0) + 1,
+			(tagInfo.__index || 0) + 1,
 			touchPoint,
 			tagInfo.isShow,
 			tagInfo.showOutLine,
@@ -674,7 +674,7 @@ export function moveDrawUnshowTagDashRect(
 		let touchPoint = getTouchPoint(e, zoomScale, origin, 'move')
 		let dashArr: BoundingBox[] = []
 		unShowArr.forEach(tag => {
-			let positions = transfromBoxToRect(tag, tag.scale, currentPosition)
+			let positions = transfromBoxToRect(tag, tag.__scale, currentPosition)
 			if (pointIsInRect(touchPoint, positions)) {
 				// console.log('DETECT hasTouchPointInArr', positions, touchPoint, [positions[0] + origin.x, positions[1] + origin.y], this, origin, zoomScale)
 				dashArr.push(tag)
@@ -709,7 +709,7 @@ export type ResizeItem = {
 }
 
 export function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index: number = -1) {
-	let positions = transfromBoxToRect(box, box.scale, currentPosition)
+	let positions = transfromBoxToRect(box, box.__scale, currentPosition)
 	const BorderWidth = device.mobile() ? DPI * 6 : 6
 	let HalfBorder = BorderWidth / 2
 	let list: ResizeItem[] = [
@@ -901,7 +901,7 @@ export function moveResizeBox(
 			}
 			drawTagList(ctx, tagArr, currentPosition, config)
 			if (config.mode == 'tag') {
-				drawTagRect(ctx, ...position, config, (box.index || 0) + 1, undefined, box.isShow, box.showOutLine, box.labelText, box.tagConfig)
+				drawTagRect(ctx, ...position, config, (box.__index || 0) + 1, undefined, box.isShow, box.showOutLine, box.labelText, box.tagConfig)
 			}
 			return position
 		}
@@ -945,8 +945,8 @@ export function transfromRect2Box(rect: Rect, currentPosition: Point, scale = 1)
 
 export function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number) {
 	return tagArr.map((tag, tagIndex) => {
-		tag.scale = scale
-		tag.index = tagIndex
+		tag.__scale = scale
+		tag.__index = tagIndex
 		return fixBoxInfo(transformBoxPrecision(tag, precision)).info
 	})
 }
