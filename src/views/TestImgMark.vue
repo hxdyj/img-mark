@@ -20,7 +20,7 @@
 				:disableDefaultShortcuts="['space', 'ctrl+b']"
 				:enableCropResize="true"
 				:enable-tag-resize="true"
-				:enableInteractiveTagChangeStatus="true"
+				:enableInteractiveTagChangeStatus="false"
 				:tagConfig="{
 					fontSize: 50,
 				}"
@@ -59,7 +59,7 @@ import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagLis
 import { uid } from 'uid'
 import { nextTick } from 'vue'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
-let mode = $ref<Mode>('crop')
+let mode = $ref<Mode>('tag')
 let cropList = $ref<
 	Array<
 		BoundingBox & {
@@ -98,6 +98,10 @@ let tagList = $ref<MyBoundingBox[]>([
 		labelText: 'haha',
 		tagConfig: {
 			highlightStrokeStyle: '#ccc',
+		},
+		onClick(e, item) {
+			item.showOutLine = !item.showOutLine
+			imgMarkRef.render()
 		},
 		// onClick(e, item) {
 		// 	console.log('Custom Click:', item)

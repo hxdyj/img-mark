@@ -1545,8 +1545,9 @@ function getTagListGroupByCropIndex(type: 'startPoint' | 'allIn' = 'startPoint')
 	})
 	return groupBy(tags, '__groupIndex')
 }
-
+const render = renderCtx2
 defineExpose({
+	render,
 	removeTagItems,
 	getTagListGroupByCropIndex,
 	hooks,

@@ -9,7 +9,7 @@ console.log('pathVue3', pathVue3)
 export default defineConfig({
 	envDir: path.resolve(__dirname, './env'),
 	server: {
-		port: 5001,
+		port: 6001,
 		host: true,
 	},
 	plugins: [

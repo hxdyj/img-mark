@@ -273,6 +273,7 @@ type CropListChangeEmitType = {
 | 方法                       | 说明                                 | 参数                                      | 返回类型                |
 | -------------------------- | ------------------------------------ | ----------------------------------------- | ----------------------- |
 | removeTagItems             | 移除 `tag` 项                        | list:BoundingBox[]                        | void                    |
+| render                     | 重新渲染                             | ——                                        | void                    |
 | getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组 | type: 'startPoint'/'allIn' = 'startPoint' | TagListGroupByCropIndex |
 
 ## Slots

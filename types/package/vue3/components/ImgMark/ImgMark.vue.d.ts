@@ -389,6 +389,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getTagListGroupByCropIndex: (type?: 'startPoint' | 'allIn') => {
         [index: number]: BoundingBox[];
     };
+    render: () => void;
 }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
         type: ObjectConstructor;
