@@ -86,8 +86,10 @@ export type Props = {
 	src: string
 	precision?: number
 	splitClickAndDoubleClickEvent?: boolean
-	disableDefaultShortcuts?: Array<'ctrl+b' | 'space'>
+	disableDefaultShortcuts?: ShortCutItem[]
 }
+
+export type ShortCutItem = 'ctrl+b' | 'space'
 
 export type Config = {
 	cropConfig: Required<CropConfig>

@@ -32,8 +32,9 @@ export declare type Props = {
     src: string;
     precision?: number;
     splitClickAndDoubleClickEvent?: boolean;
-    disableDefaultShortcuts?: Array<'ctrl+b' | 'space'>;
+    disableDefaultShortcuts?: ShortCutItem[];
 };
+export declare type ShortCutItem = 'ctrl+b' | 'space';
 export declare type Config = {
     cropConfig: Required<CropConfig>;
     layerConfig: Required<LayerConfig>;
@@ -281,7 +282,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         src: string;
         precision: number;
         splitClickAndDoubleClickEvent: boolean;
-        disableDefaultShortcuts: Array<'ctrl+b' | 'space'>;
+        disableDefaultShortcuts: ShortCutItem[];
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
