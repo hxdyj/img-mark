@@ -33,6 +33,7 @@ export declare type Props = {
     precision?: number;
     splitClickAndDoubleClickEvent?: boolean;
     disableDefaultShortcuts?: ShortCutItem[];
+    customDrawTopCtx?: CustomDrawTopCtx;
 };
 export declare type ShortCutItem = 'ctrl+b' | 'space';
 export declare type Config = {
@@ -79,7 +80,7 @@ export declare type OnLoadImageEmitType = {
 };
 export declare type TagListChangeType = 'add' | 'delete' | 'statusChange' | 'resize';
 export declare type CropListChangeType = 'add' | 'delete' | 'resize';
-import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition } from './util';
+import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition, CustomDrawTopCtx } from './util';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -233,6 +234,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: () => any[];
     };
+    customDrawTopCtx: {
+        type: null;
+        required: false;
+    };
 }, {
     drawSwitch: boolean;
     mouseDownTime: undefined;
@@ -283,6 +288,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         precision: number;
         splitClickAndDoubleClickEvent: boolean;
         disableDefaultShortcuts: ShortCutItem[];
+        customDrawTopCtx?: CustomDrawTopCtx | undefined;
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
@@ -363,6 +369,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     getContainerInfo: () => void;
     initComponent: () => Promise<true | void>;
     initResizeVar: () => void;
+    initAndTransfromBoxToRect: (boundingBoxList: BoundingBox[]) => Rect[];
     renderCtx2: () => void;
     resizeRender: () => Promise<undefined>;
     initMobileOperation: () => void;
@@ -534,6 +541,10 @@ declare const _sfc_main: import("vue").DefineComponent<{
         type: ArrayConstructor;
         required: false;
         default: () => any[];
+    };
+    customDrawTopCtx: {
+        type: null;
+        required: false;
     };
 }>> & {
     "onUpdate:cropList"?: ((...args: any[]) => any) | undefined;

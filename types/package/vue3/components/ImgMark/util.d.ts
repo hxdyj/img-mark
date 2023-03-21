@@ -1,6 +1,8 @@
 import { Config, TagConfig } from './ImgMark.vue';
 export declare const DPI: number;
 export declare const debug = false;
+export declare type BoundingBox2Rect = (boundingBoxList: BoundingBox[]) => Rect[];
+export declare type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: BoundingBox2Rect) => void;
 export declare const DEFAULT_CONFIG: Config;
 export declare type WH = {
     width: number;

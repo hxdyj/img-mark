@@ -4,7 +4,8 @@ import device from 'current-device'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
 export const debug = false
-
+export type BoundingBox2Rect = (boundingBoxList: BoundingBox[]) => Rect[]
+export type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: BoundingBox2Rect) => void
 export const DEFAULT_CONFIG: Config = {
 	tagConfig: {
 		fontSize: 20,

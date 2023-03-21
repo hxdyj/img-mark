@@ -17,7 +17,7 @@
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"
 				@onLoadImage="onLoadImage"
-				:disableDefaultShortcuts="['space', 'ctrl+b']"
+				:customDrawTopCtx="onCustomDrawTopCtx"
 				:enableCropResize="true"
 				:enable-tag-resize="true"
 				:enableInteractiveTagChangeStatus="false"
@@ -55,7 +55,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagListChangeEmitRetunType } from 'img-mark'
+import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagListChangeEmitRetunType, BoundingBox2Rect } from 'img-mark'
 import { uid } from 'uid'
 import { nextTick } from 'vue'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
@@ -149,6 +149,30 @@ function drawTagStart() {
 function delCrop(data: MyBoundingBox[]) {
 	console.log('delCrop', data)
 	//del后重新获取，然后把不在框里的tag删除
+}
+let linePoint: BoundingBox[] = [
+	{
+		startX: 50,
+		startY: 0,
+		endX: 51,
+		endY: 1,
+	},
+	{
+		startX: 50,
+		startY: 100,
+		endX: 51,
+		endY: 101,
+	},
+]
+function onCustomDrawTopCtx(ctx: CanvasRenderingContext2D, dealData: BoundingBox2Rect) {
+	ctx.lineWidth = 5
+	ctx.beginPath()
+	let list = dealData(linePoint)
+	ctx.moveTo(list[0][0], list[0][1])
+	ctx.lineTo(list[1][0], list[1][1])
+	ctx.strokeStyle = 'green'
+	ctx.setLineDash([0])
+	ctx.stroke()
 }
 
 function removeTag(data?: BoundingBox[]) {

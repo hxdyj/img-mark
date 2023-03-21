@@ -87,6 +87,7 @@ export type Props = {
 	precision?: number
 	splitClickAndDoubleClickEvent?: boolean
 	disableDefaultShortcuts?: ShortCutItem[]
+	customDrawTopCtx?: CustomDrawTopCtx
 }
 
 export type ShortCutItem = 'ctrl+b' | 'space'
@@ -195,6 +196,7 @@ import {
 	transformBoxPrecision,
 	detectEventIsTriggerOnBoxBorderOrVertex,
 	getBoxFourBorderRect,
+	CustomDrawTopCtx,
 } from './util'
 
 //是否开始画模式
@@ -385,6 +387,7 @@ const actions = {
 
 			tmpBoxPositionInfo = moveDrawCropRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, cropArr, currentPosition, config)
 			drawTagList(ctx2, tagArr, currentPosition, config)
+			props.customDrawTopCtx?.(ctx2, initAndTransfromBoxToRect)
 		}
 
 		if (type == 'drawTag') {
@@ -394,6 +397,7 @@ const actions = {
 			status.isDrawRecting = true
 			drawCropList(ctx2, cropArr, currentPosition, config)
 			tmpBoxPositionInfo = moveDrawTagRect(ctx2, startMousePoint, endMousePoint, zoomScale, origin, tagArr, currentPosition, config)
+			props.customDrawTopCtx?.(ctx2, initAndTransfromBoxToRect)
 		}
 
 		if (type == 'resize') {
@@ -418,6 +422,7 @@ const actions = {
 							cropArr.filter((item, i) => i !== status.resizeHovering?.index),
 							config
 						)
+						props.customDrawTopCtx?.(ctx2, initAndTransfromBoxToRect)
 					} else {
 						actions.move()
 					}
@@ -440,6 +445,7 @@ const actions = {
 							cropArr,
 							config
 						)
+						props.customDrawTopCtx?.(ctx2, initAndTransfromBoxToRect)
 					} else {
 						actions.move()
 					}
@@ -486,6 +492,13 @@ const actions = {
 		if (!props.enableMove || !ctx || !ctx2 || !img || status.isScaleing) return
 		status.isMoving = true
 		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr, config)
+		props.customDrawTopCtx?.(ctx2, (data: BoundingBox[]) => {
+			return initAndTransfromBoxToRect(data).map(positions => {
+				positions[0] += offsetInfo!.offsetX
+				positions[1] += offsetInfo!.offsetY
+				return positions
+			})
+		})
 		if (offsetInfo) {
 			tmpCurrentPosition = cloneDeep(currentPosition)
 			if (!tmpCurrentPosition) return
@@ -851,10 +864,18 @@ function initResizeVar() {
 	containerInfo = undefined
 }
 
+function initAndTransfromBoxToRect(boundingBoxList: BoundingBox[]) {
+	let list = initBoundingArrScale(boundingBoxList, scale, props.precision)
+	return list.map(item => {
+		return transfromBoxToRect(item, scale, currentPosition)
+	})
+}
+
 function renderCtx2() {
 	if (!ctx2) return
 	drawCropList(ctx2, cropArr, currentPosition, config)
 	drawTagList(ctx2, tagArr, currentPosition, config)
+	props.customDrawTopCtx?.(ctx2, initAndTransfromBoxToRect)
 }
 
 async function resizeRender() {
