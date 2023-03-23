@@ -1,9 +1,4 @@
-export declare type CropConfig = {
-    lineDash?: number[];
-    strokeStyle?: string;
-    lineWidth?: number;
-};
-export declare type Props = {
+export interface Props {
     cropConfig?: CropConfig;
     layerConfig?: LayerConfig;
     tagConfig?: TagConfig;
@@ -34,53 +29,8 @@ export declare type Props = {
     splitClickAndDoubleClickEvent?: boolean;
     disableDefaultShortcuts?: ShortCutItem[];
     customDrawTopCtx?: CustomDrawTopCtx;
-};
-export declare type ShortCutItem = 'ctrl+b' | 'space';
-export declare type Config = {
-    cropConfig: Required<CropConfig>;
-    layerConfig: Required<LayerConfig>;
-    tagConfig: Required<TagConfig>;
-} & Pick<Props, 'drawingText' | 'mode'>;
-export declare type MobileOperation = 'draw' | 'move';
-export declare type LayerConfig = {
-    fillStyle?: string;
-};
-export declare type TagConfig = {
-    fontSize?: number;
-    showText?: boolean;
-    fillStyle?: string;
-    textFillStyle?: string;
-    hoverStrokeStyle?: string;
-    hoverLineWidth?: number;
-    hoverLineDash?: number[];
-    highlightStrokeStyle?: string;
-    highlightLineWidth?: number;
-    highlightLineDash?: number[];
-};
-export declare type ResizeEmitType = {
-    index: number;
-    box: BoundingBox;
-};
-export declare type TagListChangeEmitRetunType = {
-    type: TagListChangeType;
-    list: BoundingBox[];
-    parentCrop?: BoundingBox;
-};
-export declare type CropListChangeEmitType = {
-    type: CropListChangeType;
-    list: BoundingBox[];
-};
-export declare type MouseOverInfoEmitType = {
-    canvas: Point | null;
-    img: Point | null;
-};
-export declare type OnLoadImageEmitType = {
-    status: 'loading' | 'success' | 'error';
-    msg?: string;
-};
-export declare type TagListChangeType = 'add' | 'delete' | 'statusChange' | 'resize';
-export declare type CropListChangeType = 'add' | 'delete' | 'resize';
-import { BoundingBox, ResizeItem, Mode, WH, Point, Rect, LayerTouchEvent, TypePoint, VertexPosition, CustomDrawTopCtx } from './util';
+}
+import { BoundingBox, CropConfig, CropListChangeEmitType, CropListChangeType, CustomDrawTopCtx, LayerConfig, LayerTouchEvent, MobileOperation, Mode, MouseOverInfoEmitType, OnLoadImageEmitType, Point, Rect, ResizeEmitType, ResizeItem, ShortCutItem, TagConfig, TagListChangeEmitRetunType, TagListChangeType, TypePoint, VertexPosition, WH } from './ImgMarkType';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -92,17 +42,17 @@ declare type TagItemTmp = BoundingBox & {
 };
 declare const _sfc_main: import("vue").DefineComponent<{
     cropConfig: {
-        type: ObjectConstructor;
+        type: null;
         required: false;
         default: () => Required<CropConfig>;
     };
     layerConfig: {
-        type: ObjectConstructor;
+        type: null;
         required: false;
         default: () => Required<LayerConfig>;
     };
     tagConfig: {
-        type: ObjectConstructor;
+        type: null;
         required: false;
         default: () => Required<TagConfig>;
     };
@@ -211,7 +161,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         default: string;
     };
     mobileOperation: {
-        type: StringConstructor;
+        type: null;
         required: false;
         default: string;
     };
@@ -400,17 +350,17 @@ declare const _sfc_main: import("vue").DefineComponent<{
     render: () => void;
 }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
-        type: ObjectConstructor;
+        type: null;
         required: false;
         default: () => Required<CropConfig>;
     };
     layerConfig: {
-        type: ObjectConstructor;
+        type: null;
         required: false;
         default: () => Required<LayerConfig>;
     };
     tagConfig: {
-        type: ObjectConstructor;
+        type: null;
         required: false;
         default: () => Required<TagConfig>;
     };
@@ -519,7 +469,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         default: string;
     };
     mobileOperation: {
-        type: StringConstructor;
+        type: null;
         required: false;
         default: string;
     };
@@ -561,9 +511,9 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onMouseOverInfo?: ((...args: any[]) => any) | undefined;
     onOnLoadImage?: ((...args: any[]) => any) | undefined;
 }, {
-    cropConfig: Record<string, any>;
-    layerConfig: Record<string, any>;
-    tagConfig: Record<string, any>;
+    cropConfig: any;
+    layerConfig: any;
+    tagConfig: any;
     isShowTip: boolean;
     enableScale: boolean;
     enableMove: boolean;
@@ -584,7 +534,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     cropList: unknown[];
     tagList: unknown[];
     mode: any;
-    mobileOperation: string;
+    mobileOperation: any;
     precision: number;
     splitClickAndDoubleClickEvent: boolean;
     disableDefaultShortcuts: unknown[];

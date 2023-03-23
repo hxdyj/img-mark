@@ -1,17 +1,7 @@
-import { Config, TagConfig } from './ImgMark.vue';
+import { BoundingBox, Config, LayerTouchEvent, Mode, Point, Rect, ResizeItem, TagConfig, TypePoint, VertexPosition, WH, TouchType } from './ImgMarkType';
 export declare const DPI: number;
 export declare const debug = false;
-export declare type BoundingBox2Rect = (boundingBoxList: BoundingBox[]) => Rect[];
-export declare type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: BoundingBox2Rect) => void;
 export declare const DEFAULT_CONFIG: Config;
-export declare type WH = {
-    width: number;
-    height: number;
-};
-export declare type Point = {
-    x: number;
-    y: number;
-};
 export declare const defaultWH: WH;
 export declare const defaultPoint: Partial<Point>;
 export declare function clearCanvas(ctx: CanvasRenderingContext2D): void;
@@ -48,7 +38,6 @@ export declare function amendMobileTouchEventDpi(touchEvent: TouchEvent): ({
 } & WH))[];
 export declare function drawCropRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, unClearCanvas?: boolean): void;
 export declare function drawCropList(ctx: CanvasRenderingContext2D, cropList: BoundingBox[], currentPosition: Point, config: Config, offset?: Offset, unClearCanvas?: boolean): void;
-export declare type Rect = [left: number, top: number, width: number, height: number];
 export declare function pointIsInBoxList(point: Point, boxList: BoundingBox[], scale?: number, currentPosition?: Point): {
     boxList: BoundingBox[];
     indexList: number[];
@@ -57,22 +46,6 @@ export declare function transfromBoxSize2Visual(box: BoundingBox, scale: number,
 export declare function pointIsInBox(point: Point, box: BoundingBox): boolean;
 export declare function pointIsInRect(point: Point, rect: Rect): boolean;
 export declare function transfromTwoPoints2Rect(pointStart: Point, pointEnd: Point): Rect;
-export declare type Event = {
-    onClick?: (e: unknown, item: BoundingBox) => void;
-    onDoubleClick?: (e: unknown, item: BoundingBox) => void;
-};
-export declare type BoundingBox = {
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
-    isShow?: boolean;
-    showOutLine?: boolean;
-    labelText?: string;
-    tagConfig?: TagConfig;
-    __scale?: number;
-    __index?: number;
-} & Event;
 declare type FixBoxInfoReturn = {
     info: BoundingBox;
     position: Rect;
@@ -81,11 +54,7 @@ export declare function fixBoxInfo(boundingBox: BoundingBox): FixBoxInfoReturn;
 export declare function getTwoBoxIntersectPart(box1: BoundingBox, box2: BoundingBox): BoundingBox | undefined;
 export declare function transfromBoxToRect(position: BoundingBox, scale?: number, currentPosition?: Point): Rect;
 export declare function isBoxValidity(box: BoundingBox): boolean;
-declare type TouchType = 'move' | 'click' | 'over';
-export declare type TypePoint = Point & {
-    type: TouchType;
-};
-export declare function drawTagRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, index?: number, touchPoint?: TypePoint, isShow?: boolean, showOutLine?: boolean, tagLabel?: string, tagConfig?: TagConfig): {
+export declare function drawTagRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, index: number, touchPoint: TypePoint | undefined, isShow: boolean | undefined, showOutLine: boolean | undefined, tagLabel: string | undefined, tagConfig: TagConfig | undefined, tagInfo: BoundingBox | undefined): {
     isShow: boolean;
     isCrash: boolean;
 } | undefined;
@@ -99,7 +68,6 @@ export declare function drawTagList(ctx: CanvasRenderingContext2D, list: Boundin
 };
 export declare function fixMoveRectPosition(position: Rect, zoomScale: number, origin: Point): Rect;
 export declare function moveDrawCropRect(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, zoomScale: any, origin: Point, cropList: BoundingBox[], currentPosition: Point, config: Config): Rect | undefined;
-export declare type VertexPosition = 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom';
 export declare function getVertexPositionByTwoPoints(startPoint: Point, endPoint: Point): VertexPosition;
 export declare function getPointByBoxAndVertexPosition(box: BoundingBox, vertex: VertexPosition): Point;
 export declare function moveDrawTagRect(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, zoomScale: number, origin: Point, tagArr: BoundingBox[], currentPosition: Point, config: Config): Rect | undefined;
@@ -108,24 +76,9 @@ export declare function getTwoPointsOffsetInfo(startPoint: Point, endPoint: Poin
     offsetInfo: Offset;
 };
 export declare function moveCanvas(ctx: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D, img: HTMLImageElement, imgWH: WH, scale: number, currentPosition: Point, startPoint: Point, endPoint: Point, cropList: BoundingBox[], zoomScale: number, tagArr: BoundingBox[], config: Config): Offset | undefined;
-export declare type LayerTouchEvent = (MouseEvent | TouchEvent) & {
-    layerX: number;
-    layerY: number;
-};
 export declare function fixPoint(point: Point, zoomScale: any, origin: Point): Point;
 export declare function getTouchPoint(event: LayerTouchEvent, zoomScale: any, origin: Point, type: TouchType): TypePoint;
-export declare type Mode = 'tag' | 'crop';
 export declare function moveDrawUnshowTagDashRect(ctx: CanvasRenderingContext2D, mode: Mode, tagArr: BoundingBox[], zoomScale: number, currentPosition: Point, origin: Point, e: LayerTouchEvent, cropList: BoundingBox[], isScaleing: boolean, hasHoverRectInTagItem: boolean, config: Config): boolean;
-declare type ResizeType = {
-    vertex: 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom';
-    border: 'left' | 'top' | 'right' | 'bottom';
-};
-export declare type ResizeItem = {
-    index: number;
-    type: keyof ResizeType;
-    name: ResizeType[keyof ResizeType];
-    positions: Rect;
-};
 export declare function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index?: number): ResizeItem[];
 export declare function pointIsInRectList(point: Point, list: Rect[]): {
     hasIn: boolean;

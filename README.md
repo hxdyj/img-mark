@@ -163,6 +163,14 @@ type LayerConfig = {
 	fillStyle?: string
 }
 
+export type CustomDraw = (
+	ctx: CanvasRenderingContext2D,
+	info: {
+		target: BoundingBox | undefined
+		positions: Rect
+	}
+) => void
+
 type TagConfig = {
 	fontSize?: number //px单位，默认20
 	showText?: boolean //是否展示tag index
@@ -174,6 +182,7 @@ type TagConfig = {
 	highlightStrokeStyle?: string
 	highlightLineWidth?: number
 	highlightLineDash?: number[]
+	customDraw?: CustomDraw
 }
 
 type Point = {

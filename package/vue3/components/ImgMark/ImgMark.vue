@@ -46,13 +46,7 @@ Bugs
 </template>
 
 <script setup lang="ts">
-export type CropConfig = {
-	lineDash?: number[]
-	strokeStyle?: string
-	lineWidth?: number
-}
-
-export type Props = {
+export interface Props {
 	cropConfig?: CropConfig
 	layerConfig?: LayerConfig
 	tagConfig?: TagConfig
@@ -89,73 +83,13 @@ export type Props = {
 	disableDefaultShortcuts?: ShortCutItem[]
 	customDrawTopCtx?: CustomDrawTopCtx
 }
-
-export type ShortCutItem = 'ctrl+b' | 'space'
-
-export type Config = {
-	cropConfig: Required<CropConfig>
-	layerConfig: Required<LayerConfig>
-	tagConfig: Required<TagConfig>
-} & Pick<Props, 'drawingText' | 'mode'>
-
-export type MobileOperation = 'draw' | 'move'
-
-export type LayerConfig = {
-	fillStyle?: string
-}
-
-export type TagConfig = {
-	fontSize?: number //px单位，默认20
-	showText?: boolean
-	fillStyle?: string
-	textFillStyle?: string
-	hoverStrokeStyle?: string
-	hoverLineWidth?: number
-	hoverLineDash?: number[]
-	highlightStrokeStyle?: string
-	highlightLineWidth?: number
-	highlightLineDash?: number[]
-}
-
-export type ResizeEmitType = {
-	index: number
-	box: BoundingBox
-}
-
-export type TagListChangeEmitRetunType = {
-	type: TagListChangeType
-	list: BoundingBox[]
-	parentCrop?: BoundingBox
-}
-export type CropListChangeEmitType = {
-	type: CropListChangeType
-	list: BoundingBox[]
-}
-
-export type MouseOverInfoEmitType = {
-	canvas: Point | null
-	img: Point | null
-}
-export type OnLoadImageEmitType = {
-	status: 'loading' | 'success' | 'error'
-	msg?: string
-}
-
-export type TagListChangeType = 'add' | 'delete' | 'statusChange' | 'resize'
-export type CropListChangeType = 'add' | 'delete' | 'resize'
 // console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
 import device from 'current-device'
 import { cloneDeep, groupBy, throttle } from 'lodash'
 import {
-	BoundingBox,
-	ResizeItem,
-	Mode,
 	defaultWH,
-	WH,
-	Point,
 	defaultPoint,
-	Rect,
 	amendDpi,
 	getElementWH,
 	initCanvasWH,
@@ -170,7 +104,6 @@ import {
 	isBoxValidity,
 	getTwoBoxIntersectPart,
 	findOneBorderOrVertex,
-	LayerTouchEvent,
 	moveDrawUnshowTagDashRect,
 	moveDetectBoxBorderSetCursor,
 	moveCanvas,
@@ -183,21 +116,43 @@ import {
 	getHypotenuseValue,
 	drawCropList,
 	initBoundingArrScale,
-	TypePoint,
 	DPI,
 	fixBoxInfo,
 	pointIsInBoxList,
 	DEFAULT_CONFIG,
 	getVertexPositionByTwoPoints,
 	getPointByBoxAndVertexPosition,
-	VertexPosition,
 	getBoxIsIntersectWithBoxList,
 	boxAllInBoxList,
 	transformBoxPrecision,
 	detectEventIsTriggerOnBoxBorderOrVertex,
 	getBoxFourBorderRect,
-	CustomDrawTopCtx,
 } from './util'
+import {
+	BoundingBox,
+	Config,
+	CropConfig,
+	CropListChangeEmitType,
+	CropListChangeType,
+	CustomDrawTopCtx,
+	LayerConfig,
+	LayerTouchEvent,
+	MobileOperation,
+	Mode,
+	MouseOverInfoEmitType,
+	OnLoadImageEmitType,
+	Point,
+	Rect,
+	ResizeEmitType,
+	ResizeItem,
+	ShortCutItem,
+	TagConfig,
+	TagListChangeEmitRetunType,
+	TagListChangeType,
+	TypePoint,
+	VertexPosition,
+	WH,
+} from './ImgMarkType'
 
 //是否开始画模式
 let drawSwitch = false

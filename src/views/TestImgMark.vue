@@ -98,6 +98,10 @@ let tagList = $ref<MyBoundingBox[]>([
 		labelText: 'haha',
 		tagConfig: {
 			highlightStrokeStyle: '#ccc',
+			customDraw(ctx, info) {
+				ctx.fillStyle = 'black'
+				ctx.fillRect(info.positions[0], info.positions[1], 5, 5)
+			},
 		},
 		onClick(e, item) {
 			item.showOutLine = !item.showOutLine

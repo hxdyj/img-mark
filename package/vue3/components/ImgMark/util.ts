@@ -1,11 +1,10 @@
 import { cloneDeep } from 'lodash'
-import { Config, TagConfig } from './ImgMark.vue'
 import device from 'current-device'
+import { BoundingBox, Config, LayerTouchEvent, Mode, Point, Rect, ResizeItem, TagConfig, TypePoint, VertexPosition, WH, TouchType } from './ImgMarkType'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
 export const debug = false
-export type BoundingBox2Rect = (boundingBoxList: BoundingBox[]) => Rect[]
-export type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: BoundingBox2Rect) => void
+
 export const DEFAULT_CONFIG: Config = {
 	tagConfig: {
 		fontSize: 20,
@@ -18,6 +17,7 @@ export const DEFAULT_CONFIG: Config = {
 		highlightStrokeStyle: 'yellow',
 		highlightLineWidth: 2,
 		highlightLineDash: [5],
+		customDraw() {},
 	},
 	layerConfig: {
 		fillStyle: 'rgba(0, 0, 0, 0.6)',
@@ -29,14 +29,6 @@ export const DEFAULT_CONFIG: Config = {
 	},
 }
 
-export type WH = {
-	width: number
-	height: number
-}
-export type Point = {
-	x: number
-	y: number
-}
 // __changed
 export const defaultWH: WH = {
 	width: 0,
@@ -189,8 +181,6 @@ export function drawCropList(
 	})
 }
 
-export type Rect = [left: number, top: number, width: number, height: number]
-
 export function pointIsInBoxList(
 	point: Point,
 	boxList: BoundingBox[],
@@ -255,24 +245,6 @@ export function transfromTwoPoints2Rect(pointStart: Point, pointEnd: Point): Rec
 	let top = Math.min(pointStart.y, pointEnd.y)
 	return [left, top, width, height]
 }
-
-export type Event = {
-	onClick?: (e: unknown, item: BoundingBox) => void
-	onDoubleClick?: (e: unknown, item: BoundingBox) => void
-}
-
-export type BoundingBox = {
-	startX: number
-	startY: number
-	endX: number
-	endY: number
-	isShow?: boolean
-	showOutLine?: boolean
-	labelText?: string
-	tagConfig?: TagConfig
-	__scale?: number
-	__index?: number
-} & Event
 
 type FixBoxInfoReturn = {
 	info: BoundingBox
@@ -360,10 +332,6 @@ export function isBoxValidity(box: BoundingBox) {
 	return false
 }
 
-type TouchType = 'move' | 'click' | 'over'
-export type TypePoint = Point & {
-	type: TouchType
-}
 export function drawTagRect(
 	ctx: CanvasRenderingContext2D,
 	left: number,
@@ -371,12 +339,13 @@ export function drawTagRect(
 	width: number,
 	height: number,
 	config: Config,
-	index?: number,
-	touchPoint?: TypePoint,
-	isShow?: boolean,
-	showOutLine?: boolean,
-	tagLabel?: string,
-	tagConfig?: TagConfig
+	index: number,
+	touchPoint: TypePoint | undefined,
+	isShow: boolean | undefined,
+	showOutLine: boolean | undefined,
+	tagLabel: string | undefined,
+	tagConfig: TagConfig | undefined,
+	tagInfo: BoundingBox | undefined
 ):
 	| {
 			isShow: boolean
@@ -384,7 +353,7 @@ export function drawTagRect(
 	  }
 	| undefined {
 	// if (debug) console.log(`DRAW ITEM${index}`, touchPoint, [left, top, width, height], isShow)
-	let finalTagConfig = cloneDeep(config.tagConfig)
+	let finalTagConfig: Required<TagConfig> = cloneDeep(config.tagConfig)
 	if (tagConfig) {
 		Object.assign(finalTagConfig, tagConfig)
 	}
@@ -425,6 +394,10 @@ export function drawTagRect(
 			}
 		}
 	}
+	finalTagConfig.customDraw(ctx, {
+		target: tagInfo,
+		positions: [left, top, width, height],
+	})
 	return undefined
 }
 type Offset = {
@@ -459,7 +432,8 @@ export function drawTagList(
 			tagInfo.isShow,
 			tagInfo.showOutLine,
 			tagInfo.labelText,
-			tagInfo.tagConfig
+			tagInfo.tagConfig,
+			tagInfo
 		)
 		if (drawTagInfo !== undefined) {
 			tagInfo.isShow = drawTagInfo.isShow
@@ -513,7 +487,6 @@ export function moveDrawCropRect(
 	}
 	return undefined
 }
-export type VertexPosition = 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom'
 export function getVertexPositionByTwoPoints(startPoint: Point, endPoint: Point): VertexPosition {
 	let lr: 'left' | 'right' = startPoint.x <= endPoint.x ? 'left' : 'right'
 	let tb: 'bottom' | 'top' = startPoint.y <= endPoint.y ? 'top' : 'bottom'
@@ -547,7 +520,7 @@ export function moveDrawTagRect(
 		if (position[2] > 5 || position[3] > 5) {
 			// if (debug) console.log('DRAW Tag', position)
 			drawTagList(ctx, tagArr, currentPosition, config)
-			drawTagRect(ctx, ...position, config, tagArr.length + 1, undefined, true, undefined, config.drawingText)
+			drawTagRect(ctx, ...position, config, tagArr.length + 1, undefined, true, undefined, config.drawingText, undefined, undefined)
 			return position
 		}
 	}
@@ -623,11 +596,6 @@ export function moveCanvas(
 	return undefined
 }
 
-export type LayerTouchEvent = (MouseEvent | TouchEvent) & {
-	layerX: number
-	layerY: number
-}
-
 export function fixPoint(point: Point, zoomScale, origin: Point): Point {
 	return {
 		x: point.x / zoomScale + origin.x,
@@ -652,7 +620,6 @@ export function getTouchPoint(event: LayerTouchEvent, zoomScale, origin: Point, 
 	}
 }
 
-export type Mode = 'tag' | 'crop'
 export function moveDrawUnshowTagDashRect(
 	ctx: CanvasRenderingContext2D,
 	mode: Mode,
@@ -696,17 +663,6 @@ export function moveDrawUnshowTagDashRect(
 	}
 
 	return hasHoverRectInTagItem
-}
-
-type ResizeType = {
-	vertex: 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom'
-	border: 'left' | 'top' | 'right' | 'bottom'
-}
-export type ResizeItem = {
-	index: number
-	type: keyof ResizeType
-	name: ResizeType[keyof ResizeType]
-	positions: Rect
 }
 
 export function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index: number = -1) {
@@ -902,7 +858,7 @@ export function moveResizeBox(
 			}
 			drawTagList(ctx, tagArr, currentPosition, config)
 			if (config.mode == 'tag') {
-				drawTagRect(ctx, ...position, config, (box.__index || 0) + 1, undefined, box.isShow, box.showOutLine, box.labelText, box.tagConfig)
+				drawTagRect(ctx, ...position, config, (box.__index || 0) + 1, undefined, box.isShow, box.showOutLine, box.labelText, box.tagConfig, undefined)
 			}
 			return position
 		}
