@@ -948,9 +948,8 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	if (status.isDrawRecting || status.isMoving) return
 	//有startMousePoint的时候也不能缩放
 	// if ((startMousePoint.x !== undefined || endMousePoint.x !== undefined) && !event.onTouchMove) return
-	let dpi = event.onTouchMove ? 1 : DPI
-	let mousex = privateCall ? 0 : (event.clientX - containerInfo.left) * dpi
-	let mousey = privateCall ? 0 : (event.clientY - containerInfo.top) * dpi
+	let mousex = privateCall ? 0 : (event.clientX - containerInfo.left) * DPI
+	let mousey = privateCall ? 0 : (event.clientY - containerInfo.top) * DPI
 	let wheel = event.deltaY < 0 ? 1 : -1
 	let zoom = privateCall ? event.__zoom : Math.exp(wheel * zoomIntensity)
 
@@ -1387,10 +1386,10 @@ function onTouchStart(event: TouchEvent) {
 		let { width, height } = getTwoFingerTouchListDistence(amendTouchList)
 		let hypotenuse = getHypotenuseValue(width, height) // 移动中的双指距离
 		hypotenuse = hypotenuse
-
+		//twoFingerCenterPoint 算的时候不用 amendTouchList 而用 touchList 是因为 onMouseWheel 的时候就是用原始的clientXY进行计算的，而上方 hypotenuse 用 amendTouchList 是因为要计算实际距离
 		twoFingerCenterPoint = {
-			x: (amendTouchList[0].clientX + amendTouchList[1].clientX) / 2 - containerInfo.left,
-			y: (amendTouchList[0].clientY + amendTouchList[1].clientY) / 2 - containerInfo.top,
+			x: (touchList[0].clientX + touchList[1].clientX) / 2,
+			y: (touchList[0].clientY + touchList[1].clientY) / 2,
 		}
 	}
 }

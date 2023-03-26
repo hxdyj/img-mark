@@ -1,6 +1,32 @@
 <template>
 	<div class="page-test-img-mark">
-		<div style="height: 20vh; background-color: aquamarine"></div>
+		<div
+			style="width: 100vw; height: 30vh; background: #ccc; box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center"
+		>
+			<div style="width: 80vw; height: 30vh; background: #ccc; box-sizing: border-box; flex-shrink: 0">
+				<ImgMark
+					ref="imgMarkRef"
+					:src="src"
+					v-model:mobileOperation="mobileOperation"
+					v-model:mode="mode"
+					v-model:tagList="tagList"
+					v-model:cropList="cropList"
+					@cropListChange="cropListChange"
+					@tagsStatusChange="tagsStatusChange"
+					@resizeStart="resizeStart"
+					@resizeEnd="resizeEnd"
+					@delCrop="delCrop"
+					@tagListChange="tagsListChange"
+					:isShowTip="true"
+					:enableDrawCropOutOfImg="false"
+					:enableDrawTagOutOfCrop="false"
+					:enableDrawTagOutOfImg="false"
+				>
+					<template #tip> 111 </template>
+				</ImgMark>
+			</div>
+		</div>
+		<div style="height: 30vh; background-color: aquamarine"></div>
 		<div
 			style="width: 100vw; height: 50vh; background: #ccc; box-sizing: border-box; flex-shrink: 0; display: flex; align-items: center; justify-content: center"
 		>
