@@ -74,13 +74,13 @@ let cropList = $ref<
 	// 	endX: 1774,
 	// 	endY: 100,
 	// },
-	// {
-	// 	__uid: '2',
-	// 	startX: 200,
-	// 	startY: 200,
-	// 	endX: 1000,
-	// 	endY: 500,
-	// },
+	{
+		__uid: '2',
+		startX: 200,
+		startY: 200,
+		endX: 1000,
+		endY: 500,
+	},
 ])
 type MyBoundingBox = BoundingBox & {
 	__uid: string

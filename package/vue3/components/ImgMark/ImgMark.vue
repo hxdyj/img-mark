@@ -724,6 +724,7 @@ async function initComponent() {
 			if (props.initScale) {
 				let initScaleInfo = initScale(canvasWH, img)
 				scale = cropScale = initScaleInfo.scale
+
 				// if (debug) console.log('Scale', scale)
 				// if (debug) console.log('Image Current', currentPosition.x, currentPosition.y, imgWH.width * scale, imgWH.height * scale)
 				//处理没有cropInfo的情况
@@ -774,7 +775,8 @@ async function initComponent() {
 						currentPosition.x = ((canvasWH.width - cropBoxInfo[2] * canvasZoom) / 2 - cropBoxInfo[0] * canvasZoom) / canvasZoom
 						currentPosition.y = (canvasWH.height - cropY * canvasZoom - (canvasWH.height * whiteRate) / 2) / canvasZoom
 					}
-
+					cropArr = initBoundingArrScale(cropArr, scale, props.precision)
+					tagArr = initBoundingArrScale(tagArr, scale, props.precision)
 					onMouseWheel(
 						{
 							deltaY: 1,
@@ -790,15 +792,13 @@ async function initComponent() {
 						} as unknown as MouseEvent,
 						true
 					)
+					//调用mouseWheel会重新绘制，所以直接return，让组件初始化完成
+					return true
 				}
 			}
-
-			drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
-			// let initPosition = transfromBoxToRect(cropInfo, cropScale, currentPosition)
-			// if (debug) console.log('Crop Current', initPosition)
-			// drawCropRect(ctx2, ...initPosition)
 			cropArr = initBoundingArrScale(cropArr, scale, props.precision)
 			tagArr = initBoundingArrScale(tagArr, scale, props.precision)
+			drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
 			renderCtx2()
 			return true
 		})
