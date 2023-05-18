@@ -449,8 +449,10 @@ const actions = {
 		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr, config)
 		props.customDrawTopCtx?.(ctx2, (data: BoundingBox[]) => {
 			return initAndTransfromBoxToRect(data).map(positions => {
-				positions[0] += offsetInfo!.offsetX
-				positions[1] += offsetInfo!.offsetY
+				if (offsetInfo) {
+					positions[0] += offsetInfo!.offsetX
+					positions[1] += offsetInfo!.offsetY
+				}
 				return positions
 			})
 		})
