@@ -1,11 +1,29 @@
 import { cloneDeep } from 'lodash'
 import device from 'current-device'
-import { BoundingBox, Config, LayerTouchEvent, Mode, Point, Rect, ResizeItem, TagConfig, TypePoint, VertexPosition, WH, TouchType } from './ImgMarkType'
+import {
+	BoundingBox,
+	Config,
+	LayerTouchEvent,
+	Mode,
+	Point,
+	Rect,
+	ResizeItem,
+	TagConfig,
+	TypePoint,
+	VertexPosition,
+	WH,
+	TouchType,
+	DaubPoint,
+} from './ImgMarkType'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
 export const debug = false
 
 export const DEFAULT_CONFIG: Config = {
+	daubConfig: {
+		lineWidth: 20,
+		strokeStyle: 'white',
+	},
 	tagConfig: {
 		fontSize: 20,
 		showText: true,
@@ -45,9 +63,11 @@ export function clearCanvas(ctx: CanvasRenderingContext2D) {
 	ctx.clearRect(-CancasSafeArea / 2, -CancasSafeArea / 2, CancasSafeArea, CancasSafeArea)
 }
 
-export function loadImage(src: string): Promise<HTMLImageElement> {
+export function loadImage(src: string, crossOrigin?: boolean): Promise<HTMLImageElement> {
 	let img = new Image()
-	// img.crossOrigin = 'anonymous'
+	if (crossOrigin) {
+		img.crossOrigin = 'anonymous'
+	}
 	img.src = src
 	return new Promise((resolve, reject) => {
 		if (img.complete) {
@@ -156,6 +176,29 @@ export function drawCropRect(ctx: CanvasRenderingContext2D, left: number, top: n
 	}
 	drawLayerImageData(ctx, left, top, width, height)
 	drawLayerBorder(ctx, left, top, width, height, config)
+}
+
+export function drawDuabPointList(ctx: CanvasRenderingContext2D, pointList: DaubPoint[], currentPosition: Point, config: Config) {
+	let movePoint: null | DaubPoint = null
+	let linePoint: null | DaubPoint = null
+
+	pointList.forEach((point, index) => {
+		if (!ctx) return
+		movePoint = pointList[index - 1] || point
+		linePoint = point
+
+		ctx.beginPath()
+
+		ctx.lineJoin = 'round'
+		ctx.lineCap = 'round'
+		ctx.lineWidth = point.lineWidth || config.daubConfig.lineWidth
+		ctx.strokeStyle = point.strokeStyle || config.daubConfig.strokeStyle
+
+		ctx.moveTo(movePoint._x || movePoint.x, movePoint._y || movePoint.y)
+		ctx.lineTo(linePoint._x || linePoint.x, linePoint._y || linePoint.y)
+
+		ctx.stroke()
+	})
 }
 
 export function drawCropList(
@@ -754,7 +797,6 @@ export function detectEventIsTriggerOnBoxBorderOrVertex(
 			return getBoxFourBorderRect(box, currentPosition, index)
 		})
 		.flat()
-
 	let detectResult = pointIsInRectList(
 		touchPoint,
 		borderList.map(i => i.positions)
@@ -905,6 +947,18 @@ export function initBoundingArrScale(tagArr: BoundingBox[], scale: number, preci
 		tag.__scale = scale
 		tag.__index = tagIndex
 		return fixBoxInfo(transformBoxPrecision(tag, precision)).info
+	})
+}
+
+export function initDaubStackList(list: DaubPoint[][], currentPosition, scale): DaubPoint[][] {
+	return list.map(arr => {
+		return arr.map(point => {
+			return {
+				...point,
+				_x: point.x * scale + currentPosition.x,
+				_y: point.y * scale + currentPosition.y,
+			}
+		})
 	})
 }
 

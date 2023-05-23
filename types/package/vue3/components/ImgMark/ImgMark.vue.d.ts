@@ -1,5 +1,6 @@
 export interface Props {
     cropConfig?: CropConfig;
+    daubConfig?: DaubConfig;
     layerConfig?: LayerConfig;
     tagConfig?: TagConfig;
     drawingText?: string;
@@ -22,6 +23,7 @@ export interface Props {
     isCropSingle?: boolean;
     cropList?: BoundingBox[];
     tagList?: BoundingBox[];
+    daubStack?: Array<Array<DaubPoint>>;
     mode?: Mode;
     mobileOperation?: MobileOperation;
     src: string;
@@ -30,7 +32,7 @@ export interface Props {
     disableDefaultShortcuts?: ShortCutItem[];
     customDrawTopCtx?: CustomDrawTopCtx;
 }
-import { BoundingBox, CropConfig, CropListChangeEmitType, CropListChangeType, CustomDrawTopCtx, LayerConfig, LayerTouchEvent, MobileOperation, Mode, MouseOverInfoEmitType, OnLoadImageEmitType, Point, Rect, ResizeEmitType, ResizeItem, ShortCutItem, TagConfig, TagListChangeEmitRetunType, TagListChangeType, TypePoint, VertexPosition, WH } from './ImgMarkType';
+import { BoundingBox, CropConfig, CropListChangeEmitType, CropListChangeType, CustomDrawTopCtx, DaubPoint, DaubConfig, LayerConfig, LayerTouchEvent, MobileOperation, Mode, MouseOverInfoEmitType, OnLoadImageEmitType, Point, Rect, ResizeEmitType, ResizeItem, ShortCutItem, TagConfig, TagListChangeEmitRetunType, TagListChangeType, TypePoint, VertexPosition, WH } from './ImgMarkType';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -45,6 +47,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         type: null;
         required: false;
         default: () => Required<CropConfig>;
+    };
+    daubConfig: {
+        type: null;
+        required: false;
+        default: () => Required<DaubConfig>;
     };
     layerConfig: {
         type: null;
@@ -155,6 +162,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: () => any[];
     };
+    daubStack: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
     mode: {
         type: null;
         required: false;
@@ -210,6 +222,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     initVar: () => void;
     props: {
         cropConfig: CropConfig;
+        daubConfig: DaubConfig;
         layerConfig: LayerConfig;
         tagConfig: TagConfig;
         drawingText?: string | undefined;
@@ -232,6 +245,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         isCropSingle: boolean;
         cropList: BoundingBox[];
         tagList: BoundingBox[];
+        daubStack: Array<Array<DaubPoint>>;
         mode: Mode;
         mobileOperation: MobileOperation;
         src: string;
@@ -242,6 +256,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     };
     emits: {
         (e: 'update:cropList', list: BoundingBox[]): void;
+        (e: 'update:daubStack', list: Array<Array<DaubPoint>>): void;
         (e: 'cropListChange', data: CropListChangeEmitType): void;
         (e: 'update:tagList', list: BoundingBox[]): void;
         (e: 'tagListChange', data: TagListChangeEmitRetunType): void;
@@ -263,6 +278,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     imgWH: WH;
     startMousePoint: Point;
     endMousePoint: Point;
+    lastMousePoint: Point;
     twoFingerCenterPoint: Point;
     hypotenuse: number;
     currentPosition: Point;
@@ -276,6 +292,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     tmpBoxPositionInfo: Rect | undefined;
     tagArr: BoundingBox[];
     cropArr: BoundingBox[];
+    daubStackList: DaubPoint[][];
     config: any;
     initDataVar: () => void;
     containerRef: any;
@@ -341,6 +358,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onTouchStart: (event: TouchEvent) => void;
     onTouchMove: (event: TouchEvent) => void;
     onTouchEnd: (event: any) => void;
+    getBase64ImageData: (crossOrigin?: boolean | undefined) => Promise<string>;
     refreshDrawTags: () => void;
     removeTagItems: (removeList: BoundingBox[]) => void;
     removeCropItems: (removeList: BoundingBox[]) => void;
@@ -348,11 +366,16 @@ declare const _sfc_main: import("vue").DefineComponent<{
         [index: number]: BoundingBox[];
     };
     render: () => void;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
         type: null;
         required: false;
         default: () => Required<CropConfig>;
+    };
+    daubConfig: {
+        type: null;
+        required: false;
+        default: () => Required<DaubConfig>;
     };
     layerConfig: {
         type: null;
@@ -463,6 +486,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: () => any[];
     };
+    daubStack: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
     mode: {
         type: null;
         required: false;
@@ -498,6 +526,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     };
 }>> & {
     "onUpdate:cropList"?: ((...args: any[]) => any) | undefined;
+    "onUpdate:daubStack"?: ((...args: any[]) => any) | undefined;
     onCropListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:tagList"?: ((...args: any[]) => any) | undefined;
     onTagListChange?: ((...args: any[]) => any) | undefined;
@@ -512,6 +541,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     onOnLoadImage?: ((...args: any[]) => any) | undefined;
 }, {
     cropConfig: any;
+    daubConfig: any;
     layerConfig: any;
     tagConfig: any;
     isShowTip: boolean;
@@ -533,6 +563,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     isCropSingle: boolean;
     cropList: unknown[];
     tagList: unknown[];
+    daubStack: unknown[];
     mode: any;
     mobileOperation: any;
     precision: number;

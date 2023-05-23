@@ -1,11 +1,11 @@
-import { BoundingBox, Config, LayerTouchEvent, Mode, Point, Rect, ResizeItem, TagConfig, TypePoint, VertexPosition, WH, TouchType } from './ImgMarkType';
+import { BoundingBox, Config, LayerTouchEvent, Mode, Point, Rect, ResizeItem, TagConfig, TypePoint, VertexPosition, WH, TouchType, DaubPoint } from './ImgMarkType';
 export declare const DPI: number;
 export declare const debug = false;
 export declare const DEFAULT_CONFIG: Config;
 export declare const defaultWH: WH;
 export declare const defaultPoint: Partial<Point>;
 export declare function clearCanvas(ctx: CanvasRenderingContext2D): void;
-export declare function loadImage(src: string): Promise<HTMLImageElement>;
+export declare function loadImage(src: string, crossOrigin?: boolean): Promise<HTMLImageElement>;
 export declare function drawImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, left: number, top: number, width: number, height: number): void;
 export declare function drawLayerBg(ctx: CanvasRenderingContext2D, config: Config): void;
 export declare function drawLayerImageData(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number): void;
@@ -37,6 +37,7 @@ export declare function amendMobileTouchEventDpi(touchEvent: TouchEvent): ({
     clientY: number;
 } & WH))[];
 export declare function drawCropRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, unClearCanvas?: boolean): void;
+export declare function drawDuabPointList(ctx: CanvasRenderingContext2D, pointList: DaubPoint[], currentPosition: Point, config: Config): void;
 export declare function drawCropList(ctx: CanvasRenderingContext2D, cropList: BoundingBox[], currentPosition: Point, config: Config, offset?: Offset, unClearCanvas?: boolean): void;
 export declare function pointIsInBoxList(point: Point, boxList: BoundingBox[], scale?: number, currentPosition?: Point): {
     boxList: BoundingBox[];
@@ -104,6 +105,7 @@ export declare function getTwoFingerTouchListDistence(touchList: Array<{
 };
 export declare function transfromRect2Box(rect: Rect, currentPosition: Point, scale?: number): BoundingBox;
 export declare function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number): BoundingBox[];
+export declare function initDaubStackList(list: DaubPoint[][], currentPosition: any, scale: any): DaubPoint[][];
 export declare function getBigBoxByBoxList(list: BoundingBox[]): BoundingBox | undefined;
 export declare function getBoxIsIntersectWithBoxList(box: BoundingBox, list: BoundingBox[]): boolean;
 export declare function boxIsAllInOtherBox(box: BoundingBox, otherBox: BoundingBox): boolean;

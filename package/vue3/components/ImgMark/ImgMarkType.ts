@@ -1,5 +1,6 @@
 export interface Props {
 	cropConfig?: CropConfig
+	duabConfig?: DaubConfig
 	layerConfig?: LayerConfig
 	tagConfig?: TagConfig
 	drawingText?: string
@@ -27,6 +28,7 @@ export interface Props {
 	isCropSingle?: boolean
 	cropList?: BoundingBox[]
 	tagList?: BoundingBox[]
+	daubStack?: Array<Array<DaubPoint>>
 	mode?: Mode
 	mobileOperation?: MobileOperation
 	src: string
@@ -37,7 +39,7 @@ export interface Props {
 }
 
 export type Rect = [left: number, top: number, width: number, height: number]
-export type Mode = 'tag' | 'crop'
+export type Mode = 'tag' | 'crop' | 'daub'
 export type TouchType = 'move' | 'click' | 'over'
 export type VertexPosition = 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom'
 export type LayerTouchEvent = (MouseEvent | TouchEvent) & {
@@ -54,6 +56,13 @@ export type WH = {
 export type Point = {
 	x: number
 	y: number
+}
+
+export type DaubPoint = Point & {
+	lineWidth?: number
+	strokeStyle?: string
+	_x?: number
+	_y?: number
 }
 
 export type Event = {
@@ -101,9 +110,15 @@ export type CropConfig = {
 	lineWidth?: number
 }
 
+export type DaubConfig = {
+	strokeStyle?: string
+	lineWidth?: number
+}
+
 export type ShortCutItem = 'ctrl+b' | 'space'
 
 export type Config = {
+	daubConfig: Required<DaubConfig>
 	cropConfig: Required<CropConfig>
 	layerConfig: Required<LayerConfig>
 	tagConfig: Required<TagConfig>

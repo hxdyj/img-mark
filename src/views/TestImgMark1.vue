@@ -13,6 +13,7 @@
 				@resizeEnd="resizeEnd"
 				@delCrop="delCrop"
 				:drawingText="'lala'"
+				:initScale="false"
 				@tagListChange="tagsListChange"
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"
@@ -40,6 +41,7 @@
 			<el-input v-model="src"></el-input>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="rollback()">撤销上一次绘制</el-button>
+			<el-button type="primary" size="small" style="margin-top: 40px" @click="getImage">获取图片</el-button>
 			<el-alert
 				v-for="item in tagList"
 				@close="removeTag([item])"
@@ -64,7 +66,10 @@
 import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagListChangeEmitRetunType, BoundingBox2Rect } from 'img-mark'
 import { uid } from 'uid'
 import { nextTick } from 'vue'
-let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
+// let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
+let src = $ref(
+	'https://homework-prod.oss-accelerate.aliyuncs.com/wx_mini_app_student_1684818143030_06793ce671481e9b08b.png?Expires=1684913738&OSSAccessKeyId=LTAI4Fgkj6vVSgC8hjWC5KVN&Signature=cS0FCU2PYlkCnlX0HII0Dql%2B1dM%3D&x-oss-process=style%2Fthumbnail'
+)
 let mode = $ref<Mode>('daub')
 
 let daubStack = $ref([
@@ -228,6 +233,14 @@ function tagsListChange(data: TagListChangeEmitRetunType) {
 function setHoverItem(item: MyBoundingBox) {
 	item.showOutLine = true
 }
+
+async function getImage() {
+	let url = await imgMarkRef.getBase64ImageData(true)
+	let img = document.createElement('img')
+	img.src = url
+	document.body.appendChild(img)
+}
+
 function removeHoverItem(item: MyBoundingBox) {
 	item.showOutLine = false
 }

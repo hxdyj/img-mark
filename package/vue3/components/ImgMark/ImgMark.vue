@@ -48,6 +48,7 @@ Bugs
 <script setup lang="ts">
 export interface Props {
 	cropConfig?: CropConfig
+	daubConfig?: DaubConfig
 	layerConfig?: LayerConfig
 	tagConfig?: TagConfig
 	drawingText?: string
@@ -75,6 +76,7 @@ export interface Props {
 	isCropSingle?: boolean
 	cropList?: BoundingBox[]
 	tagList?: BoundingBox[]
+	daubStack?: Array<Array<DaubPoint>>
 	mode?: Mode
 	mobileOperation?: MobileOperation
 	src: string
@@ -127,6 +129,9 @@ import {
 	transformBoxPrecision,
 	detectEventIsTriggerOnBoxBorderOrVertex,
 	getBoxFourBorderRect,
+	fixPoint,
+	drawDuabPointList,
+	initDaubStackList,
 } from './util'
 import {
 	BoundingBox,
@@ -135,6 +140,8 @@ import {
 	CropListChangeEmitType,
 	CropListChangeType,
 	CustomDrawTopCtx,
+	DaubPoint,
+	DaubConfig,
 	LayerConfig,
 	LayerTouchEvent,
 	MobileOperation,
@@ -193,6 +200,7 @@ function initVar() {
 }
 
 let props = withDefaults(defineProps<Props>(), {
+	daubConfig: () => DEFAULT_CONFIG.daubConfig,
 	tagConfig: () => DEFAULT_CONFIG.tagConfig,
 	layerConfig: () => DEFAULT_CONFIG.layerConfig,
 	cropConfig: () => DEFAULT_CONFIG.cropConfig,
@@ -219,11 +227,13 @@ let props = withDefaults(defineProps<Props>(), {
 	splitClickAndDoubleClickEvent: false,
 	tagList: () => Array(),
 	cropList: () => Array(),
+	daubStack: () => Array(),
 	disableDefaultShortcuts: () => Array(),
 })
 
 let emits = defineEmits<{
 	(e: 'update:cropList', list: BoundingBox[]): void
+	(e: 'update:daubStack', list: Array<Array<DaubPoint>>): void
 	(e: 'cropListChange', data: CropListChangeEmitType): void
 	(e: 'update:tagList', list: BoundingBox[]): void
 	(e: 'tagListChange', data: TagListChangeEmitRetunType): void
@@ -248,6 +258,7 @@ let canvasWH: RectDom | undefined = cloneDeep(defaultWH) as RectDom
 let imgWH: WH = cloneDeep(defaultWH)
 let startMousePoint: Point = cloneDeep(defaultPoint) as Point
 let endMousePoint: Point = cloneDeep(defaultPoint) as Point
+let lastMousePoint: Point = cloneDeep(defaultPoint) as Point
 let twoFingerCenterPoint: Point = {
 	x: 0,
 	y: 0,
@@ -270,12 +281,14 @@ let zoomScale = 1
 let tmpBoxPositionInfo: Rect | undefined
 let tagArr: BoundingBox[] = []
 let cropArr: BoundingBox[] = []
+let daubStackList: Array<Array<DaubPoint>> = []
 
 let config = $computed<Config>(() => {
 	let obj: Config = cloneDeep(DEFAULT_CONFIG)
 	Object.assign(obj.cropConfig, props.cropConfig)
 	Object.assign(obj.tagConfig, props.tagConfig)
 	Object.assign(obj.layerConfig, props.layerConfig)
+	Object.assign(obj.daubConfig, props.daubConfig)
 	obj.drawingText = props.drawingText
 	obj.mode = props.mode
 	return obj
@@ -290,6 +303,7 @@ function initDataVar() {
 	imgWH = cloneDeep(defaultWH) as WH
 	startMousePoint = cloneDeep(defaultPoint) as Point
 	endMousePoint = cloneDeep(defaultPoint) as Point
+	lastMousePoint = cloneDeep(defaultPoint) as Point
 	currentPosition = {
 		x: 0,
 		y: 0,
@@ -405,6 +419,7 @@ const actions = {
 						actions.move()
 					}
 				},
+				daub() {},
 			}
 			resizeStratagem[props.mode]()
 		}
@@ -510,13 +525,29 @@ const events = {
 			x: event.layerX,
 			y: event.layerY,
 		}
-
 		if (!drawSwitch) {
-			//在crop模式的时候 检测是否在crop的边或者顶点上， 是的话执行放大缩小crop的逻辑，否的话拖动画布
-			if (status.resizeHovering) {
-				actions.dragCreatOrResizeRect('resize')
+			if (props.mode === 'daub') {
+				if (status.isScaleing) return
+				let last = fixPoint(lastMousePoint, zoomScale, origin)
+				let end = fixPoint(endMousePoint, zoomScale, origin)
+				let realEnd: DaubPoint = {
+					x: end.x,
+					y: end.y,
+					lineWidth: props.daubConfig.lineWidth,
+					strokeStyle: props.daubConfig.strokeStyle,
+				}
+				if (ctx2) {
+					drawDuabPointList(ctx2, [last, end], currentPosition, config)
+					lastMousePoint = cloneDeep(endMousePoint)
+					daubStackList[daubStackList.length - 1].push(realEnd)
+				}
 			} else {
-				actions.move()
+				//在crop模式的时候 检测是否在crop的边或者顶点上， 是的话执行放大缩小crop的逻辑，否的话拖动画布
+				if (status.resizeHovering) {
+					actions.dragCreatOrResizeRect('resize')
+				} else {
+					actions.move()
+				}
 			}
 		} else {
 			this.onDrawSwitchOnStartDraw()
@@ -696,12 +727,12 @@ async function initComponent() {
 	initCropInfo()
 	tagArr = cloneDeep(props.tagList)
 	cropArr = cloneDeep(props.cropList)
+	daubStackList = cloneDeep(props.daubStack)
 	getContainerInfo()
 	addListenerKeyUpDown()
 	initMobileOperation()
 	ctx = canvasRef.getContext('2d')
 	ctx2 = canvas2Ref.getContext('2d')
-
 	if (!ctx || !ctx2) return Promise.reject(`Error: can't find canvas element.`)
 	canvasWH = amendDpi(getElementWH(ctx.canvas))
 	if (!canvasWH) return Promise.reject(`Error: can't get canvas height and width.`)
@@ -779,6 +810,7 @@ async function initComponent() {
 					}
 					cropArr = initBoundingArrScale(cropArr, scale, props.precision)
 					tagArr = initBoundingArrScale(tagArr, scale, props.precision)
+					daubStackList = initDaubStackList(daubStackList, currentPosition, scale)
 					onMouseWheel(
 						{
 							deltaY: 1,
@@ -800,6 +832,7 @@ async function initComponent() {
 			}
 			cropArr = initBoundingArrScale(cropArr, scale, props.precision)
 			tagArr = initBoundingArrScale(tagArr, scale, props.precision)
+			daubStackList = initDaubStackList(daubStackList, currentPosition, scale)
 			drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
 			renderCtx2()
 			return true
@@ -818,6 +851,7 @@ function initResizeVar() {
 	canvasWH = cloneDeep(defaultWH) as RectDom
 	startMousePoint = cloneDeep(defaultPoint) as Point
 	endMousePoint = cloneDeep(defaultPoint) as Point
+	lastMousePoint = cloneDeep(defaultPoint) as Point
 	containerInfo = undefined
 }
 
@@ -832,6 +866,12 @@ function renderCtx2() {
 	if (!ctx2) return
 	drawCropList(ctx2, cropArr, currentPosition, config)
 	drawTagList(ctx2, tagArr, currentPosition, config)
+	daubStackList.forEach(list => {
+		if (ctx2) {
+			drawDuabPointList(ctx2, list, currentPosition, config)
+		}
+	})
+
 	props.customDrawTopCtx?.(ctx2, initAndTransfromBoxToRect)
 }
 
@@ -921,6 +961,19 @@ watch(
 )
 
 watch(
+	() => props.daubStack,
+	list => {
+		if (!inited) return
+		daubStackList = initDaubStackList(cloneDeep(props.daubStack), currentPosition, scale)
+		debugger
+		renderCtx2()
+	},
+	{
+		deep: true,
+	}
+)
+
+watch(
 	() => props.cropList,
 	list => {
 		if (!inited) return
@@ -986,6 +1039,11 @@ function setBoxResize(newBoxInfo: BoundingBox) {
 				trigger: triggerTagListChange,
 				getBoxFunc: getTagList,
 			},
+			daub: {
+				boxList: [],
+				trigger: () => {},
+				getBoxFunc: () => [],
+			},
 		}
 		let resizeInfo = resizeStratagem[props.mode]
 		resizeInfo.boxList[status.resizeHovering.index] = newBoxInfo
@@ -1011,81 +1069,110 @@ function cleartMousePoints() {
 	tmpCurrentPosition = undefined
 
 	if (status.isMouseUpDownPoints()) {
-		if (props.mode === 'crop') {
-			if (tmpBoxPositionInfo) {
-				let newCropInfo = {
-					...clickedBox,
-					...transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale),
-				}
-				clickedBox = null
-				if (status.resizeHovering) {
-					if (!props.enableCropCross) {
-						let intersectFlag = getBoxIsIntersectWithBoxList(
-							newCropInfo,
-							cropArr.filter((item, index) => index !== status.resizeHovering?.index)
-						)
-						if (intersectFlag) {
-							if (props.handleResizeCropCross === 'reset') {
-								renderCtx2()
-							}
-							if (props.handleResizeCropCross === 'delete') {
-								let removeItem = cropArr[status.resizeHovering.index]
-								removeCropItems([removeItem])
+		let upStratagem: {
+			[key in Mode]: () => void
+		} = {
+			crop() {
+				if (tmpBoxPositionInfo) {
+					let newCropInfo = {
+						...clickedBox,
+						...transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale),
+					}
+					clickedBox = null
+					if (status.resizeHovering) {
+						if (!props.enableCropCross) {
+							let intersectFlag = getBoxIsIntersectWithBoxList(
+								newCropInfo,
+								cropArr.filter((item, index) => index !== status.resizeHovering?.index)
+							)
+							if (intersectFlag) {
+								if (props.handleResizeCropCross === 'reset') {
+									renderCtx2()
+								}
+								if (props.handleResizeCropCross === 'delete') {
+									let removeItem = cropArr[status.resizeHovering.index]
+									removeCropItems([removeItem])
+								}
+							} else {
+								setBoxResize(newCropInfo)
 							}
 						} else {
 							setBoxResize(newCropInfo)
 						}
 					} else {
-						setBoxResize(newCropInfo)
-					}
-				} else {
-					newCropInfo = initBoundingArrScale([newCropInfo], scale, props.precision)[0]
-					if (props.enableCropCross) {
-						cropArr.push(newCropInfo)
-						triggerCropListChange('add', getCropList([newCropInfo]))
-					} else {
-						//判断crop是否和其他box相交，相交就不保存
-						let intersectFlag = getBoxIsIntersectWithBoxList(newCropInfo, cropArr)
-						if (!intersectFlag) {
+						newCropInfo = initBoundingArrScale([newCropInfo], scale, props.precision)[0]
+						if (props.enableCropCross) {
 							cropArr.push(newCropInfo)
 							triggerCropListChange('add', getCropList([newCropInfo]))
 						} else {
-							renderCtx2()
+							//判断crop是否和其他box相交，相交就不保存
+							let intersectFlag = getBoxIsIntersectWithBoxList(newCropInfo, cropArr)
+							if (!intersectFlag) {
+								cropArr.push(newCropInfo)
+								triggerCropListChange('add', getCropList([newCropInfo]))
+							} else {
+								renderCtx2()
+							}
 						}
 					}
+					tmpBoxPositionInfo = undefined
 				}
-				tmpBoxPositionInfo = undefined
-			}
-		} else {
-			if (tmpBoxPositionInfo) {
-				let newCropInfo = {
-					...clickedBox,
-					...transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale),
+			},
+			tag() {
+				if (tmpBoxPositionInfo) {
+					let newCropInfo = {
+						...clickedBox,
+						...transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale),
+					}
+					clickedBox = null
+					if (status.resizeHovering) {
+						setBoxResize(newCropInfo)
+					} else {
+						let vertexPosition = getVertexPositionByTwoPoints(startMousePoint, endMousePoint)
+						let tagInfo = transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale)
+						tagInfo = initBoundingArrScale([tagInfo], scale, props.precision)[0]
+						Object.assign(tagInfo, {
+							isShow: true,
+							__oprateType: 'add',
+							__vertexPosition: vertexPosition,
+						})
+						tagArr.push(tagInfo)
+						triggerTagListChange('add', getTagList([tagInfo]))
+					}
+					tmpBoxPositionInfo = undefined
 				}
-				clickedBox = null
-				if (status.resizeHovering) {
-					setBoxResize(newCropInfo)
-				} else {
-					let vertexPosition = getVertexPositionByTwoPoints(startMousePoint, endMousePoint)
-					let tagInfo = transfromRect2Box(tmpBoxPositionInfo, currentPosition, scale)
-					tagInfo = initBoundingArrScale([tagInfo], scale, props.precision)[0]
-					Object.assign(tagInfo, {
-						isShow: true,
-						__oprateType: 'add',
-						__vertexPosition: vertexPosition,
+			},
+			daub() {
+				if (tmpBoxPositionInfo) {
+					tmpBoxPositionInfo = undefined
+				}
+				let result = cloneDeep(daubStackList)
+				emits(
+					'update:daubStack',
+					result.map(list => {
+						return list.map(point => {
+							if (point._x != undefined && point._y != undefined) {
+								delete point._x
+								delete point._y
+							} else {
+								point.x = (point.x - currentPosition.x) / scale
+								point.y = (point.y - currentPosition.y) / scale
+							}
+
+							return point
+						})
 					})
-					tagArr.push(tagInfo)
-					triggerTagListChange('add', getTagList([tagInfo]))
-				}
-				tmpBoxPositionInfo = undefined
-			}
+				)
+			},
 		}
+		upStratagem[props.mode]()
 	}
 
 	status.resizeHovering = undefined
 	status.isDrawRecting = false
 	startMousePoint = cloneDeep(defaultPoint) as Point
 	endMousePoint = cloneDeep(defaultPoint) as Point
+	lastMousePoint = cloneDeep(defaultPoint) as Point
 	containerRef.style.cursor = 'auto'
 }
 
@@ -1230,6 +1317,10 @@ function onMouseDown(e: MouseEvent) {
 		x: event.layerX,
 		y: event.layerY,
 	}
+	lastMousePoint = cloneDeep(startMousePoint)
+	if (props.mode == 'daub') {
+		daubStackList.push([])
+	}
 
 	//检测是否点在了crop的border或者vertex上边
 	if (props.mode === 'crop' && !drawSwitch && props.enableCropResize) {
@@ -1269,6 +1360,8 @@ let triggerMouseOverInfo = throttle(
 				canvas: canvasPosition,
 				img: imgPosition,
 			})
+			// console.log('mouse over')
+			// console.log(canvasPosition, imgPosition)
 		} else {
 			emits('mouseOverInfo', {
 				canvas: null,
@@ -1375,8 +1468,8 @@ function onTouchStart(event: TouchEvent) {
 	let touchList = event.touches
 	if (event.touches.length === 1) {
 		let fakeEvent = {
-			layerX: touchList[0].clientX,
-			layerY: touchList[0].clientY,
+			layerX: touchList[0].clientX - (containerInfo?.left || 0),
+			layerY: touchList[0].clientY - (containerInfo?.top || 0),
 		} as unknown as MouseEvent
 		onMouseDown(fakeEvent)
 	}
@@ -1402,8 +1495,8 @@ function onTouchMove(event: TouchEvent) {
 	// let touchList = amendMobileTouchEventDpi(event)
 	if (event.touches.length === 1) {
 		onMouseMove({
-			layerX: touchList[0].clientX,
-			layerY: touchList[0].clientY,
+			layerX: touchList[0].clientX - (containerInfo?.left || 0),
+			layerY: touchList[0].clientY - (containerInfo?.top || 0),
 		} as unknown as MouseEvent)
 	}
 	if (event.touches.length == 2) {
@@ -1440,6 +1533,31 @@ function onTouchEnd(event) {
 	// if (event.touches.length == 2) {
 	// 	111
 	// }
+}
+
+/* API */
+async function getBase64ImageData(crossOrigin?: boolean) {
+	const canvas = document.createElement('canvas')
+	canvas.style.width = imgWH.width + 'px'
+	canvas.style.height = imgWH.height + 'px'
+	canvas.width = imgWH.width
+	canvas.height = imgWH.height
+	let ctx = canvas.getContext('2d')
+	return loadImage(props.src, crossOrigin).then(img => {
+		if (ctx) {
+			let cPosition = { x: 0, y: 0 }
+			drawImage(ctx, img, 0, 0, img.width, img.height)
+			drawCropList(ctx, props.cropList, cPosition, config, undefined, true)
+			drawTagList(ctx, props.tagList, cPosition, config)
+			props.daubStack.forEach(list => {
+				if (ctx) {
+					drawDuabPointList(ctx, list, cPosition, config)
+				}
+			})
+			return canvas.toDataURL('image/png')
+		}
+		throw new Error('ctx not exist')
+	})
 }
 
 /* API */
@@ -1529,6 +1647,7 @@ defineExpose({
 	render,
 	removeTagItems,
 	getTagListGroupByCropIndex,
+	getBase64ImageData,
 	hooks,
 })
 </script>

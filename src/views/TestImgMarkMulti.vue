@@ -1,7 +1,7 @@
 <template>
 	<div class="page-test-img-mark">
-		<div style="height: 50vh; width: 100vw; display: flex">
-			<div style="width: 50vw; height: 50vh; background: #ccc; box-sizing: border-box">
+		<div style="height: 50vh; width: 100vw; display: flex; align-items: center; justify-content: center">
+			<div style="width: 48vw; height: 48vh; background: #ccc; box-sizing: border-box">
 				<ImgMark
 					ref="imgMarkRef"
 					style="width: 100%; height: 100%"
@@ -14,6 +14,7 @@
 					:enableDrawCropOutOfImg="false"
 					:enableDrawTagOutOfCrop="false"
 					:enableDrawTagOutOfImg="false"
+					:enableTagResize="true"
 				></ImgMark>
 			</div>
 			<div class="info-panel">
@@ -39,6 +40,7 @@
 					:enableDrawCropOutOfImg="false"
 					:enableDrawTagOutOfCrop="false"
 					:enableDrawTagOutOfImg="false"
+					:enableTagResize="true"
 				></ImgMark>
 			</div>
 			<div class="info-panel">
@@ -57,8 +59,8 @@ import { ImgMark, Mode, BoundingBox } from 'img-mark'
 import { uid } from 'uid'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let src1 = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
-let mode = $ref<Mode>('crop')
-let mode1 = $ref<Mode>('crop')
+let mode = $ref<Mode>('tag')
+let mode1 = $ref<Mode>('tag')
 let cropInfo = $ref<BoundingBox>()
 let cropInfo1 = $ref<BoundingBox>()
 type MyBoundingBox = BoundingBox & {

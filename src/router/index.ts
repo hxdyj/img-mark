@@ -7,6 +7,11 @@ const routes: Array<RouteRecordRaw> = [
 		component: () => import('../views/TestImgMark.vue'),
 	},
 	{
+		path: '/test1',
+		name: 'test1',
+		component: () => import('../views/TestImgMark1.vue'),
+	},
+	{
 		path: '/multi',
 		name: 'multi',
 		component: () => import('../views/TestImgMarkMulti.vue'),
