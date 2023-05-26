@@ -90,6 +90,7 @@ export type BoundingBox = {
 	showOutLine?: boolean
 	labelText?: string
 	tagConfig?: TagConfig
+	cropConfig?: CropConfig
 	__scale?: number
 	__index?: number
 } & Event
@@ -108,6 +109,7 @@ export type CropConfig = {
 	lineDash?: number[]
 	strokeStyle?: string
 	lineWidth?: number
+	customDraw?: CustomDraw
 }
 
 export type DaubConfig = {

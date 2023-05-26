@@ -1,6 +1,6 @@
 {
 	"name": "img-mark",
-	"version": "0.0.63",
+	"version": "0.0.64",
 	"description": "",
 	"main": "./dist/index.umd.js",
 	"module": "./dist/index.es.js",

@@ -9,7 +9,7 @@ export declare function loadImage(src: string, crossOrigin?: boolean): Promise<H
 export declare function drawImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement, left: number, top: number, width: number, height: number): void;
 export declare function drawLayerBg(ctx: CanvasRenderingContext2D, config: Config): void;
 export declare function drawLayerImageData(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number): void;
-export declare function drawLayerBorder(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config): void;
+export declare function drawLayerBorder(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, cropInfo?: BoundingBox): void;
 export declare function getElementWH(ele: HTMLElement): {
     top: number;
     right: number;

@@ -14,6 +14,7 @@ import {
 	WH,
 	TouchType,
 	DaubPoint,
+	CropConfig,
 } from './ImgMarkType'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
@@ -44,6 +45,7 @@ export const DEFAULT_CONFIG: Config = {
 		lineDash: [],
 		strokeStyle: 'rgba(255, 255, 255, 1)',
 		lineWidth: 2,
+		customDraw() {},
 	},
 }
 
@@ -98,10 +100,22 @@ export function drawLayerImageData(ctx: CanvasRenderingContext2D, left: number, 
 	ctx.clearRect(left, top, width, height)
 }
 
-export function drawLayerBorder(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config) {
-	ctx.setLineDash(config.cropConfig.lineDash)
-	ctx.strokeStyle = config.cropConfig.strokeStyle
-	ctx.lineWidth = config.cropConfig.lineWidth
+export function drawLayerBorder(
+	ctx: CanvasRenderingContext2D,
+	left: number,
+	top: number,
+	width: number,
+	height: number,
+	config: Config,
+	cropInfo?: BoundingBox
+) {
+	let finalCropConfig: Required<CropConfig> = cloneDeep(config.cropConfig)
+	if (cropInfo && cropInfo.cropConfig) {
+		Object.assign(finalCropConfig, cropInfo.cropConfig)
+	}
+	ctx.setLineDash(finalCropConfig.lineDash)
+	ctx.strokeStyle = finalCropConfig.strokeStyle
+	ctx.lineWidth = finalCropConfig.lineWidth
 	ctx.strokeRect(left, top, width, height)
 }
 
@@ -220,7 +234,17 @@ export function drawCropList(
 			position[1] += offset.offsetY
 		}
 		drawLayerImageData(ctx, ...position)
-		drawLayerBorder(ctx, ...position, config)
+		drawLayerBorder(ctx, ...position, config, crop)
+
+		let finalCropConfig: Required<CropConfig> = cloneDeep(config.cropConfig)
+		if (crop && crop.cropConfig) {
+			Object.assign(finalCropConfig, crop.cropConfig)
+		}
+
+		finalCropConfig.customDraw?.(ctx, {
+			target: crop,
+			positions: position,
+		})
 	})
 }
 

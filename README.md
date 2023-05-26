@@ -151,12 +151,14 @@ type BoundingBox = {
 	showOutLine?: boolean //tag是否边框是否高亮
 	labelText?: string //tag的标签文字
 	tagConfig?: TagConfig //单独定义某个tagConfig
+	cropConfig?: CropConfig //单独定义某个cropConfig
 } & Event
 
 type CropConfig = {
 	lineDash?: number[]
 	strokeStyle?: string
 	lineWidth?: number
+	customDraw?: CustomDraw
 }
 
 export type DaubConfig = {

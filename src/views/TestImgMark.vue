@@ -13,6 +13,9 @@
 				@resizeEnd="resizeEnd"
 				@delCrop="delCrop"
 				:drawingText="'lala'"
+				:crop-config="{
+					strokeStyle: 'blue',
+				}"
 				@tagListChange="tagsListChange"
 				@drawCropStart="drawCropStart"
 				@drawTagStart="drawTagStart"
@@ -65,19 +68,19 @@ import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagLis
 import { uid } from 'uid'
 import { nextTick } from 'vue'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
-let mode = $ref<Mode>('daub')
+let mode = $ref<Mode>('crop')
 
 let daubStack = $ref([
-	[
-		{
-			x: 1774,
-			y: 0,
-		},
-		{
-			x: 0,
-			y: 1182,
-		},
-	],
+	// [
+	// 	{
+	// 		x: 1774,
+	// 		y: 0,
+	// 	},
+	// 	{
+	// 		x: 0,
+	// 		y: 1182,
+	// 	},
+	// ],
 ])
 
 function rollback() {
@@ -90,13 +93,26 @@ let cropList = $ref<
 		}
 	>
 >([
-	// {
-	// 	__uid: '1',
-	// 	startX: 0,
-	// 	startY: 0,
-	// 	endX: 1774,
-	// 	endY: 100,
-	// },
+	{
+		__uid: '1',
+		startX: 0,
+		startY: 0,
+		endX: 1774,
+		endY: 100,
+		cropConfig: {
+			lineDash: [5],
+			strokeStyle: 'red',
+			customDraw(ctx, info) {
+				let width = Math.abs((info.target?.endX || 0) - (info.target?.startX || 0))
+				let scale = info.positions[2] / width
+				let a = info.positions
+				a[0] += 0
+				a[1] += 100 * scale
+				ctx.strokeStyle = 'blue'
+				ctx.fillRect(...a)
+			},
+		},
+	},
 	// {
 	// 	__uid: '2',
 	// 	startX: 200,
@@ -110,47 +126,47 @@ type MyBoundingBox = BoundingBox & {
 	type: number
 }
 let tagList = $ref<MyBoundingBox[]>([
-	{
-		__uid: '1',
-		startX: 50,
-		startY: 0,
-		endX: 100,
-		endY: 50,
-		isShow: true,
-		type: 1,
-		labelText: 'haha',
-		tagConfig: {
-			highlightStrokeStyle: '#ccc',
-			customDraw(ctx, info) {
-				ctx.fillStyle = 'black'
-				ctx.fillRect(info.positions[0], info.positions[1], 5, 5)
-			},
-		},
-		onClick(e, item) {
-			item.showOutLine = !item.showOutLine
-			imgMarkRef.render()
-		},
-		// onClick(e, item) {
-		// 	console.log('Custom Click:', item)
-		// },
-		// onDoubleClick(e, item) {
-		// 	console.log('Custom Double Click:', item)
-		// },
-	},
-	{
-		__uid: '2',
-		startX: 0,
-		startY: 0,
-		endX: 1774,
-		endY: 100,
-		isShow: true,
-		type: 1,
-		showOutLine: true,
-		tagConfig: {
-			highlightStrokeStyle: 'red',
-			highlightLineDash: [0],
-		},
-	},
+	// {
+	// 	__uid: '1',
+	// 	startX: 50,
+	// 	startY: 0,
+	// 	endX: 100,
+	// 	endY: 50,
+	// 	isShow: true,
+	// 	type: 1,
+	// 	labelText: 'haha',
+	// 	tagConfig: {
+	// 		highlightStrokeStyle: '#ccc',
+	// 		customDraw(ctx, info) {
+	// 			ctx.fillStyle = 'black'
+	// 			ctx.fillRect(info.positions[0], info.positions[1], 5, 5)
+	// 		},
+	// 	},
+	// 	onClick(e, item) {
+	// 		item.showOutLine = !item.showOutLine
+	// 		imgMarkRef.render()
+	// 	},
+	// 	// onClick(e, item) {
+	// 	// 	console.log('Custom Click:', item)
+	// 	// },
+	// 	// onDoubleClick(e, item) {
+	// 	// 	console.log('Custom Double Click:', item)
+	// 	// },
+	// },
+	// {
+	// 	__uid: '2',
+	// 	startX: 0,
+	// 	startY: 0,
+	// 	endX: 1774,
+	// 	endY: 100,
+	// 	isShow: true,
+	// 	type: 1,
+	// 	showOutLine: true,
+	// 	tagConfig: {
+	// 		highlightStrokeStyle: 'red',
+	// 		highlightLineDash: [0],
+	// 	},
+	// },
 ])
 
 let imgMarkRef = $ref<InstanceType<typeof ImgMark>>()

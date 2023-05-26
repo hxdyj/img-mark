@@ -80,6 +80,7 @@ export declare type BoundingBox = {
     showOutLine?: boolean;
     labelText?: string;
     tagConfig?: TagConfig;
+    cropConfig?: CropConfig;
     __scale?: number;
     __index?: number;
 } & Event;
@@ -93,6 +94,7 @@ export declare type CropConfig = {
     lineDash?: number[];
     strokeStyle?: string;
     lineWidth?: number;
+    customDraw?: CustomDraw;
 };
 export declare type DaubConfig = {
     strokeStyle?: string;
