@@ -43,6 +43,7 @@
 			<el-input v-model="src"></el-input>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="rollback()">撤销上一次绘制</el-button>
+			<el-button type="primary" size="small" style="margin-top: 40px" @click="scrollIntoView()">scrollIntoView</el-button>
 			<el-alert
 				v-for="item in tagList"
 				@close="removeTag([item])"
@@ -173,6 +174,10 @@ let imgMarkRef = $ref<InstanceType<typeof ImgMark>>()
 
 function onLoadImage(data: OnLoadImageEmitType) {
 	console.log('onLoadImage', data)
+}
+
+function scrollIntoView() {
+	imgMarkRef.scrollIntoView(cropList[0])
 }
 
 function resizeStart(data: ResizeEmitType) {

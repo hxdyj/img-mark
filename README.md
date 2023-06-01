@@ -306,6 +306,7 @@ type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: Boundi
 | render                     | 重新渲染                                       | ——                                        | void                    |
 | getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组           | type: 'startPoint'/'allIn' = 'startPoint' | TagListGroupByCropIndex |
 | getBase64ImageData         | 获取原图大小绘制完各种元素后的 base64 图片 url | crossOrigin?: boolean                     | Promise\<string>        |
+| scrollIntoView             | 讲某个区域滚动到 0,0 点                        | box: BoundingBox                          | void                    |
 
 ## Slots
 

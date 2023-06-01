@@ -312,6 +312,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         changeMode(): void;
         scale(zoom: number, mouse: Point): void;
         move(): void;
+        scrollIntoView(box: BoundingBox): void;
         hoverRect(event: LayerTouchEvent): void;
     };
     events: {

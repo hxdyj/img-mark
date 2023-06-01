@@ -478,6 +478,18 @@ const actions = {
 			tmpCurrentPosition.y += offsetInfo.offsetY
 		}
 	},
+	scrollIntoView(box: BoundingBox) {
+		if (!ctx || !ctx2 || !img) return
+		let positions = transfromBoxToRect(box, scale, currentPosition)
+		currentPosition = {
+			x: currentPosition.x - positions[0],
+			y: currentPosition.y - positions[1],
+		}
+		clearCanvas(ctx)
+		clearCanvas(ctx2)
+		drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
+		renderCtx2()
+	},
 	hoverRect(event: LayerTouchEvent) {
 		if (!ctx2) return
 		//画Tag虚线部分
@@ -1649,6 +1661,7 @@ defineExpose({
 	getTagListGroupByCropIndex,
 	getBase64ImageData,
 	hooks,
+	scrollIntoView: actions.scrollIntoView,
 })
 </script>
 
