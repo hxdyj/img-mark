@@ -732,9 +732,9 @@ export function moveDrawUnshowTagDashRect(
 	return hasHoverRectInTagItem
 }
 
-export function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index: number = -1) {
+export function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index: number = -1, borderWidth?: number) {
 	let positions = transfromBoxToRect(box, box.__scale, currentPosition)
-	const BorderWidth = device.mobile() ? DPI * 6 : 6
+	const BorderWidth = borderWidth != undefined ? borderWidth : device.mobile() ? DPI * 6 : 6
 	let HalfBorder = BorderWidth / 2
 	let list: ResizeItem[] = [
 		{

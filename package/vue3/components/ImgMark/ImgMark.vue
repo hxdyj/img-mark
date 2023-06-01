@@ -88,7 +88,7 @@ export interface Props {
 // console.log('Init Component.')
 import { nextTick, onBeforeUnmount, onMounted, unref, watch } from 'vue'
 import device from 'current-device'
-import { cloneDeep, groupBy, throttle } from 'lodash'
+import { cloneDeep, groupBy, throttle, take } from 'lodash'
 import {
 	defaultWH,
 	defaultPoint,
@@ -132,6 +132,7 @@ import {
 	fixPoint,
 	drawDuabPointList,
 	initDaubStackList,
+	pointIsInRect,
 } from './util'
 import {
 	BoundingBox,
@@ -481,14 +482,28 @@ const actions = {
 	scrollIntoView(box: BoundingBox) {
 		if (!ctx || !ctx2 || !img) return
 		let positions = transfromBoxToRect(box, scale, currentPosition)
-		currentPosition = {
-			x: currentPosition.x - positions[0],
-			y: currentPosition.y - positions[1],
+		box.__scale = scale
+		let boxVertexPoint = take(getBoxFourBorderRect(box, currentPosition, undefined, 0), 4).map((i: ResizeItem) => {
+			let point: Point = {
+				x: i.positions[0] + origin.x,
+				y: i.positions[1] + origin.y,
+			}
+			return point
+		})
+		let canvasRect: Rect = [0, 0, origin.x + (canvasWH?.width || 0) / zoomScale, origin.y + (canvasWH?.height || 0) / zoomScale]
+
+		//在可视区
+		if (boxVertexPoint.every(point => !pointIsInRect(point, canvasRect))) {
+			currentPosition = {
+				x: currentPosition.x - positions[0] + origin.x,
+				y: currentPosition.y - positions[1] + origin.y,
+			}
+
+			clearCanvas(ctx)
+			clearCanvas(ctx2)
+			drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
+			renderCtx2()
 		}
-		clearCanvas(ctx)
-		clearCanvas(ctx2)
-		drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
-		renderCtx2()
 	},
 	hoverRect(event: LayerTouchEvent) {
 		if (!ctx2) return
@@ -509,7 +524,7 @@ const actions = {
 		if (!drawSwitch) {
 			//检测鼠标是否在裁剪框四边上
 			if (props.enableCropResize && props.mode === 'crop') {
-				console.log('---------------MAMAMA-----------------')
+				// console.log('---------------MAMAMA-----------------')
 				moveDetectBoxBorderSetCursor(containerRef, event, cropArr, zoomScale, currentPosition, origin, status.isScaleing)
 			}
 			if (props.enableTagResize && props.mode === 'tag') {

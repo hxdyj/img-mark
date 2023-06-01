@@ -80,7 +80,7 @@ export declare function moveCanvas(ctx: CanvasRenderingContext2D, ctx2: CanvasRe
 export declare function fixPoint(point: Point, zoomScale: any, origin: Point): Point;
 export declare function getTouchPoint(event: LayerTouchEvent, zoomScale: any, origin: Point, type: TouchType): TypePoint;
 export declare function moveDrawUnshowTagDashRect(ctx: CanvasRenderingContext2D, mode: Mode, tagArr: BoundingBox[], zoomScale: number, currentPosition: Point, origin: Point, e: LayerTouchEvent, cropList: BoundingBox[], isScaleing: boolean, hasHoverRectInTagItem: boolean, config: Config): boolean;
-export declare function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index?: number): ResizeItem[];
+export declare function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index?: number, borderWidth?: number): ResizeItem[];
 export declare function pointIsInRectList(point: Point, list: Rect[]): {
     hasIn: boolean;
     coverList: Rect[];
