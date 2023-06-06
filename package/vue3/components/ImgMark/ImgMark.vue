@@ -485,18 +485,17 @@ const actions = {
 		box.__scale = scale
 		let boxVertexPoint = take(getBoxFourBorderRect(box, currentPosition, undefined, 0), 4).map((i: ResizeItem) => {
 			let point: Point = {
-				x: i.positions[0] + origin.x,
-				y: i.positions[1] + origin.y,
+				x: i.positions[0] - origin.x,
+				y: i.positions[1] - origin.y,
 			}
 			return point
 		})
-		let canvasRect: Rect = [0, 0, origin.x + (canvasWH?.width || 0) / zoomScale, origin.y + (canvasWH?.height || 0) / zoomScale]
-
+		let canvasRect: Rect = [0, 0, (canvasWH?.width || 0) / zoomScale, (canvasWH?.height || 0) / zoomScale]
 		//在可视区
 		if (boxVertexPoint.every(point => !pointIsInRect(point, canvasRect))) {
 			currentPosition = {
-				x: currentPosition.x - positions[0] + origin.x,
-				y: currentPosition.y - positions[1] + origin.y,
+				x: currentPosition.x - positions[0] + origin.x + (canvasRect[2] - positions[2]) / 2,
+				y: currentPosition.y - positions[1] + origin.y + (canvasRect[3] - positions[3]) / 2,
 			}
 
 			clearCanvas(ctx)
@@ -1034,7 +1033,6 @@ function onMouseWheel(e: MouseEvent, privateCall?: boolean) {
 	let mousey = privateCall ? 0 : (event.clientY - containerInfo.top) * DPI
 	let wheel = event.deltaY < 0 ? 1 : -1
 	let zoom = privateCall ? event.__zoom : Math.exp(wheel * zoomIntensity)
-
 	//缩放系数过小，不能缩放
 	if (zoomScale * zoom < 0.2) return
 	events.onWheel(
