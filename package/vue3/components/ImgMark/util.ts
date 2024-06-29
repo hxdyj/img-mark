@@ -15,6 +15,8 @@ import {
 	TouchType,
 	DaubPoint,
 	CropConfig,
+	Dot,
+	DotConfig,
 } from './ImgMarkType'
 const CancasSafeArea = 100000
 export const DPI = window.devicePixelRatio || 1
@@ -46,6 +48,14 @@ export const DEFAULT_CONFIG: Config = {
 		strokeStyle: 'rgba(255, 255, 255, 1)',
 		lineWidth: 2,
 		customDraw() {},
+	},
+	dotConfig: {
+		lineDash: [],
+		lineWidth: 2,
+		strokeStyle: 'transparent',
+		hoverFillStyle: '#69B1FF',
+		fillStyle: '#24FF6E',
+		radius: 50,
 	},
 }
 
@@ -377,6 +387,25 @@ export function getTwoBoxIntersectPart(box1: BoundingBox, box2: BoundingBox): Bo
 	return undefined
 }
 
+export function transfromDotToArc(
+	dot: Dot,
+	scale = 1,
+	currentPosition: Point = {
+		x: 0,
+		y: 0,
+	},
+	raduis: number,
+	offset?: Offset
+): [number, number, number, number, number] {
+	return [
+		dot.x * scale + currentPosition.x + (offset?.offsetX || 0),
+		dot.y * scale + currentPosition.y + (offset?.offsetY || 0),
+		raduis * scale,
+		0,
+		2 * Math.PI,
+	]
+}
+
 export function transfromBoxToRect(
 	position: BoundingBox,
 	scale = 1,
@@ -554,6 +583,25 @@ export function moveDrawCropRect(
 	}
 	return undefined
 }
+
+export function drawDotList(ctx: CanvasRenderingContext2D, dotList: Dot[], currentPosition: Point, config: Config, offset?: Offset, unClearCanvas?: boolean) {
+	dotList.forEach(dot => {
+		ctx.beginPath()
+		let finalDotConfig: Required<DotConfig> = cloneDeep(config.dotConfig)
+		if (dot.dotConfig) {
+			Object.assign(finalDotConfig, dot.dotConfig)
+		}
+		ctx.fillStyle = dot.__isHover ? finalDotConfig.hoverFillStyle : finalDotConfig.fillStyle
+		ctx.strokeStyle = finalDotConfig.strokeStyle
+		ctx.lineWidth = finalDotConfig.lineWidth
+		ctx.setLineDash(finalDotConfig.lineDash)
+		let position = transfromDotToArc(dot, dot.__scale, currentPosition, finalDotConfig.radius, offset)
+		ctx.arc(...position)
+		ctx.fill()
+		ctx.stroke()
+	})
+}
+
 export function getVertexPositionByTwoPoints(startPoint: Point, endPoint: Point): VertexPosition {
 	let lr: 'left' | 'right' = startPoint.x <= endPoint.x ? 'left' : 'right'
 	let tb: 'bottom' | 'top' = startPoint.y <= endPoint.y ? 'top' : 'bottom'
@@ -632,6 +680,7 @@ export function moveCanvas(
 	cropList: BoundingBox[],
 	zoomScale: number,
 	tagArr: BoundingBox[],
+	dotArr: Dot[],
 	config: Config
 ): Offset | undefined {
 	if (startPoint.x !== undefined && endPoint.x !== undefined) {
@@ -654,6 +703,7 @@ export function moveCanvas(
 				offsetX,
 				offsetY,
 			})
+			drawDotList(ctx2, dotArr, currentPosition, config, offsetResult.offsetInfo)
 			return {
 				offsetX,
 				offsetY,
@@ -668,6 +718,9 @@ export function fixPoint(point: Point, zoomScale, origin: Point): Point {
 		x: point.x / zoomScale + origin.x,
 		y: point.y / zoomScale + origin.y,
 	}
+}
+export function fixLength(len: number, zoomScale): number {
+	return len / zoomScale
 }
 
 export function getTouchPoint(event: LayerTouchEvent, zoomScale, origin: Point, type: TouchType): TypePoint {
@@ -965,12 +1018,28 @@ export function transfromRect2Box(rect: Rect, currentPosition: Point, scale = 1)
 	}
 	return fixBoxInfo(rectInfo).info
 }
+export function fixTouchPoint2ImagePoint(point: Point, currentPosition: Point, scale = 1) {
+	let zoom = scale
+	let result: Point = {
+		x: (point.x - currentPosition.x) / zoom,
+		y: (point.y - currentPosition.y) / zoom,
+	}
+	return result
+}
 
 export function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number) {
 	return tagArr.map((tag, tagIndex) => {
 		tag.__scale = scale
 		tag.__index = tagIndex
 		return fixBoxInfo(transformBoxPrecision(tag, precision)).info
+	})
+}
+
+export function initDotArrScale(dotArr: Dot[], scale: number, precision: number) {
+	return dotArr.map((dot, dotIndex) => {
+		dot.__scale = scale
+		dot.__index = dotIndex
+		return transformDotPrecision(dot, precision)
 	})
 }
 
@@ -1068,10 +1137,31 @@ export function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: Boun
 export function transformPrecision(list: BoundingBox[], precision: number) {
 	return list.map(box => transformBoxPrecision(box, precision))
 }
+
 export function transformBoxPrecision(box: BoundingBox, precision: number) {
-	box.startX = parseFloat(box.startX.toFixed(precision))
-	box.endX = parseFloat(box.endX.toFixed(precision))
-	box.startY = parseFloat(box.startY.toFixed(precision))
-	box.endY = parseFloat(box.endY.toFixed(precision))
+	box.startX = numFixPrecision(box.startX, precision)
+	box.endX = numFixPrecision(box.endX, precision)
+	box.startY = numFixPrecision(box.startY, precision)
+	box.endY = numFixPrecision(box.endY, precision)
 	return box
+}
+export function transformDotPrecision(dot: Dot, precision: number) {
+	dot.x = numFixPrecision(dot.x, precision)
+	dot.y = numFixPrecision(dot.y, precision)
+	dot.raduis = numFixPrecision(dot.raduis || 0, precision)
+	return dot
+}
+
+export function numFixPrecision(num: number, precision: number) {
+	return parseFloat(num.toFixed(precision))
+}
+
+export function pointInDot(point: Point, dot: Dot, config: Config): boolean {
+	let finalDotConfig: Required<DotConfig> = cloneDeep(config.dotConfig)
+	if (dot.dotConfig) {
+		Object.assign(finalDotConfig, dot.dotConfig)
+	}
+	const distanceSquared = (point.x - dot.x) ** 2 + (point.y - dot.y) ** 2
+	const radiusSquared = finalDotConfig.radius ** 2
+	return distanceSquared <= radiusSquared
 }

@@ -3,6 +3,7 @@ export interface Props {
     daubConfig?: DaubConfig;
     layerConfig?: LayerConfig;
     tagConfig?: TagConfig;
+    dotConfig?: DotConfig;
     drawingText?: string;
     isShowTip?: boolean;
     enableScale?: boolean;
@@ -24,6 +25,7 @@ export interface Props {
     cropList?: BoundingBox[];
     tagList?: BoundingBox[];
     daubStack?: Array<Array<DaubPoint>>;
+    dotList?: Dot[];
     mode?: Mode;
     mobileOperation?: MobileOperation;
     src: string;
@@ -32,7 +34,7 @@ export interface Props {
     disableDefaultShortcuts?: ShortCutItem[];
     customDrawTopCtx?: CustomDrawTopCtx;
 }
-import { BoundingBox, CropConfig, CropListChangeEmitType, CropListChangeType, CustomDrawTopCtx, DaubPoint, DaubConfig, LayerConfig, LayerTouchEvent, MobileOperation, Mode, MouseOverInfoEmitType, OnLoadImageEmitType, Point, Rect, ResizeEmitType, ResizeItem, ShortCutItem, TagConfig, TagListChangeEmitRetunType, TagListChangeType, TypePoint, VertexPosition, WH } from './ImgMarkType';
+import { BoundingBox, CropConfig, CropListChangeEmitType, CropListChangeType, CustomDrawTopCtx, DaubPoint, DaubConfig, LayerConfig, LayerTouchEvent, MobileOperation, Mode, MouseOverInfoEmitType, OnLoadImageEmitType, Point, Rect, ResizeEmitType, ResizeItem, ShortCutItem, TagConfig, TagListChangeEmitRetunType, TagListChangeType, TypePoint, VertexPosition, WH, Dot, DotConfig } from './ImgMarkType';
 declare type RectDom = Pick<DOMRect, 'top' | 'right' | 'bottom' | 'left' | 'width' | 'height' | 'x' | 'y'>;
 declare type TagItemTmp = BoundingBox & {
     scale?: number;
@@ -62,6 +64,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         type: null;
         required: false;
         default: () => Required<TagConfig>;
+    };
+    dotConfig: {
+        type: null;
+        required: false;
+        default: () => Required<DotConfig>;
     };
     drawingText: {
         type: StringConstructor;
@@ -163,6 +170,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         default: () => any[];
     };
     daubStack: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
+    dotList: {
         type: ArrayConstructor;
         required: false;
         default: () => any[];
@@ -225,6 +237,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         daubConfig: DaubConfig;
         layerConfig: LayerConfig;
         tagConfig: TagConfig;
+        dotConfig: DotConfig;
         drawingText?: string | undefined;
         isShowTip: boolean;
         enableScale: boolean;
@@ -246,6 +259,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         cropList: BoundingBox[];
         tagList: BoundingBox[];
         daubStack: Array<Array<DaubPoint>>;
+        dotList: Dot[];
         mode: Mode;
         mobileOperation: MobileOperation;
         src: string;
@@ -259,6 +273,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         (e: 'update:daubStack', list: Array<Array<DaubPoint>>): void;
         (e: 'cropListChange', data: CropListChangeEmitType): void;
         (e: 'update:tagList', list: BoundingBox[]): void;
+        (e: 'update:dotList', list: Dot[]): void;
         (e: 'tagListChange', data: TagListChangeEmitRetunType): void;
         (e: 'update:mode', mode: Mode): void;
         (e: 'update:mobileOperation', mode: MobileOperation): void;
@@ -292,6 +307,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     tmpBoxPositionInfo: Rect | undefined;
     tagArr: BoundingBox[];
     cropArr: BoundingBox[];
+    dotArr: Dot[];
     daubStackList: DaubPoint[][];
     config: any;
     initDataVar: () => void;
@@ -308,7 +324,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     };
     actions: {
         dragCreatRectInterrupt(): void;
-        dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resize'): void;
+        dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resize' | 'drawDot'): void;
         changeMode(): void;
         scale(zoom: number, mouse: Point): void;
         move(): void;
@@ -367,7 +383,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         [index: number]: BoundingBox[];
     };
     render: () => void;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "update:dotList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "update:dotList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
         type: null;
         required: false;
@@ -387,6 +403,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         type: null;
         required: false;
         default: () => Required<TagConfig>;
+    };
+    dotConfig: {
+        type: null;
+        required: false;
+        default: () => Required<DotConfig>;
     };
     drawingText: {
         type: StringConstructor;
@@ -492,6 +513,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: () => any[];
     };
+    dotList: {
+        type: ArrayConstructor;
+        required: false;
+        default: () => any[];
+    };
     mode: {
         type: null;
         required: false;
@@ -530,6 +556,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     "onUpdate:daubStack"?: ((...args: any[]) => any) | undefined;
     onCropListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:tagList"?: ((...args: any[]) => any) | undefined;
+    "onUpdate:dotList"?: ((...args: any[]) => any) | undefined;
     onTagListChange?: ((...args: any[]) => any) | undefined;
     "onUpdate:mode"?: ((...args: any[]) => any) | undefined;
     "onUpdate:mobileOperation"?: ((...args: any[]) => any) | undefined;
@@ -545,6 +572,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     daubConfig: any;
     layerConfig: any;
     tagConfig: any;
+    dotConfig: any;
     isShowTip: boolean;
     enableScale: boolean;
     enableMove: boolean;
@@ -565,6 +593,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     cropList: unknown[];
     tagList: unknown[];
     daubStack: unknown[];
+    dotList: unknown[];
     mode: any;
     mobileOperation: any;
     precision: number;

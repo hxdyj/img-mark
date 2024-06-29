@@ -7,6 +7,7 @@
 				v-model:mode="mode"
 				v-model:tagList="tagList"
 				v-model:cropList="cropList"
+				v-model:dotList="dotList"
 				@cropListChange="cropListChange"
 				@tagsStatusChange="tagsStatusChange"
 				@resizeStart="resizeStart"
@@ -15,6 +16,9 @@
 				:drawingText="'lala'"
 				:crop-config="{
 					strokeStyle: 'blue',
+				}"
+				:dot-config="{
+					radius: 10,
 				}"
 				@tagListChange="tagsListChange"
 				@drawCropStart="drawCropStart"
@@ -69,7 +73,7 @@ import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagLis
 import { uid } from 'uid'
 import { nextTick } from 'vue'
 let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
-let mode = $ref<Mode>('crop')
+let mode = $ref<Mode>('dot')
 
 let daubStack = $ref([
 	// [
@@ -82,6 +86,12 @@ let daubStack = $ref([
 	// 		y: 1182,
 	// 	},
 	// ],
+])
+let dotList = $ref([
+	{
+		x: 1774,
+		y: 0,
+	},
 ])
 
 function rollback() {

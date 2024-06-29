@@ -3,6 +3,7 @@ export interface Props {
     duabConfig?: DaubConfig;
     layerConfig?: LayerConfig;
     tagConfig?: TagConfig;
+    dotConfig?: DotConfig;
     drawingText?: string;
     isShowTip?: boolean;
     enableScale?: boolean;
@@ -24,6 +25,7 @@ export interface Props {
     cropList?: BoundingBox[];
     tagList?: BoundingBox[];
     daubStack?: Array<Array<DaubPoint>>;
+    dotList?: Dot[];
     mode?: Mode;
     mobileOperation?: MobileOperation;
     src: string;
@@ -33,7 +35,7 @@ export interface Props {
     customDrawTopCtx?: CustomDrawTopCtx;
 }
 export declare type Rect = [left: number, top: number, width: number, height: number];
-export declare type Mode = 'tag' | 'crop' | 'daub';
+export declare type Mode = 'tag' | 'crop' | 'daub' | 'dot';
 export declare type TouchType = 'move' | 'click' | 'over';
 export declare type VertexPosition = 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom';
 export declare type LayerTouchEvent = (MouseEvent | TouchEvent) & {
@@ -84,6 +86,15 @@ export declare type BoundingBox = {
     __scale?: number;
     __index?: number;
 } & Event;
+export declare type Dot = {
+    x: number;
+    y: number;
+    raduis: number;
+    __scale?: number;
+    __index?: number;
+    __isHover?: boolean;
+    dotConfig?: DotConfig;
+} & Event;
 export declare type BoundingBox2Rect = (boundingBoxList: BoundingBox[]) => Rect[];
 export declare type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: BoundingBox2Rect) => void;
 export declare type CustomDraw = (ctx: CanvasRenderingContext2D, info: {
@@ -100,12 +111,21 @@ export declare type DaubConfig = {
     strokeStyle?: string;
     lineWidth?: number;
 };
+export declare type DotConfig = {
+    lineDash?: number[];
+    strokeStyle?: string;
+    fillStyle?: string;
+    hoverFillStyle?: string;
+    lineWidth?: number;
+    radius?: number;
+};
 export declare type ShortCutItem = 'ctrl+b' | 'space';
 export declare type Config = {
     daubConfig: Required<DaubConfig>;
     cropConfig: Required<CropConfig>;
     layerConfig: Required<LayerConfig>;
     tagConfig: Required<TagConfig>;
+    dotConfig: Required<DotConfig>;
 } & Pick<Props, 'drawingText' | 'mode'>;
 export declare type MobileOperation = 'draw' | 'move';
 export declare type LayerConfig = {

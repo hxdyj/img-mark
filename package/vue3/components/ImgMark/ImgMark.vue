@@ -51,6 +51,7 @@ export interface Props {
 	daubConfig?: DaubConfig
 	layerConfig?: LayerConfig
 	tagConfig?: TagConfig
+	dotConfig?: DotConfig
 	drawingText?: string
 	isShowTip?: boolean
 	enableScale?: boolean
@@ -77,6 +78,7 @@ export interface Props {
 	cropList?: BoundingBox[]
 	tagList?: BoundingBox[]
 	daubStack?: Array<Array<DaubPoint>>
+	dotList?: Dot[]
 	mode?: Mode
 	mobileOperation?: MobileOperation
 	src: string
@@ -117,6 +119,9 @@ import {
 	getTwoFingerTouchListDistence,
 	getHypotenuseValue,
 	drawCropList,
+	drawDotList,
+	initDotArrScale,
+	fixTouchPoint2ImagePoint,
 	initBoundingArrScale,
 	DPI,
 	fixBoxInfo,
@@ -133,6 +138,7 @@ import {
 	drawDuabPointList,
 	initDaubStackList,
 	pointIsInRect,
+	pointInDot,
 } from './util'
 import {
 	BoundingBox,
@@ -160,6 +166,8 @@ import {
 	TypePoint,
 	VertexPosition,
 	WH,
+	Dot,
+	DotConfig,
 } from './ImgMarkType'
 
 //是否开始画模式
@@ -205,6 +213,7 @@ let props = withDefaults(defineProps<Props>(), {
 	tagConfig: () => DEFAULT_CONFIG.tagConfig,
 	layerConfig: () => DEFAULT_CONFIG.layerConfig,
 	cropConfig: () => DEFAULT_CONFIG.cropConfig,
+	dotConfig: () => DEFAULT_CONFIG.dotConfig,
 	initScale: true,
 	isShowTip: false,
 	enableMove: true,
@@ -229,6 +238,7 @@ let props = withDefaults(defineProps<Props>(), {
 	tagList: () => Array(),
 	cropList: () => Array(),
 	daubStack: () => Array(),
+	dotList: () => Array(),
 	disableDefaultShortcuts: () => Array(),
 })
 
@@ -237,6 +247,7 @@ let emits = defineEmits<{
 	(e: 'update:daubStack', list: Array<Array<DaubPoint>>): void
 	(e: 'cropListChange', data: CropListChangeEmitType): void
 	(e: 'update:tagList', list: BoundingBox[]): void
+	(e: 'update:dotList', list: Dot[]): void
 	(e: 'tagListChange', data: TagListChangeEmitRetunType): void
 	(e: 'update:mode', mode: Mode): void
 	(e: 'update:mobileOperation', mode: MobileOperation): void
@@ -282,6 +293,7 @@ let zoomScale = 1
 let tmpBoxPositionInfo: Rect | undefined
 let tagArr: BoundingBox[] = []
 let cropArr: BoundingBox[] = []
+let dotArr: Dot[] = []
 let daubStackList: Array<Array<DaubPoint>> = []
 
 let config = $computed<Config>(() => {
@@ -290,6 +302,7 @@ let config = $computed<Config>(() => {
 	Object.assign(obj.tagConfig, props.tagConfig)
 	Object.assign(obj.layerConfig, props.layerConfig)
 	Object.assign(obj.daubConfig, props.daubConfig)
+	Object.assign(obj.dotConfig, props.dotConfig)
 	obj.drawingText = props.drawingText
 	obj.mode = props.mode
 	return obj
@@ -344,8 +357,13 @@ const actions = {
 	dragCreatRectInterrupt() {
 		cleartMousePoints()
 	},
-	dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resize') {
+	dragCreatOrResizeRect(type: 'drawCrop' | 'drawTag' | 'resize' | 'drawDot') {
 		if (!ctx2) return
+
+		if (type == 'drawDot') {
+			drawDotList(ctx2, dotArr, currentPosition, config)
+		}
+
 		if (type == 'drawCrop') {
 			if (props.isCropSingle && !status.isDrawRecting) {
 				cropArr = []
@@ -421,6 +439,7 @@ const actions = {
 					}
 				},
 				daub() {},
+				dot() {},
 			}
 			resizeStratagem[props.mode]()
 		}
@@ -462,7 +481,7 @@ const actions = {
 	move() {
 		if (!props.enableMove || !ctx || !ctx2 || !img || status.isScaleing) return
 		status.isMoving = true
-		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr, config)
+		let offsetInfo = moveCanvas(ctx, ctx2, img, imgWH, scale, currentPosition, startMousePoint, endMousePoint, cropArr, zoomScale, tagArr, dotArr, config)
 		props.customDrawTopCtx?.(ctx2, (data: BoundingBox[]) => {
 			return initAndTransfromBoxToRect(data).map(positions => {
 				if (offsetInfo) {
@@ -529,6 +548,26 @@ const actions = {
 			if (props.enableTagResize && props.mode === 'tag') {
 				moveDetectBoxBorderSetCursor(containerRef, event, tagArr, zoomScale, currentPosition, origin, status.isScaleing)
 			}
+			if (props.mode == 'dot') {
+				let touchPoint = getTouchPoint(event, zoomScale, origin, 'move')
+				let last = touchPoint
+				let dot = {
+					x: (last.x - currentPosition.x) / scale,
+					y: (last.y - currentPosition.y) / scale,
+					raduis: 0,
+				}
+				initDotArrScale([dot], scale, props.precision)
+				dotArr.forEach(item => {
+					if (pointInDot(dot, item, config)) {
+						item.__isHover = true
+						containerRef.style.cursor = 'pointer'
+					} else {
+						item.__isHover = false
+						containerRef.style.cursor = 'auto'
+					}
+				})
+				drawDotList(ctx2, dotArr, currentPosition, config)
+			}
 		}
 	},
 }
@@ -541,6 +580,9 @@ const events = {
 		} else {
 			if (!status.isMouseDown() && !device.mobile()) {
 				actions.hoverRect(event)
+				return
+			}
+			if (props.mode === 'dot' && !drawSwitch) {
 				return
 			}
 			this.onHoldMouseLeftBtnMove(event)
@@ -593,6 +635,27 @@ const events = {
 		}
 	},
 	onCick(touchPoint: TypePoint) {
+		if (props.mode == 'dot') {
+			let last = touchPoint
+			// console.log('click dot', JSON.stringify(touchPoint), JSON.stringify(last), JSON.stringify(currentPosition), scale, zoomScale)
+			let dot = {
+				x: (last.x - currentPosition.x) / scale,
+				y: (last.y - currentPosition.y) / scale,
+				raduis: 0,
+			}
+			initDotArrScale([dot], scale, props.precision)
+			const notInDotList = dotArr.filter(item => !pointInDot(dot, item, config))
+			if (notInDotList.length !== dotArr.length) {
+				dotArr = notInDotList
+				renderCtx2()
+				return
+			} else {
+				dotArr.push(dot)
+			}
+			actions.dragCreatOrResizeRect('drawDot')
+			return
+		}
+
 		if (props.mode !== 'tag') return
 		if (!ctx2) return
 
@@ -617,6 +680,10 @@ const events = {
 	},
 	/* 画模式打开后开始画 */
 	onDrawSwitchOnStartDraw() {
+		if (props.mode === 'dot') {
+			actions.move()
+			return
+		}
 		if (props.mode === 'crop') {
 			if (props.enableDrawCrop) {
 				actions.dragCreatOrResizeRect('drawCrop')
@@ -753,6 +820,7 @@ async function initComponent() {
 	initCropInfo()
 	tagArr = cloneDeep(props.tagList)
 	cropArr = cloneDeep(props.cropList)
+	dotArr = cloneDeep(props.dotList)
 	daubStackList = cloneDeep(props.daubStack)
 	getContainerInfo()
 	addListenerKeyUpDown()
@@ -778,6 +846,7 @@ async function initComponent() {
 				width: img.width,
 				height: img.height,
 			}
+
 			// console.log('WH', canvasWH, imgWH)
 			// if (debug) console.log('Image WH', imgWH, canvasWH)
 			if (props.initScale) {
@@ -834,8 +903,10 @@ async function initComponent() {
 						currentPosition.x = ((canvasWH.width - cropBoxInfo[2] * canvasZoom) / 2 - cropBoxInfo[0] * canvasZoom) / canvasZoom
 						currentPosition.y = (canvasWH.height - cropY * canvasZoom - (canvasWH.height * whiteRate) / 2) / canvasZoom
 					}
+
 					cropArr = initBoundingArrScale(cropArr, scale, props.precision)
 					tagArr = initBoundingArrScale(tagArr, scale, props.precision)
+					dotArr = initDotArrScale(dotArr, scale, props.precision)
 					daubStackList = initDaubStackList(daubStackList, currentPosition, scale)
 					onMouseWheel(
 						{
@@ -858,6 +929,7 @@ async function initComponent() {
 			}
 			cropArr = initBoundingArrScale(cropArr, scale, props.precision)
 			tagArr = initBoundingArrScale(tagArr, scale, props.precision)
+			dotArr = initDotArrScale(dotArr, scale, props.precision)
 			daubStackList = initDaubStackList(daubStackList, currentPosition, scale)
 			drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
 			renderCtx2()
@@ -892,6 +964,7 @@ function renderCtx2() {
 	if (!ctx2) return
 	drawCropList(ctx2, cropArr, currentPosition, config)
 	drawTagList(ctx2, tagArr, currentPosition, config)
+	drawDotList(ctx2, dotArr, currentPosition, config)
 	daubStackList.forEach(list => {
 		if (ctx2) {
 			drawDuabPointList(ctx2, list, currentPosition, config)
@@ -921,6 +994,7 @@ async function resizeRender() {
 	drawImage(ctx, img, currentPosition.x, currentPosition.y, img.width * scale, img.height * scale)
 	cropArr = initBoundingArrScale(cropArr, scale, props.precision)
 	tagArr = initBoundingArrScale(tagArr, scale, props.precision)
+	dotArr = initDotArrScale(dotArr, scale, props.precision)
 	renderCtx2()
 	inited = true
 }
@@ -987,11 +1061,22 @@ watch(
 )
 
 watch(
+	() => props.dotList,
+	list => {
+		if (!inited) return
+		dotArr = initDotArrScale(list, scale, props.precision)
+		renderCtx2()
+	},
+	{
+		deep: true,
+	}
+)
+
+watch(
 	() => props.daubStack,
 	list => {
 		if (!inited) return
 		daubStackList = initDaubStackList(cloneDeep(props.daubStack), currentPosition, scale)
-		debugger
 		renderCtx2()
 	},
 	{
@@ -1069,6 +1154,11 @@ function setBoxResize(newBoxInfo: BoundingBox) {
 				trigger: () => {},
 				getBoxFunc: () => [],
 			},
+			dot: {
+				boxList: [],
+				trigger: () => {},
+				getBoxFunc: () => [],
+			},
 		}
 		let resizeInfo = resizeStratagem[props.mode]
 		resizeInfo.boxList[status.resizeHovering.index] = newBoxInfo
@@ -1092,8 +1182,7 @@ function cleartMousePoints() {
 	status.isMoving = false
 	if (tmpCurrentPosition) currentPosition = cloneDeep(tmpCurrentPosition)
 	tmpCurrentPosition = undefined
-
-	if (status.isMouseUpDownPoints()) {
+	if (status.isMouseUpDownPoints() || props.mode === 'dot') {
 		let upStratagem: {
 			[key in Mode]: () => void
 		} = {
@@ -1188,6 +1277,19 @@ function cleartMousePoints() {
 						})
 					})
 				)
+			},
+			dot() {
+				setTimeout(() => {
+					nextTick(() => {
+						let result = cloneDeep(dotArr)
+						emits(
+							'update:dotList',
+							result.map(point => {
+								return point
+							})
+						)
+					})
+				}, 300)
 			},
 		}
 		upStratagem[props.mode]()

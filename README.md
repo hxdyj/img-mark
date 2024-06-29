@@ -154,6 +154,16 @@ type BoundingBox = {
 	cropConfig?: CropConfig //单独定义某个cropConfig
 } & Event
 
+type Dot = {
+	x: number
+	y: number
+	raduis: number
+	__scale?: number
+	__index?: number
+	__isHover?: boolean
+	dotConfig?: DotConfig
+} & Event
+
 type CropConfig = {
 	lineDash?: number[]
 	strokeStyle?: string
@@ -197,9 +207,18 @@ type Point = {
 	y: number
 }
 
-export type DaubPoint = Point & {
+type DaubPoint = Point & {
 	lineWidth?: number
 	strokeStyle?: string
+}
+
+type DotConfig = {
+	lineDash?: number[]
+	strokeStyle?: string
+	fillStyle?: string
+	hoverFillStyle?: string
+	lineWidth?: number
+	radius?: number
 }
 
 type ResizeEmitType = {
@@ -243,40 +262,42 @@ type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: Boundi
 
 ## 组件属性
 
-| 属性                                    | 说明                                                                                                                                                 | 类型             | 可选值        | 默认值 |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------- | ------ |
-| src                                     | 图片地址, 必选参数                                                                                                                                   | string           | ——            | ——     |
-| mode/v-model:mode                       | 模式                                                                                                                                                 | string           | crop/tag/daub | crop   |
-| mobileOperation/v-model:mobileOperation | 移动端单指在画布滑动是移动还是画 rect                                                                                                                | string           | move/draw     | move   |
-| cropList/v-model:cropList               | 裁切区域集合，相对于`img`左上角开始定位                                                                                                              | BoundingBox[]    | ——            | []     |
-| tagList/v-model:tagList                 | tag 区域集合,相对于`img`左上角开始定位                                                                                                               | BoundingBox[]    | ——            | []     |
-| daubStack/v-model:daubStack             | 涂抹区域店集合,相对于`img`左上角开始定位                                                                                                             | DaubPoint[][]    | ——            | []     |
-| precision                               | BoundingBox 精度                                                                                                                                     | number           | ——            | 0      |
-| drawingText                             | 画`tag`时候展示的文字                                                                                                                                | number           | ——            | 0      |
-| initScale                               | 是否自动缩放图片适应到画布大小                                                                                                                       | boolean          | true/false    | true   |
-| enableScale                             | 是否允许缩放画布                                                                                                                                     | boolean          | true/false    | true   |
-| enableMove                              | 是否允许移动画布                                                                                                                                     | boolean          | true/false    | true   |
-| enableDrawCrop                          | 是否允许在画布上画 `crop`                                                                                                                            | boolean          | true/false    | true   |
-| enableDrawTag                           | 是否允许在画布上画 `tag`                                                                                                                             | boolean          | true/false    | true   |
-| enableInteractiveTagChangeStatus        | 是否允许交互改变 `tag` 状态                                                                                                                          | boolean          | true/false    | true   |
-| enableInteractiveCropDelete             | 是否允许交互删除 `crop`                                                                                                                              | boolean          | true/false    | true   |
-| enableDrawCropOutOfImg                  | 是否允许 `crop` 画到图片外                                                                                                                           | boolean          | true/false    | true   |
-| enableDrawTagOutOfCrop                  | 是否允许 `tag` 画到 `crop` 外                                                                                                                        | boolean          | true/false    | true   |
-| enableDrawTagOutOfImg                   | 是否允许 `tag` 画到图片外                                                                                                                            | boolean          | true/false    | true   |
-| splitClickAndDoubleClickEvent           | 是否分离单击和双击事件                                                                                                                               | boolean          | true/false    | false  |
-| disableDefaultShortcuts                 | 禁用默认快捷键                                                                                                                                       | ShortCutItem[]   | ——            | []     |
-| enableCropResize                        | 是否允许 `crop` 改变大小                                                                                                                             | boolean          | true/false    | true   |
-| enableTagResize                         | 是否允许 `tag` 改变大小                                                                                                                              | boolean          | true/false    | false  |
-| enableCropCross                         | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交，新画的`crop`会不添加，如果是 resize 操作相交以后，按照下方 `handleResizeCropCross` 属性去处理 | boolean          | true/false    | true   |
-| handleResizeCropCross                   | 当`enableCropCross`属性为 false，resize 操作相交后该如何处理进行 resize 操作的`crop`                                                                 | string           | delete/reset  | reset  |
-| isShowTip                               | 是否显示底部提示区域                                                                                                                                 | boolean          | true/false    | false  |
-| isCropSingle                            | 是否单个 `crop` , 在添加 `crop` 的时候自动删除旧的 `crop`                                                                                            | boolean          | true/false    | false  |
-| isImgCrop                               | 是否在 `cropList` 为空时默认以图片大小为裁切区域                                                                                                     | boolean          | true/false    | false  |
-| layerConfig                             | 浮层样式                                                                                                                                             | LayerConfig      | ——            | ——     |
-| cropConfig                              | `crop` 样式                                                                                                                                          | CropConfig       | ——            | ——     |
-| tagConfig                               | `tag` 样式                                                                                                                                           | TagConfig        | ——            | ——     |
-| daubConfig                              | `daub` 样式                                                                                                                                          | DaubConfig       | ——            | ——     |
-| customDrawTopCtx                        | 自定义绘制                                                                                                                                           | CustomDrawTopCtx | ——            | ——     |
+| 属性                                    | 说明                                                                                                                                                  | 类型             | 可选值            | 默认值 |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ----------------- | ------ |
+| src                                     | 图片地址, 必选参数                                                                                                                                    | string           | ——                | ——     |
+| mode/v-model:mode                       | 模式                                                                                                                                                  | string           | crop/tag/daub/dot | crop   |
+| mobileOperation/v-model:mobileOperation | 移动端单指在画布滑动是移动还是画 rect                                                                                                                 | string           | move/draw         | move   |
+| cropList/v-model:cropList               | 裁切区域集合，相对于 `img`左上角开始定位                                                                                                              | BoundingBox[]    | ——                | []     |
+| tagList/v-model:tagList                 | tag 区域集合,相对于 `img`左上角开始定位                                                                                                               | BoundingBox[]    | ——                | []     |
+| dotList/v-model:dotList                 | dot 集合,相对于 `img`左上角开始定位                                                                                                                   | Dot[]            | ——                | []     |
+| daubStack/v-model:daubStack             | 涂抹区域店集合,相对于 `img`左上角开始定位                                                                                                             | DaubPoint[][]    | ——                | []     |
+| precision                               | BoundingBox 精度                                                                                                                                      | number           | ——                | 0      |
+| drawingText                             | 画 `tag`时候展示的文字                                                                                                                                | number           | ——                | 0      |
+| initScale                               | 是否自动缩放图片适应到画布大小                                                                                                                        | boolean          | true/false        | true   |
+| enableScale                             | 是否允许缩放画布                                                                                                                                      | boolean          | true/false        | true   |
+| enableMove                              | 是否允许移动画布                                                                                                                                      | boolean          | true/false        | true   |
+| enableDrawCrop                          | 是否允许在画布上画 `crop`                                                                                                                             | boolean          | true/false        | true   |
+| enableDrawTag                           | 是否允许在画布上画 `tag`                                                                                                                              | boolean          | true/false        | true   |
+| enableInteractiveTagChangeStatus        | 是否允许交互改变 `tag` 状态                                                                                                                           | boolean          | true/false        | true   |
+| enableInteractiveCropDelete             | 是否允许交互删除 `crop`                                                                                                                               | boolean          | true/false        | true   |
+| enableDrawCropOutOfImg                  | 是否允许 `crop` 画到图片外                                                                                                                            | boolean          | true/false        | true   |
+| enableDrawTagOutOfCrop                  | 是否允许 `tag` 画到 `crop` 外                                                                                                                         | boolean          | true/false        | true   |
+| enableDrawTagOutOfImg                   | 是否允许 `tag` 画到图片外                                                                                                                             | boolean          | true/false        | true   |
+| splitClickAndDoubleClickEvent           | 是否分离单击和双击事件                                                                                                                                | boolean          | true/false        | false  |
+| disableDefaultShortcuts                 | 禁用默认快捷键                                                                                                                                        | ShortCutItem[]   | ——                | []     |
+| enableCropResize                        | 是否允许 `crop` 改变大小                                                                                                                              | boolean          | true/false        | true   |
+| enableTagResize                         | 是否允许 `tag` 改变大小                                                                                                                               | boolean          | true/false        | false  |
+| enableCropCross                         | 是否允许 `crop` 和其他 `crop` 相交,不允许后，如果相交，新画的 `crop`会不添加，如果是 resize 操作相交以后，按照下方 `handleResizeCropCross` 属性去处理 | boolean          | true/false        | true   |
+| handleResizeCropCross                   | 当 `enableCropCross`属性为 false，resize 操作相交后该如何处理进行 resize 操作的 `crop`                                                                | string           | delete/reset      | reset  |
+| isShowTip                               | 是否显示底部提示区域                                                                                                                                  | boolean          | true/false        | false  |
+| isCropSingle                            | 是否单个 `crop` , 在添加 `crop` 的时候自动删除旧的 `crop`                                                                                             | boolean          | true/false        | false  |
+| isImgCrop                               | 是否在 `cropList` 为空时默认以图片大小为裁切区域                                                                                                      | boolean          | true/false        | false  |
+| layerConfig                             | 浮层样式                                                                                                                                              | LayerConfig      | ——                | ——     |
+| cropConfig                              | `crop` 样式                                                                                                                                           | CropConfig       | ——                | ——     |
+| tagConfig                               | `tag` 样式                                                                                                                                            | TagConfig        | ——                | ——     |
+| daubConfig                              | `daub` 样式                                                                                                                                           | DaubConfig       | ——                | ——     |
+| dotConfig                               | `dot` 样式                                                                                                                                            | DotConfig        | ——                | ——     |
+| customDrawTopCtx                        | 自定义绘制                                                                                                                                            | CustomDrawTopCtx | ——                | ——     |
 
 ## 组件事件
 

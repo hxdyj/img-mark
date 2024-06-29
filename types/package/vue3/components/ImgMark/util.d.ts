@@ -1,4 +1,4 @@
-import { BoundingBox, Config, LayerTouchEvent, Mode, Point, Rect, ResizeItem, TagConfig, TypePoint, VertexPosition, WH, TouchType, DaubPoint } from './ImgMarkType';
+import { BoundingBox, Config, LayerTouchEvent, Mode, Point, Rect, ResizeItem, TagConfig, TypePoint, VertexPosition, WH, TouchType, DaubPoint, Dot } from './ImgMarkType';
 export declare const DPI: number;
 export declare const debug = false;
 export declare const DEFAULT_CONFIG: Config;
@@ -53,6 +53,7 @@ declare type FixBoxInfoReturn = {
 };
 export declare function fixBoxInfo(boundingBox: BoundingBox): FixBoxInfoReturn;
 export declare function getTwoBoxIntersectPart(box1: BoundingBox, box2: BoundingBox): BoundingBox | undefined;
+export declare function transfromDotToArc(dot: Dot, scale: number | undefined, currentPosition: Point | undefined, raduis: number, offset?: Offset): [number, number, number, number, number];
 export declare function transfromBoxToRect(position: BoundingBox, scale?: number, currentPosition?: Point): Rect;
 export declare function isBoxValidity(box: BoundingBox): boolean;
 export declare function drawTagRect(ctx: CanvasRenderingContext2D, left: number, top: number, width: number, height: number, config: Config, index: number, touchPoint: TypePoint | undefined, isShow: boolean | undefined, showOutLine: boolean | undefined, tagLabel: string | undefined, tagConfig: TagConfig | undefined, tagInfo: BoundingBox | undefined): {
@@ -69,6 +70,7 @@ export declare function drawTagList(ctx: CanvasRenderingContext2D, list: Boundin
 };
 export declare function fixMoveRectPosition(position: Rect, zoomScale: number, origin: Point): Rect;
 export declare function moveDrawCropRect(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, zoomScale: any, origin: Point, cropList: BoundingBox[], currentPosition: Point, config: Config): Rect | undefined;
+export declare function drawDotList(ctx: CanvasRenderingContext2D, dotList: Dot[], currentPosition: Point, config: Config, offset?: Offset, unClearCanvas?: boolean): void;
 export declare function getVertexPositionByTwoPoints(startPoint: Point, endPoint: Point): VertexPosition;
 export declare function getPointByBoxAndVertexPosition(box: BoundingBox, vertex: VertexPosition): Point;
 export declare function moveDrawTagRect(ctx: CanvasRenderingContext2D, startPoint: Point, endPoint: Point, zoomScale: number, origin: Point, tagArr: BoundingBox[], currentPosition: Point, config: Config): Rect | undefined;
@@ -76,8 +78,9 @@ export declare function getTwoPointsOffsetInfo(startPoint: Point, endPoint: Poin
     isStartMove: boolean;
     offsetInfo: Offset;
 };
-export declare function moveCanvas(ctx: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D, img: HTMLImageElement, imgWH: WH, scale: number, currentPosition: Point, startPoint: Point, endPoint: Point, cropList: BoundingBox[], zoomScale: number, tagArr: BoundingBox[], config: Config): Offset | undefined;
+export declare function moveCanvas(ctx: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D, img: HTMLImageElement, imgWH: WH, scale: number, currentPosition: Point, startPoint: Point, endPoint: Point, cropList: BoundingBox[], zoomScale: number, tagArr: BoundingBox[], dotArr: Dot[], config: Config): Offset | undefined;
 export declare function fixPoint(point: Point, zoomScale: any, origin: Point): Point;
+export declare function fixLength(len: number, zoomScale: any): number;
 export declare function getTouchPoint(event: LayerTouchEvent, zoomScale: any, origin: Point, type: TouchType): TypePoint;
 export declare function moveDrawUnshowTagDashRect(ctx: CanvasRenderingContext2D, mode: Mode, tagArr: BoundingBox[], zoomScale: number, currentPosition: Point, origin: Point, e: LayerTouchEvent, cropList: BoundingBox[], isScaleing: boolean, hasHoverRectInTagItem: boolean, config: Config): boolean;
 export declare function getBoxFourBorderRect(box: BoundingBox, currentPosition: Point, index?: number, borderWidth?: number): ResizeItem[];
@@ -104,7 +107,9 @@ export declare function getTwoFingerTouchListDistence(touchList: Array<{
     height: number;
 };
 export declare function transfromRect2Box(rect: Rect, currentPosition: Point, scale?: number): BoundingBox;
+export declare function fixTouchPoint2ImagePoint(point: Point, currentPosition: Point, scale?: number): Point;
 export declare function initBoundingArrScale(tagArr: BoundingBox[], scale: number, precision: number): BoundingBox[];
+export declare function initDotArrScale(dotArr: Dot[], scale: number, precision: number): Dot[];
 export declare function initDaubStackList(list: DaubPoint[][], currentPosition: any, scale: any): DaubPoint[][];
 export declare function getBigBoxByBoxList(list: BoundingBox[]): BoundingBox | undefined;
 export declare function getBoxIsIntersectWithBoxList(box: BoundingBox, list: BoundingBox[]): boolean;
@@ -118,4 +123,7 @@ export declare function transformTagListBoxRelativeTo(type: TagBoxRelativeTo, cr
 export declare function transformTagBoxRelativeTo(type: TagBoxRelativeTo, cropInfo: BoundingBox, tag: BoundingBox): BoundingBox;
 export declare function transformPrecision(list: BoundingBox[], precision: number): BoundingBox[];
 export declare function transformBoxPrecision(box: BoundingBox, precision: number): BoundingBox;
+export declare function transformDotPrecision(dot: Dot, precision: number): Dot;
+export declare function numFixPrecision(num: number, precision: number): number;
+export declare function pointInDot(point: Point, dot: Dot, config: Config): boolean;
 export {};

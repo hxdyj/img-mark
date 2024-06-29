@@ -3,6 +3,7 @@ export interface Props {
 	duabConfig?: DaubConfig
 	layerConfig?: LayerConfig
 	tagConfig?: TagConfig
+	dotConfig?: DotConfig
 	drawingText?: string
 	isShowTip?: boolean
 	enableScale?: boolean
@@ -29,6 +30,7 @@ export interface Props {
 	cropList?: BoundingBox[]
 	tagList?: BoundingBox[]
 	daubStack?: Array<Array<DaubPoint>>
+	dotList?: Dot[]
 	mode?: Mode
 	mobileOperation?: MobileOperation
 	src: string
@@ -39,7 +41,7 @@ export interface Props {
 }
 
 export type Rect = [left: number, top: number, width: number, height: number]
-export type Mode = 'tag' | 'crop' | 'daub'
+export type Mode = 'tag' | 'crop' | 'daub' | 'dot'
 export type TouchType = 'move' | 'click' | 'over'
 export type VertexPosition = 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom'
 export type LayerTouchEvent = (MouseEvent | TouchEvent) & {
@@ -95,6 +97,16 @@ export type BoundingBox = {
 	__index?: number
 } & Event
 
+export type Dot = {
+	x: number
+	y: number
+	raduis: number
+	__scale?: number
+	__index?: number
+	__isHover?: boolean
+	dotConfig?: DotConfig
+} & Event
+
 export type BoundingBox2Rect = (boundingBoxList: BoundingBox[]) => Rect[]
 export type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: BoundingBox2Rect) => void
 export type CustomDraw = (
@@ -117,6 +129,15 @@ export type DaubConfig = {
 	lineWidth?: number
 }
 
+export type DotConfig = {
+	lineDash?: number[]
+	strokeStyle?: string
+	fillStyle?: string
+	hoverFillStyle?: string
+	lineWidth?: number
+	radius?: number
+}
+
 export type ShortCutItem = 'ctrl+b' | 'space'
 
 export type Config = {
@@ -124,6 +145,7 @@ export type Config = {
 	cropConfig: Required<CropConfig>
 	layerConfig: Required<LayerConfig>
 	tagConfig: Required<TagConfig>
+	dotConfig: Required<DotConfig>
 } & Pick<Props, 'drawingText' | 'mode'>
 
 export type MobileOperation = 'draw' | 'move'
