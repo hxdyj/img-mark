@@ -18,7 +18,7 @@
 					strokeStyle: 'blue',
 				}"
 				:dot-config="{
-					radius: 10,
+					radius: 40,
 				}"
 				@tagListChange="tagsListChange"
 				@drawCropStart="drawCropStart"
@@ -44,6 +44,7 @@
 			</ImgMark>
 		</div>
 		<div class="info-panel">
+			{{ scaleInfo }}
 			<el-input v-model="src"></el-input>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="rollback()">撤销上一次绘制</el-button>
@@ -93,6 +94,8 @@ let dotList = $ref([
 		y: 0,
 	},
 ])
+
+const scaleInfo = $computed(() => imgMarkRef?.scaleInfo)
 
 function rollback() {
 	daubStack.pop()

@@ -298,17 +298,21 @@ declare const _sfc_main: import("vue").DefineComponent<{
     hypotenuse: number;
     currentPosition: Point;
     origin: Point;
-    scale: number;
+    scale: any;
     cropInfo: BoundingBox | undefined;
     tmpCurrentPosition: Point | undefined;
     cropScale: number;
     containerInfo: RectDom | undefined;
-    zoomScale: number;
+    zoomScale: any;
     tmpBoxPositionInfo: Rect | undefined;
     tagArr: BoundingBox[];
     cropArr: BoundingBox[];
     dotArr: Dot[];
     daubStackList: DaubPoint[][];
+    scaleInfo: import("vue").Ref<{
+        scale: number;
+        zoomScale: number;
+    }>;
     config: any;
     initDataVar: () => void;
     containerRef: any;

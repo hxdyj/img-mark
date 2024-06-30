@@ -315,9 +315,10 @@ type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: Boundi
 
 ## 组件暴露对象
 
-| 对象  | 类型  | 说明             |
-| ----- | ----- | ---------------- |
-| hooks | Hooks | 调用组件抽象方法 |
+| 对象      | 类型                                             | 说明                                                             |
+| --------- | ------------------------------------------------ | ---------------------------------------------------------------- |
+| hooks     | Hooks                                            | 调用组件抽象方法                                                 |
+| scaleInfo | {<br />scale:number<br />zoomScale:number<br />} | scale 为初始缩放到容器时候的缩放值<br />zoomScale 为继续缩放的值 |
 
 ## 组件暴露方法
 

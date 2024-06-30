@@ -169,6 +169,7 @@ import {
 	Dot,
 	DotConfig,
 } from './ImgMarkType'
+import { ref } from 'vue'
 
 //是否开始画模式
 let drawSwitch = false
@@ -284,17 +285,30 @@ let origin: Point = {
 	x: 0,
 	y: 0,
 }
-let scale = 1
+let scale = $ref(1)
 let cropInfo: BoundingBox | undefined
 let tmpCurrentPosition: Point | undefined
 let cropScale = 1
 let containerInfo: RectDom | undefined
-let zoomScale = 1
+let zoomScale = $ref(1)
 let tmpBoxPositionInfo: Rect | undefined
 let tagArr: BoundingBox[] = []
 let cropArr: BoundingBox[] = []
 let dotArr: Dot[] = []
 let daubStackList: Array<Array<DaubPoint>> = []
+
+let scaleInfo = ref({
+	scale: 1,
+	zoomScale: 1,
+})
+
+watch(
+	() => [scale, zoomScale, cropScale],
+	() => {
+		scaleInfo.value.scale = scale
+		scaleInfo.value.zoomScale = zoomScale
+	}
+)
 
 let config = $computed<Config>(() => {
 	let obj: Config = cloneDeep(DEFAULT_CONFIG)
@@ -557,7 +571,9 @@ const actions = {
 					raduis: 0,
 				}
 				initDotArrScale([dot], scale, props.precision)
-				dotArr.forEach(item => {
+
+				let cloneArr = cloneDeep(dotArr)
+				cloneArr.forEach(item => {
 					if (pointInDot(dot, item, config)) {
 						item.__isHover = true
 						containerRef.style.cursor = 'pointer'
@@ -566,6 +582,7 @@ const actions = {
 						containerRef.style.cursor = 'auto'
 					}
 				})
+				dotArr = cloneArr
 				drawDotList(ctx2, dotArr, currentPosition, config)
 			}
 		}
@@ -1279,17 +1296,13 @@ function cleartMousePoints() {
 				)
 			},
 			dot() {
-				setTimeout(() => {
-					nextTick(() => {
-						let result = cloneDeep(dotArr)
-						emits(
-							'update:dotList',
-							result.map(point => {
-								return point
-							})
-						)
+				let result = cloneDeep(dotArr)
+				emits(
+					'update:dotList',
+					result.map(point => {
+						return point
 					})
-				}, 300)
+				)
 			},
 		}
 		upStratagem[props.mode]()
@@ -1777,6 +1790,7 @@ defineExpose({
 	getBase64ImageData,
 	hooks,
 	scrollIntoView: actions.scrollIntoView,
+	scaleInfo,
 })
 </script>
 
