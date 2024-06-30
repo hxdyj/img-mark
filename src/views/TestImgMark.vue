@@ -45,6 +45,11 @@
 		</div>
 		<div class="info-panel">
 			{{ scaleInfo }}
+			<div style="background-color: #ccc">
+				{{ dotList.length }}
+				<br />
+				{{ dotList }}
+			</div>
 			<el-input v-model="src"></el-input>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="getGroupInfo()">getGroupInfo</el-button>
 			<el-button type="primary" size="small" style="margin-top: 40px" @click="rollback()">撤销上一次绘制</el-button>
@@ -73,7 +78,8 @@
 import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagListChangeEmitRetunType, BoundingBox2Rect } from 'img-mark'
 import { uid } from 'uid'
 import { nextTick } from 'vue'
-let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
+let src = $ref('/test.jpeg')
+// let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('dot')
 
 let daubStack = $ref([
@@ -89,10 +95,10 @@ let daubStack = $ref([
 	// ],
 ])
 let dotList = $ref([
-	{
-		x: 1774,
-		y: 0,
-	},
+	// {
+	// 	x: 1774,
+	// 	y: 0,
+	// },
 ])
 
 const scaleInfo = $computed(() => imgMarkRef?.scaleInfo)
@@ -107,26 +113,26 @@ let cropList = $ref<
 		}
 	>
 >([
-	{
-		__uid: '1',
-		startX: 0,
-		startY: 0,
-		endX: 1774,
-		endY: 100,
-		cropConfig: {
-			lineDash: [5],
-			strokeStyle: 'red',
-			customDraw(ctx, info) {
-				let width = Math.abs((info.target?.endX || 0) - (info.target?.startX || 0))
-				let scale = info.positions[2] / width
-				let a = info.positions
-				a[0] += 0
-				a[1] += 100 * scale
-				ctx.strokeStyle = 'blue'
-				ctx.fillRect(...a)
-			},
-		},
-	},
+	// {
+	// 	__uid: '1',
+	// 	startX: 0,
+	// 	startY: 0,
+	// 	endX: 1774,
+	// 	endY: 100,
+	// 	cropConfig: {
+	// 		lineDash: [5],
+	// 		strokeStyle: 'red',
+	// 		customDraw(ctx, info) {
+	// 			let width = Math.abs((info.target?.endX || 0) - (info.target?.startX || 0))
+	// 			let scale = info.positions[2] / width
+	// 			let a = info.positions
+	// 			a[0] += 0
+	// 			a[1] += 100 * scale
+	// 			ctx.strokeStyle = 'blue'
+	// 			ctx.fillRect(...a)
+	// 		},
+	// 	},
+	// },
 	// {
 	// 	__uid: '2',
 	// 	startX: 200,

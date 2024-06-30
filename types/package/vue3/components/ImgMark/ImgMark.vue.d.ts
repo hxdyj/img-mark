@@ -301,7 +301,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     scale: any;
     cropInfo: BoundingBox | undefined;
     tmpCurrentPosition: Point | undefined;
-    cropScale: number;
+    cropScale: any;
     containerInfo: RectDom | undefined;
     zoomScale: any;
     tmpBoxPositionInfo: Rect | undefined;

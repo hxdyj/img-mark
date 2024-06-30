@@ -288,7 +288,7 @@ let origin: Point = {
 let scale = $ref(1)
 let cropInfo: BoundingBox | undefined
 let tmpCurrentPosition: Point | undefined
-let cropScale = 1
+let cropScale = $ref(1)
 let containerInfo: RectDom | undefined
 let zoomScale = $ref(1)
 let tmpBoxPositionInfo: Rect | undefined
@@ -307,6 +307,9 @@ watch(
 	() => {
 		scaleInfo.value.scale = scale
 		scaleInfo.value.zoomScale = zoomScale
+	},
+	{
+		deep: true,
 	}
 )
 
@@ -584,6 +587,7 @@ const actions = {
 				})
 				dotArr = cloneArr
 				drawDotList(ctx2, dotArr, currentPosition, config)
+				cleartMousePoints()
 			}
 		}
 	},
@@ -669,6 +673,7 @@ const events = {
 			} else {
 				dotArr.push(dot)
 			}
+			cleartMousePoints()
 			actions.dragCreatOrResizeRect('drawDot')
 			return
 		}
@@ -1536,7 +1541,6 @@ function onMouseUp() {
 	} else {
 		mouseQuickDoubleTapTime.prev.up = time
 	}
-
 	cleartMousePoints()
 }
 
