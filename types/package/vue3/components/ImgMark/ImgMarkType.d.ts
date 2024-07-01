@@ -22,6 +22,7 @@ export interface Props {
     enableDrawTagOutOfImg?: boolean;
     isImgCrop?: boolean;
     isCropSingle?: boolean;
+    enableDotCenterOutOfImg?: boolean;
     cropList?: BoundingBox[];
     tagList?: BoundingBox[];
     daubStack?: Array<Array<DaubPoint>>;

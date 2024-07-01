@@ -22,6 +22,7 @@ export interface Props {
     enableDrawTagOutOfImg?: boolean;
     isImgCrop?: boolean;
     isCropSingle?: boolean;
+    enableDotCenterOutOfImg?: boolean;
     cropList?: BoundingBox[];
     tagList?: BoundingBox[];
     daubStack?: Array<Array<DaubPoint>>;
@@ -159,6 +160,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    enableDotCenterOutOfImg: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     cropList: {
         type: ArrayConstructor;
         required: false;
@@ -256,6 +262,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
         enableDrawTagOutOfImg: boolean;
         isImgCrop: boolean;
         isCropSingle: boolean;
+        enableDotCenterOutOfImg: boolean;
         cropList: BoundingBox[];
         tagList: BoundingBox[];
         daubStack: Array<Array<DaubPoint>>;
@@ -502,6 +509,11 @@ declare const _sfc_main: import("vue").DefineComponent<{
         required: false;
         default: boolean;
     };
+    enableDotCenterOutOfImg: {
+        type: BooleanConstructor;
+        required: false;
+        default: boolean;
+    };
     cropList: {
         type: ArrayConstructor;
         required: false;
@@ -594,6 +606,7 @@ declare const _sfc_main: import("vue").DefineComponent<{
     enableDrawTagOutOfImg: boolean;
     isImgCrop: boolean;
     isCropSingle: boolean;
+    enableDotCenterOutOfImg: boolean;
     cropList: unknown[];
     tagList: unknown[];
     daubStack: unknown[];

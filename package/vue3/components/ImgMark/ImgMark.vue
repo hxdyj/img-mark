@@ -75,6 +75,8 @@ export interface Props {
 	isImgCrop?: boolean
 	//是否crop为数量维持一个，新画crop的时候会自动清空之前的
 	isCropSingle?: boolean
+	//是否允许dot画到img外
+	enableDotCenterOutOfImg?: boolean
 	cropList?: BoundingBox[]
 	tagList?: BoundingBox[]
 	daubStack?: Array<Array<DaubPoint>>
@@ -231,6 +233,7 @@ let props = withDefaults(defineProps<Props>(), {
 	enableDrawTagOutOfCrop: true,
 	enableDrawTagOutOfImg: true,
 	isCropSingle: false,
+	enableDotCenterOutOfImg: false,
 	isImgCrop: false,
 	mode: 'crop',
 	mobileOperation: 'move',
@@ -665,6 +668,13 @@ const events = {
 				raduis: 0,
 			}
 			initDotArrScale([dot], scale, props.precision)
+
+			if (!props.enableDotCenterOutOfImg) {
+				if (dot.x < 0 || dot.x > imgWH.width || dot.y < 0 || dot.y > imgWH.height) {
+					return
+				}
+			}
+
 			const notInDotList = dotArr.filter(item => !pointInDot(dot, item, config))
 			if (notInDotList.length !== dotArr.length) {
 				dotArr = notInDotList

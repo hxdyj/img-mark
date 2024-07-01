@@ -4,6 +4,7 @@
 			<ImgMark
 				ref="imgMarkRef"
 				:src="src"
+				enableDotCenterOutOfImg
 				v-model:mode="mode"
 				v-model:tagList="tagList"
 				v-model:cropList="cropList"
@@ -78,8 +79,8 @@
 import { ImgMark, Mode, BoundingBox, ResizeEmitType, OnLoadImageEmitType, TagListChangeEmitRetunType, BoundingBox2Rect } from 'img-mark'
 import { uid } from 'uid'
 import { nextTick } from 'vue'
-let src = $ref('/test.jpeg')
-// let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
+// let src = $ref('/test.jpeg')
+let src = $ref('https://forza.ismcdn.jp/mwimgs/8/e/1774n/img_8e8307dc5355e41385fd3568ef95f233218536.jpg')
 let mode = $ref<Mode>('dot')
 
 let daubStack = $ref([
