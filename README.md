@@ -135,6 +135,11 @@ type Event = {
 	onDoubleClick?: (e: unknown, item: BoundingBox) => void //tag double click事件
 }
 
+type WH = {
+	width: number
+	height: number
+}
+
 type Hooks = {
 	shiftMode(): void //切换模式
 	shiftDrawSwitch(onOrOff: 'on' | 'off'): void //切换是否开始画的开关
@@ -320,6 +325,7 @@ type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: Boundi
 | --------- | ------------------------------------------------ | ---------------------------------------------------------------- |
 | hooks     | Hooks                                            | 调用组件抽象方法                                                 |
 | scaleInfo | {<br />scale:number<br />zoomScale:number<br />} | scale 为初始缩放到容器时候的缩放值<br />zoomScale 为继续缩放的值 |
+| info      | {<br />imgWH:WH<br />}                           | 一些常见的信息                                                   |
 
 ## 组件暴露方法
 
@@ -328,7 +334,7 @@ type CustomDrawTopCtx = (ctx: CanvasRenderingContext2D, boundingBox2Rect: Boundi
 | removeTagItems             | 移除 `tag` 项                                  | list:BoundingBox\[\]                      | void                    |
 | render                     | 重新渲染                                       | ——                                        | void                    |
 | getTagListGroupByCropIndex | 获取 `tagList` 并按照 cropIndex 分组           | type: 'startPoint'/'allIn' = 'startPoint' | TagListGroupByCropIndex |
-| getBase64ImageData         | 获取原图大小绘制完各种元素后的 base64 图片 url | crossOrigin?: boolean                     | Promise<string>         |
+| getBase64ImageData         | 获取原图大小绘制完各种元素后的 base64 图片 url | crossOrigin?: boolean                     | Promise`<string>`       |
 | scrollIntoView             | 讲某个区域滚动到 0,0 点                        | box: BoundingBox                          | void                    |
 
 ## Slots

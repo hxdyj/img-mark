@@ -394,6 +394,9 @@ declare const _sfc_main: import("vue").DefineComponent<{
         [index: number]: BoundingBox[];
     };
     render: () => void;
+    info: import("vue").ComputedRef<{
+        imgWH: WH;
+    }>;
 }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "update:dotList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage")[], "update:cropList" | "update:daubStack" | "cropListChange" | "update:tagList" | "update:dotList" | "tagListChange" | "update:mode" | "update:mobileOperation" | "resizeStart" | "resizeEnd" | "delCrop" | "drawCropStart" | "drawTagStart" | "mouseOverInfo" | "onLoadImage", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cropConfig: {
         type: null;

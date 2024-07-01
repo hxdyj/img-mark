@@ -46,6 +46,7 @@
 		</div>
 		<div class="info-panel">
 			{{ scaleInfo }}
+			<div>{{ info }}</div>
 			<div style="background-color: #ccc">
 				{{ dotList.length }}
 				<br />
@@ -103,6 +104,7 @@ let dotList = $ref([
 ])
 
 const scaleInfo = $computed(() => imgMarkRef?.scaleInfo)
+const info = $computed(() => imgMarkRef?.info)
 
 function rollback() {
 	daubStack.pop()

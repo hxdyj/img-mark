@@ -172,6 +172,7 @@ import {
 	DotConfig,
 } from './ImgMarkType'
 import { ref } from 'vue'
+import { computed } from 'vue'
 
 //是否开始画模式
 let drawSwitch = false
@@ -271,7 +272,7 @@ let ctx: CanvasRenderingContext2D | null = null
 let ctx2: CanvasRenderingContext2D | null = null
 let img: HTMLImageElement | undefined
 let canvasWH: RectDom | undefined = cloneDeep(defaultWH) as RectDom
-let imgWH: WH = cloneDeep(defaultWH)
+let imgWH: WH = $ref(cloneDeep(defaultWH))
 let startMousePoint: Point = cloneDeep(defaultPoint) as Point
 let endMousePoint: Point = cloneDeep(defaultPoint) as Point
 let lastMousePoint: Point = cloneDeep(defaultPoint) as Point
@@ -1797,6 +1798,13 @@ function getTagListGroupByCropIndex(type: 'startPoint' | 'allIn' = 'startPoint')
 	return groupBy(tags, '__groupIndex')
 }
 const render = renderCtx2
+
+const info = computed(() => {
+	return {
+		imgWH,
+	}
+})
+
 defineExpose({
 	render,
 	removeTagItems,
@@ -1805,6 +1813,7 @@ defineExpose({
 	hooks,
 	scrollIntoView: actions.scrollIntoView,
 	scaleInfo,
+	info,
 })
 </script>
 
